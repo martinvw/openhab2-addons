@@ -134,6 +134,7 @@ public class RFXComBindingConstants {
     public final static ThingTypeUID THING_TYPE_FS20 = new ThingTypeUID(BINDING_ID, "fs20");
     public final static ThingTypeUID THING_TYPE_RFY = new ThingTypeUID(BINDING_ID, "rfy");
     public static final ThingTypeUID THING_TYPE_HOMEDUINO_SWITCH1 = new ThingTypeUID(BINDING_ID, "homeduino_switch1");
+    public static final ThingTypeUID THING_TYPE_HOMEDUINO_SWITCH2 = new ThingTypeUID(BINDING_ID, "homeduino_switch2");
     public static final ThingTypeUID THING_TYPE_HOMEDUINO_SWITCH4 = new ThingTypeUID(BINDING_ID, "homeduino_switch4");
     public static final ThingTypeUID THING_TYPE_HOMEDUINO_DIMMER1 = new ThingTypeUID(BINDING_ID, "homeduino_dommer1");
     public static final ThingTypeUID THING_TYPE_HOMEDUINO_PIR1 = new ThingTypeUID(BINDING_ID, "homeduino_pir1");
