@@ -20,6 +20,7 @@ public class HomeduinoMessageFactoryTest {
     private static final String RF_EVENT_DIM = "RF receive 284 2800 1352 10760 0 0 0 0 0100020002020000020002020000020002000202000200020002000200000202000200020000020002000200020002020002000002000200000002000200020002020002000200020003";
     private static final String RF_EVENT_DOORBEL = "RF receive 352 1052 10864 0 0 0 0 0 01100101010101010110011001100101011001100110011002";
     private static final String RF_EVENT_OLD_COCO = "RF receive 295 1180 11210 0 0 0 0 0 01010110010101100110011001100110010101100110011002";
+    private static final String RF_EVENT_SWITCH2 = "RF receive 312 956 8700 0 0 0 0 0 01100110010101100101010101100101010101100110011002";
     private static final String RF_EVENTS_SHUTTER_DOWN = "RF receive 5096 1712 364 732 10956 0 0 0 0123232332323232322332232323232323322332323232232323322332232323322323323232322324";
     private static final String RF_EVENTS_SHUTTER_UP = "RF receive 5100 1708 364 732 10896 0 0 0 0123232332323232322332232323232323322332323232232323322332232323322323233232323224";
     private static final String RF_EVENTS_SHUTTER_UP_2 = "RF receive 5268 1716 320 740 464 10448 0 0 0123232332323232342332232323232323342334343434232323342334232323342323233223232335";
@@ -80,6 +81,20 @@ public class HomeduinoMessageFactoryTest {
         RFXComMessage event = rfEvent.getInterpretations().get(0);
 
         Assert.assertEquals("2.20", event.getDeviceId());
+        Assert.assertEquals(event.convertToState(RFXComValueSelector.COMMAND), OnOffType.ON);
+    }
+	
+	@Test
+    public void testHomeduinoMessageSwitch2() throws Exception {
+        HomeduinoMessage result = HomeduinoMessageFactory
+                .createMessage(RF_EVENT_SWITCH2.getBytes(StandardCharsets.US_ASCII));
+        Assert.assertNotEquals(result, null);
+        Assert.assertTrue(result instanceof HomeduinoEventMessage);
+
+        HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
+        RFXComMessage event = rfEvent.getInterpretations().get(0);
+
+        Assert.assertEquals("11.2", event.getDeviceId());
         Assert.assertEquals(event.convertToState(RFXComValueSelector.COMMAND), OnOffType.ON);
     }
 
