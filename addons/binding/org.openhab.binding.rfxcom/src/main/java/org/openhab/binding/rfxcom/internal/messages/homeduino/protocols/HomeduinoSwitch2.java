@@ -8,8 +8,12 @@ import java.util.List;
 import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 public final class HomeduinoSwitch2 extends HomeduinoProtocol  {
-	
+	private Logger logger = LoggerFactory.getLogger(HomeduinoSwitch2.class);
 	private static int[] PULSE_LENGTHS = { 306, 957, 9808 };
     private static int PULSE_COUNT = 50;
 
@@ -37,6 +41,10 @@ public final class HomeduinoSwitch2 extends HomeduinoProtocol  {
         int id = Integer.parseInt(output.substring(5, 9).toString(), 2);
         int state = 1 - Integer.parseInt(output.substring(11).toString(), 2);
 
+		logger.warn("state: " + state); // could also indicate presence
+        logger.warn("Id: " + id);
+        logger.warn("Unitcode: " + unit);
+		
         return new Result(id, unit, state, false, null);
     }
 	
