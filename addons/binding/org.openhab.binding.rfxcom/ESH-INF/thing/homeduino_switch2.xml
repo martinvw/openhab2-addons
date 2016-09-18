@@ -3,11 +3,13 @@
 	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
+	<thing-type id="homeduino_switch2">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="Homeduino" />
 		</supported-bridge-type-refs>
 		
         <label>Homeduino Switch2 Actuator</label>
+        <description>A Switch2 device.</description>
 
         <channels>
             <channel id="command" typeId="command" />

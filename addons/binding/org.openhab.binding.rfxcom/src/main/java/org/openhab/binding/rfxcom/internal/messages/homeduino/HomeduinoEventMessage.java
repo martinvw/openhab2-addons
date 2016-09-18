@@ -24,6 +24,7 @@ import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.Homeduin
 import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoProtocol.Result;
 import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoShutter3;
 import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoSwitch1;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoSwitch2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +44,10 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
     private static List<HomeduinoProtocol> initializeProtocols() {
         List<HomeduinoProtocol> result = new ArrayList<>();
         result.add(new HomeduinoSwitch1());
+        result.add(new HomeduinoSwitch2());
         result.add(new HomeduinoDimmer1());
         result.add(new HomeduinoPir1());
         result.add(new HomeduinoShutter3());
-
         return result;
     }
 
