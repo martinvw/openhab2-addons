@@ -15,7 +15,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.junit.Test;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComMessageTooLongException;
-import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
+import org.openhab.binding.rfxcom.internal.exceptions.RFXComMessageNotImplementedException;
 import org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType;
 
 /**

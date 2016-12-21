@@ -9,12 +9,13 @@
 package org.openhab.binding.rfxcom.internal.messages;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
-import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
+import org.openhab.binding.rfxcom.internal.exceptions.RFXComMessageNotImplementedException;
 import org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType;
 
 public class RFXComMessageFactory {
@@ -40,12 +41,15 @@ public class RFXComMessageFactory {
                     put(PacketType.CURTAIN1, "RFXComCurtain1Message");
                     put(PacketType.BLINDS1, "RFXComBlinds1Message");
                     put(PacketType.RFY, "RFXComRfyMessage");
+                    put(PacketType.HOME_CONFORT, "RFXComHomeConfort");
                     put(PacketType.SECURITY1, "RFXComSecurity1Message");
+                    put(PacketType.SECURITY2, "RFXComSecurity2Message");
                     put(PacketType.CAMERA1, "RFXComCamera1Message");
                     put(PacketType.REMOTE_CONTROL, "RFXComRemoteControlMessage");
                     put(PacketType.THERMOSTAT1, "RFXComThermostat1Message");
                     put(PacketType.THERMOSTAT2, "RFXComThermostat2Message");
                     put(PacketType.THERMOSTAT3, "RFXComThermostat3Message");
+                    put(PacketType.RADIATOR1, "RFXComRadiator1Message");
                     put(PacketType.BBQ1, "RFXComBBQMessage");
                     put(PacketType.TEMPERATURE_RAIN, "RFXComTemperatureRainMessage");
                     put(PacketType.TEMPERATURE, "RFXComTemperatureMessage");
@@ -99,7 +103,7 @@ public class RFXComMessageFactory {
     public final static byte[] CMD_START_RECEIVER = new byte[] { 0x0D, 0x00, 0x00, 0x03, 0x07, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00 };
 
-    public static RFXComMessage createMessage(PacketType packetType) throws RFXComException, RFXComNotImpException {
+    public static RFXComMessage createMessage(PacketType packetType) throws RFXComException {
 
         try {
             String className = messageClasses.get(packetType);
@@ -107,27 +111,35 @@ public class RFXComMessageFactory {
             return (RFXComMessage) cl.newInstance();
 
         } catch (ClassNotFoundException e) {
-            throw new RFXComNotImpException("Message " + packetType + " not implemented", e);
+            throw new RFXComMessageNotImplementedException("Message " + packetType + " not implemented");
 
         } catch (Exception e) {
             throw new RFXComException(e);
         }
     }
 
-    public static RFXComMessage createMessage(byte[] packet) throws RFXComException, RFXComNotImpException {
-
-        PacketType packetType = getPacketType(packet[1]);
+    public static RFXComMessage createMessage(byte[] packet) throws RFXComException {
+        PacketType packetType = PacketType.fromByte(packet[1]);
 
         try {
             String className = messageClasses.get(packetType);
             Class<?> cl = Class.forName(classUrl + className);
             Constructor<?> c = cl.getConstructor(byte[].class);
             return (RFXComMessage) c.newInstance(packet);
-
         } catch (ClassNotFoundException e) {
-            throw new RFXComNotImpException("Message " + packetType + " not implemented, exception: ", e);
-
-        } catch (Exception e) {
+            throw new RFXComMessageNotImplementedException("Message " + packetType + " not implemented");
+        } catch (InvocationTargetException e){
+            if (e.getCause() instanceof RFXComException){
+                throw (RFXComException)e.getCause();
+            } else {
+                throw new RFXComException(e);
+            }
+        // Java 7 - multi catch anyone?
+        } catch (NoSuchMethodException e) {
+            throw new RFXComException(e);
+        } catch (IllegalAccessException e) {
+            throw new RFXComException(e);
+        } catch (InstantiationException e) {
             throw new RFXComException(e);
         }
     }
@@ -141,15 +153,5 @@ public class RFXComMessageFactory {
         }
 
         throw new IllegalArgumentException("Unknown packet type " + packetType);
-    }
-
-    private static PacketType getPacketType(byte packetType) {
-        for (PacketType p : PacketType.values()) {
-            if (p.toByte() == packetType) {
-                return p;
-            }
-        }
-
-        return PacketType.UNKNOWN;
     }
 }

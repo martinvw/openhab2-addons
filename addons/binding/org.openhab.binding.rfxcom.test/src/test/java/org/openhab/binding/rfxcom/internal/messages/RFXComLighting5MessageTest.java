@@ -8,18 +8,12 @@
  */
 package org.openhab.binding.rfxcom.internal.messages;
 
-import org.eclipse.smarthome.core.library.types.OnOffType;
+import static org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType.LIGHTING5;
+
 import org.junit.Test;
+import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
-import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
-
-import javax.xml.bind.DatatypeConverter;
-
-import static org.junit.Assert.assertEquals;
-import static org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType.LIGHTING5;
-import static org.openhab.binding.rfxcom.internal.messages.RFXComLighting5Message.Commands.ON;
-import static org.openhab.binding.rfxcom.internal.messages.RFXComLighting5Message.SubType.IT;
 
 /**
  * Test for RFXCom-binding
@@ -28,10 +22,6 @@ import static org.openhab.binding.rfxcom.internal.messages.RFXComLighting5Messag
  * @since 1.9.0
  */
 public class RFXComLighting5MessageTest {
-    @Test
-    public void basicBoundaryCheck() throws RFXComException, RFXComNotImpException {
-        RFXComTestHelper.basicBoundaryCheck(LIGHTING5);
-    }
 
     @Test
     public void convertFromStateItMessage() throws RFXComException, RFXComNotImpException {
@@ -46,6 +36,16 @@ public class RFXComLighting5MessageTest {
         assertEquals("SubType", IT, msg.subType);
         assertEquals("Sensor Id", "2061.1", msg.getDeviceId());
         assertEquals("Command", ON, msg.command);
+    }
+
+    @Test
+    public void basicBoundaryCheck() throws RFXComException {
+        RFXComLighting5Message message = (RFXComLighting5Message) RFXComMessageFactory.createMessage(LIGHTING5);
+
+        message.subType = RFXComLighting5Message.SubType.LIGHTWAVERF;
+        message.command = RFXComLighting5Message.Commands.ON;
+
+        RFXComTestHelper.basicBoundaryCheck(LIGHTING5, message);
     }
 
     // TODO please add more tests for different messages
