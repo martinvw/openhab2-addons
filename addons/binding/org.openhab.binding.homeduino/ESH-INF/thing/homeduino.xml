@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="rfxcom" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0" xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 org.eclipse.smarthome.thing-description.xsd">
+
+    <bridge-type id="homeduino">
+        <label>Homeduino 433.92MHz Tranciever</label>
+        <description>This is an Homeduino 433.92MHz receiver bridge.</description>
+
+        <config-description>
+            <parameter name="serialPort" type="text" required="true">
+                <label>Serial port</label>
+                <description>Serial port for the homeduino device</description>
+            </parameter>
+            
+            <parameter name="baudrate" type="integer" min="115200" max="115200">
+                <label>Homeduino baudrate</label>
+                <description>Homeduino baudrate.</description>
+                <default>115200</default>
+            </parameter>
+
+            <parameter name="transmitterPin" type="integer" min="1" max="4">
+                <label>Homeduino transmitterPin</label>
+                <description>Homeduino transmitterPin.</description>
+                <default>4</default>
+            </parameter>
+
+            <parameter name="receiverPin" type="integer" min="0" max="1"> 
+                <label>Homeduino receiverPin</label>
+                <description>Homeduino receiverPin.</description>
+                <default>0</default>
+            </parameter>
+        </config-description>
+    </bridge-type>
+
+</thing:thing-descriptions>
