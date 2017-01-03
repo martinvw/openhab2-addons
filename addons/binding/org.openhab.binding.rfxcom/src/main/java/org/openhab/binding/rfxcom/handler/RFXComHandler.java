@@ -92,9 +92,9 @@ public class RFXComHandler extends BaseThingHandler implements DeviceMessageList
                     }
 
                 } catch (RFXComMessageNotImplementedException e) {
-                    logger.error("Message not supported: {}", e.getMessage());
+                    logger.error("Message not supported", e);
                 } catch (RFXComException e) {
-                    logger.error("Transmitting error: {}", e.getMessage());
+                    logger.error("Transmitting error", e);
                 }
             }
 

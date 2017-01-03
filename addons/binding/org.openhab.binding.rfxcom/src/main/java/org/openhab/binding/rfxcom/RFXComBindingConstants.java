@@ -95,92 +95,79 @@ public class RFXComBindingConstants {
     public final static String CHANNEL_SET_POINT = "setpoint";
 
     // List of all Thing Type UIDs
-    private final static ThingTypeUID THING_TYPE_UNDECODED = new ThingTypeUID(BINDING_ID, "undecoded");
+    private final static ThingTypeUID THING_TYPE_BAROMETRIC = new ThingTypeUID(BINDING_ID, "barometric");
+    private final static ThingTypeUID THING_TYPE_BBQ_TEMPERATURE = new ThingTypeUID(BINDING_ID, "bbqtemperature");
+    private final static ThingTypeUID THING_TYPE_BLINDS1 = new ThingTypeUID(BINDING_ID, "blinds1");
+    private final static ThingTypeUID THING_TYPE_CAMERA1 = new ThingTypeUID(BINDING_ID, "camera1");
+    private final static ThingTypeUID THING_TYPE_CHIME = new ThingTypeUID(BINDING_ID, "chime");
+    private final static ThingTypeUID THING_TYPE_CURRENT = new ThingTypeUID(BINDING_ID, "current");
+    private final static ThingTypeUID THING_TYPE_CURRENT_ENERGY = new ThingTypeUID(BINDING_ID, "currentenergy");
+    private final static ThingTypeUID THING_TYPE_CURTAIN1 = new ThingTypeUID(BINDING_ID, "curtain1");
+    private final static ThingTypeUID THING_TYPE_DATE_TIME = new ThingTypeUID(BINDING_ID, "datetime");
+    private final static ThingTypeUID THING_TYPE_ENERGY = new ThingTypeUID(BINDING_ID, "energy");
+    private final static ThingTypeUID THING_TYPE_FAN = new ThingTypeUID(BINDING_ID, "fan");
+    private final static ThingTypeUID THING_TYPE_FS20 = new ThingTypeUID(BINDING_ID, "fs20");
+    private final static ThingTypeUID THING_TYPE_GAS_USAGE = new ThingTypeUID(BINDING_ID, "gasusage");
+    private final static ThingTypeUID THING_TYPE_HOME_CONFORT = new ThingTypeUID(BINDING_ID, "homeconfort");
+    private final static ThingTypeUID THING_TYPE_HUMIDITY = new ThingTypeUID(BINDING_ID, "humidity");
+    private final static ThingTypeUID THING_TYPE_IO_LINES = new ThingTypeUID(BINDING_ID, "iolines");
     private final static ThingTypeUID THING_TYPE_LIGHTNING1 = new ThingTypeUID(BINDING_ID, "lighting1");
     private final static ThingTypeUID THING_TYPE_LIGHTNING2 = new ThingTypeUID(BINDING_ID, "lighting2");
     private final static ThingTypeUID THING_TYPE_LIGHTNING3 = new ThingTypeUID(BINDING_ID, "lighting3");
     private final static ThingTypeUID THING_TYPE_LIGHTNING4 = new ThingTypeUID(BINDING_ID, "lighting4");
     private final static ThingTypeUID THING_TYPE_LIGHTNING5 = new ThingTypeUID(BINDING_ID, "lighting5");
     private final static ThingTypeUID THING_TYPE_LIGHTNING6 = new ThingTypeUID(BINDING_ID, "lighting6");
-    private final static ThingTypeUID THING_TYPE_CHIME = new ThingTypeUID(BINDING_ID, "chime");
-    private final static ThingTypeUID THING_TYPE_FAN = new ThingTypeUID(BINDING_ID, "fan");
-    private final static ThingTypeUID THING_TYPE_CURTAIN1 = new ThingTypeUID(BINDING_ID, "curtain1");
-    private final static ThingTypeUID THING_TYPE_BLINDS1 = new ThingTypeUID(BINDING_ID, "blinds1");
+    private final static ThingTypeUID THING_TYPE_POWER = new ThingTypeUID(BINDING_ID, "power");
+    private final static ThingTypeUID THING_TYPE_RADIATOR1 = new ThingTypeUID(BINDING_ID, "radiator1");
+    private final static ThingTypeUID THING_TYPE_RAIN = new ThingTypeUID(BINDING_ID, "rain");
+    private final static ThingTypeUID THING_TYPE_REMOTE_CONTROL = new ThingTypeUID(BINDING_ID, "remotecontrol");
+    private final static ThingTypeUID THING_TYPE_RFX_METER = new ThingTypeUID(BINDING_ID, "rfxmeter");
+    private final static ThingTypeUID THING_TYPE_RFX_SENSOR = new ThingTypeUID(BINDING_ID, "rfxsensor");
+    private final static ThingTypeUID THING_TYPE_RFY = new ThingTypeUID(BINDING_ID, "rfy");
     private final static ThingTypeUID THING_TYPE_SECURITY1 = new ThingTypeUID(BINDING_ID, "security1");
     private final static ThingTypeUID THING_TYPE_SECURITY2 = new ThingTypeUID(BINDING_ID, "security2");
-    private final static ThingTypeUID THING_TYPE_CAMERA1 = new ThingTypeUID(BINDING_ID, "camera1");
-    private final static ThingTypeUID THING_TYPE_REMOTE_CONTROL = new ThingTypeUID(BINDING_ID, "remotecontrol");
+    private final static ThingTypeUID THING_TYPE_TEMPERATURE = new ThingTypeUID(BINDING_ID, "temperature");
+    private final static ThingTypeUID THING_TYPE_TEMPERATURE_HUMIDITY = new ThingTypeUID(BINDING_ID,
+            "temperaturehumidity");
+    private final static ThingTypeUID THING_TYPE_TEMPERATURE_HUMIDITY_BAROMETRIC = new ThingTypeUID(BINDING_ID,
+            "temperaturehumiditybarometric");
+    private final static ThingTypeUID THING_TYPE_TEMPERATURE_RAIN = new ThingTypeUID(BINDING_ID, "temperaturerain");
     private final static ThingTypeUID THING_TYPE_THERMOSTAT1 = new ThingTypeUID(BINDING_ID, "thermostat1");
     private final static ThingTypeUID THING_TYPE_THERMOSTAT2 = new ThingTypeUID(BINDING_ID, "thermostat2");
     private final static ThingTypeUID THING_TYPE_THERMOSTAT3 = new ThingTypeUID(BINDING_ID, "thermostat3");
-    private final static ThingTypeUID THING_TYPE_BBQ_TEMPERATURE = new ThingTypeUID(BINDING_ID, "bbqtemperature");
-    private final static ThingTypeUID THING_TYPE_TEMPERATURE_RAIN = new ThingTypeUID(BINDING_ID, "temperaturerain");
-    private final static ThingTypeUID THING_TYPE_TEMPERATURE = new ThingTypeUID(BINDING_ID, "temperature");
-    private final static ThingTypeUID THING_TYPE_HUMIDITY = new ThingTypeUID(BINDING_ID, "humidity");
-    private final static ThingTypeUID THING_TYPE_IO_LINES = new ThingTypeUID(BINDING_ID, "iolines");
-    private final static ThingTypeUID THING_TYPE_TEMPERATURE_HUMIDITY = new ThingTypeUID(BINDING_ID,
-            "temperaturehumidity");
-    private final static ThingTypeUID THING_TYPE_BAROMETRIC = new ThingTypeUID(BINDING_ID, "barometric");
-    private final static ThingTypeUID THING_TYPE_TEMPERATURE_HUMIDITY_BAROMETRIC = new ThingTypeUID(BINDING_ID,
-            "temperaturehumiditybarometric");
-    private final static ThingTypeUID THING_TYPE_RAIN = new ThingTypeUID(BINDING_ID, "rain");
-    private final static ThingTypeUID THING_TYPE_WIND = new ThingTypeUID(BINDING_ID, "wind");
+    private final static ThingTypeUID THING_TYPE_UNDECODED = new ThingTypeUID(BINDING_ID, "undecoded");
     private final static ThingTypeUID THING_TYPE_UV = new ThingTypeUID(BINDING_ID, "uv");
-    private final static ThingTypeUID THING_TYPE_DATE_TIME = new ThingTypeUID(BINDING_ID, "datetime");
-    private final static ThingTypeUID THING_TYPE_CURRENT = new ThingTypeUID(BINDING_ID, "current");
-    private final static ThingTypeUID THING_TYPE_ENERGY = new ThingTypeUID(BINDING_ID, "energy");
-    private final static ThingTypeUID THING_TYPE_CURRENT_ENERGY = new ThingTypeUID(BINDING_ID, "currentenergy");
-    private final static ThingTypeUID THING_TYPE_POWER = new ThingTypeUID(BINDING_ID, "power");
-    private final static ThingTypeUID THING_TYPE_RADIATOR1 = new ThingTypeUID(BINDING_ID, "radiator1");
-    private final static ThingTypeUID THING_TYPE_WEIGHTING_SCALE = new ThingTypeUID(BINDING_ID, "weightingscale");
-    private final static ThingTypeUID THING_TYPE_GAS_USAGE = new ThingTypeUID(BINDING_ID, "gasusage");
-    private final static ThingTypeUID THING_TYPE_HOME_CONFORT = new ThingTypeUID(BINDING_ID, "homeconfort");
     private final static ThingTypeUID THING_TYPE_WATER_USAGE = new ThingTypeUID(BINDING_ID, "waterusage");
-    private final static ThingTypeUID THING_TYPE_RFX_SENSOR = new ThingTypeUID(BINDING_ID, "rfxsensor");
-    private final static ThingTypeUID THING_TYPE_RFX_METER = new ThingTypeUID(BINDING_ID, "rfxmeter");
-    private final static ThingTypeUID THING_TYPE_FS20 = new ThingTypeUID(BINDING_ID, "fs20");
-    private final static ThingTypeUID THING_TYPE_RFY = new ThingTypeUID(BINDING_ID, "rfy");
+    private final static ThingTypeUID THING_TYPE_WEIGHTING_SCALE = new ThingTypeUID(BINDING_ID, "weightingscale");
+    private final static ThingTypeUID THING_TYPE_WIND = new ThingTypeUID(BINDING_ID, "wind");
 
     /**
      * Presents all supported Thing types by RFXCOM binding.
      */
-<<<<<<< b08d18a4f115d48aca7fc0acd4d9588a0ec6f384
-    public final static Set<ThingTypeUID> SUPPORTED_DEVICE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_UNDECODED,
+    public final static Set<ThingTypeUID> SUPPORTED_DEVICE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_BAROMETRIC,
+            THING_TYPE_BBQ_TEMPERATURE, THING_TYPE_BLINDS1, THING_TYPE_CAMERA1, THING_TYPE_CHIME, THING_TYPE_CURRENT,
+            THING_TYPE_CURRENT_ENERGY, THING_TYPE_CURTAIN1, THING_TYPE_DATE_TIME, THING_TYPE_ENERGY, THING_TYPE_FAN,
+            THING_TYPE_FS20, THING_TYPE_GAS_USAGE, THING_TYPE_HOME_CONFORT, THING_TYPE_HUMIDITY, THING_TYPE_IO_LINES,
             THING_TYPE_LIGHTNING1, THING_TYPE_LIGHTNING2, THING_TYPE_LIGHTNING3, THING_TYPE_LIGHTNING4,
-            THING_TYPE_LIGHTNING5, THING_TYPE_LIGHTNING6, THING_TYPE_CHIME, THING_TYPE_FAN, THING_TYPE_CURTAIN1,
-            THING_TYPE_BLINDS1, THING_TYPE_SECURITY1, THING_TYPE_CAMERA1, THING_TYPE_REMOTE_CONTROL,
-            THING_TYPE_THERMOSTAT1, THING_TYPE_THERMOSTAT2, THING_TYPE_THERMOSTAT3, THING_TYPE_BBQ_TEMPERATURE,
-            THING_TYPE_TEMPERATURE_RAIN, THING_TYPE_TEMPERATURE, THING_TYPE_HUMIDITY, THING_TYPE_TEMPERATURE_HUMIDITY,
-            THING_TYPE_BAROMETRIC, THING_TYPE_TEMPERATURE_HUMIDITY_BAROMETRIC, THING_TYPE_RAIN, THING_TYPE_WIND,
-            THING_TYPE_UV, THING_TYPE_DATE_TIME, THING_TYPE_CURRENT, THING_TYPE_ENERGY, THING_TYPE_CURRENT_ENERGY,
-            THING_TYPE_POWER, THING_TYPE_WEIGHTING_SCALE, THING_TYPE_GAS_USAGE, THING_TYPE_WATER_USAGE,
-            THING_TYPE_RFX_SENSOR, THING_TYPE_RFX_METER, THING_TYPE_FS20, THING_TYPE_RFY);
-=======
-    public final static Set<ThingTypeUID> SUPPORTED_DEVICE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_LIGHTNING1,
-            THING_TYPE_LIGHTNING2, THING_TYPE_LIGHTNING3, THING_TYPE_LIGHTNING4, THING_TYPE_LIGHTNING5,
-            THING_TYPE_LIGHTNING6, THING_TYPE_CHIME, THING_TYPE_FAN, THING_TYPE_CURTAIN1, THING_TYPE_BLINDS1,
-            THING_TYPE_SECURITY1, THING_TYPE_SECURITY2, THING_TYPE_CAMERA1, THING_TYPE_REMOTE_CONTROL,
-            THING_TYPE_THERMOSTAT1, THING_TYPE_THERMOSTAT2, THING_TYPE_THERMOSTAT3, THING_TYPE_RADIATOR1,
-            THING_TYPE_BBQ_TEMPERATURE, THING_TYPE_TEMPERATURE_RAIN, THING_TYPE_TEMPERATURE, THING_TYPE_HUMIDITY,
-            THING_TYPE_TEMPERATURE_HUMIDITY, THING_TYPE_BAROMETRIC, THING_TYPE_TEMPERATURE_HUMIDITY_BAROMETRIC,
-            THING_TYPE_RAIN, THING_TYPE_WIND, THING_TYPE_UV, THING_TYPE_DATE_TIME, THING_TYPE_CURRENT,
-            THING_TYPE_ENERGY, THING_TYPE_CURRENT_ENERGY, THING_TYPE_POWER, THING_TYPE_WEIGHTING_SCALE,
-            THING_TYPE_GAS_USAGE, THING_TYPE_WATER_USAGE, THING_TYPE_RFX_SENSOR, THING_TYPE_RFX_METER, THING_TYPE_FS20,
-            THING_TYPE_IO_LINES, THING_TYPE_RFY, THING_TYPE_HOME_CONFORT);
->>>>>>> Remove unknown values from enums as they can cover errors elsewhere
+            THING_TYPE_LIGHTNING5, THING_TYPE_LIGHTNING6, THING_TYPE_POWER, THING_TYPE_RADIATOR1, THING_TYPE_RAIN,
+            THING_TYPE_REMOTE_CONTROL, THING_TYPE_RFX_METER, THING_TYPE_RFX_SENSOR, THING_TYPE_RFY,
+            THING_TYPE_SECURITY1, THING_TYPE_SECURITY2, THING_TYPE_TEMPERATURE, THING_TYPE_TEMPERATURE_HUMIDITY,
+            THING_TYPE_TEMPERATURE_HUMIDITY_BAROMETRIC, THING_TYPE_TEMPERATURE_RAIN, THING_TYPE_THERMOSTAT1,
+            THING_TYPE_THERMOSTAT2, THING_TYPE_THERMOSTAT3, THING_TYPE_UNDECODED, THING_TYPE_UV, THING_TYPE_WATER_USAGE,
+            THING_TYPE_WEIGHTING_SCALE, THING_TYPE_WIND);
 
     /**
      * Map RFXCOM packet types to RFXCOM Thing types and vice versa.
      */
     public final static Map<PacketType, ThingTypeUID> packetTypeThingMap = ImmutableMap
-            .<PacketType, ThingTypeUID>builder()
+            .<PacketType, ThingTypeUID> builder()
             .put(PacketType.BAROMETRIC, RFXComBindingConstants.THING_TYPE_BAROMETRIC)
             .put(PacketType.BBQ1, RFXComBindingConstants.THING_TYPE_BBQ_TEMPERATURE)
             .put(PacketType.BLINDS1, RFXComBindingConstants.THING_TYPE_BLINDS1)
             .put(PacketType.CAMERA1, RFXComBindingConstants.THING_TYPE_CAMERA1)
             .put(PacketType.CHIME, RFXComBindingConstants.THING_TYPE_CHIME)
-            .put(PacketType.CURRENT_ENERGY, RFXComBindingConstants.THING_TYPE_CURRENT_ENERGY)
             .put(PacketType.CURRENT, RFXComBindingConstants.THING_TYPE_CURRENT)
+            .put(PacketType.CURRENT_ENERGY, RFXComBindingConstants.THING_TYPE_CURRENT_ENERGY)
             .put(PacketType.CURTAIN1, RFXComBindingConstants.THING_TYPE_CURTAIN1)
             .put(PacketType.DATE_TIME, RFXComBindingConstants.THING_TYPE_DATE_TIME)
             .put(PacketType.ENERGY, RFXComBindingConstants.THING_TYPE_ENERGY)
@@ -205,10 +192,10 @@ public class RFXComBindingConstants {
             .put(PacketType.RFY, RFXComBindingConstants.THING_TYPE_RFY)
             .put(PacketType.SECURITY1, RFXComBindingConstants.THING_TYPE_SECURITY1)
             .put(PacketType.SECURITY2, RFXComBindingConstants.THING_TYPE_SECURITY2)
+            .put(PacketType.TEMPERATURE, RFXComBindingConstants.THING_TYPE_TEMPERATURE)
+            .put(PacketType.TEMPERATURE_HUMIDITY, RFXComBindingConstants.THING_TYPE_TEMPERATURE_HUMIDITY)
             .put(PacketType.TEMPERATURE_HUMIDITY_BAROMETRIC,
                     RFXComBindingConstants.THING_TYPE_TEMPERATURE_HUMIDITY_BAROMETRIC)
-            .put(PacketType.TEMPERATURE_HUMIDITY, RFXComBindingConstants.THING_TYPE_TEMPERATURE_HUMIDITY)
-            .put(PacketType.TEMPERATURE, RFXComBindingConstants.THING_TYPE_TEMPERATURE)
             .put(PacketType.TEMPERATURE_RAIN, RFXComBindingConstants.THING_TYPE_RAIN)
             .put(PacketType.THERMOSTAT1, RFXComBindingConstants.THING_TYPE_THERMOSTAT1)
             .put(PacketType.THERMOSTAT2, RFXComBindingConstants.THING_TYPE_THERMOSTAT2)

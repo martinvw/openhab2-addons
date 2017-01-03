@@ -8,10 +8,15 @@
  */
 package org.openhab.binding.rfxcom.internal.messages;
 
+import static org.junit.Assert.assertEquals;
 import static org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType.LIGHTING5;
+import static org.openhab.binding.rfxcom.internal.messages.RFXComLighting5Message.Commands.ON;
+import static org.openhab.binding.rfxcom.internal.messages.RFXComLighting5Message.SubType.IT;
 
-import org.junit.Test;
+import javax.xml.bind.DatatypeConverter;
+
 import org.eclipse.smarthome.core.library.types.OnOffType;
+import org.junit.Test;
 import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 
@@ -24,7 +29,7 @@ import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 public class RFXComLighting5MessageTest {
 
     @Test
-    public void convertFromStateItMessage() throws RFXComException, RFXComNotImpException {
+    public void convertFromStateItMessage() throws RFXComException {
         RFXComMessage itMessageObject = RFXComMessageFactory.createMessage(LIGHTING5);
         itMessageObject.setDeviceId("2061.1");
         itMessageObject.setSubType(IT);
