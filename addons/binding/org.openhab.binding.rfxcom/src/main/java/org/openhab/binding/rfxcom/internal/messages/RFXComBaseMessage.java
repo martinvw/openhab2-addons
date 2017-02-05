@@ -8,6 +8,8 @@
  */
 package org.openhab.binding.rfxcom.internal.messages;
 
+import org.openhab.binding.rfxcom.internal.exceptions.RFXComUnsupportedValueException;
+
 import javax.xml.bind.DatatypeConverter;
 
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
