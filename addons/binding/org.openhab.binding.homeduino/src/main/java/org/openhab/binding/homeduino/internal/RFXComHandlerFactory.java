@@ -43,7 +43,7 @@ public class RFXComHandlerFactory extends BaseThingHandlerFactory {
      */
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
-    public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES = Sets.union(
+    private final static Set<ThingTypeUID> SUPPORTED_THING_TYPES = Sets.union(
             RFXComBindingConstants.SUPPORTED_DEVICE_THING_TYPES_UIDS,
             RFXComBindingConstants.SUPPORTED_BRIDGE_THING_TYPES_UIDS);
 

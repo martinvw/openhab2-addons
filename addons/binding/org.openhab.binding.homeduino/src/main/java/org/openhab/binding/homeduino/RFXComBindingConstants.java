@@ -71,7 +71,7 @@ public class RFXComBindingConstants {
     private static final ThingTypeUID THING_TYPE_SWITCH1 = new ThingTypeUID(BINDING_ID, "switch1");
     private static final ThingTypeUID THING_TYPE_SWITCH2 = new ThingTypeUID(BINDING_ID, "switch2");
     private static final ThingTypeUID THING_TYPE_SWITCH4 = new ThingTypeUID(BINDING_ID, "switch4");
-    private static final ThingTypeUID THING_TYPE_DIMMER1 = new ThingTypeUID(BINDING_ID, "dommer1");
+    private static final ThingTypeUID THING_TYPE_DIMMER1 = new ThingTypeUID(BINDING_ID, "dimmer1");
     private static final ThingTypeUID THING_TYPE_PIR1 = new ThingTypeUID(BINDING_ID, "pir1");
     private static final ThingTypeUID THING_TYPE_SHUTTER3 = new ThingTypeUID(BINDING_ID, "shutter3");
 

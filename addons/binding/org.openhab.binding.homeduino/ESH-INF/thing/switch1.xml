@@ -3,7 +3,7 @@
 	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
-	<thing-type id="homeduino_switch1">
+	<thing-type id="switch1">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="homeduino" />
 		</supported-bridge-type-refs>

@@ -3,17 +3,18 @@
 	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
-	<thing-type id="switch2">
+	<thing-type id="dimmer1">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="homeduino" />
 		</supported-bridge-type-refs>
 		
-        <label>Homeduino Switch2 Actuator</label>
-        <description>A Switch2 device.</description>
+        <label>Homeduino dimmer1 Actuator</label>
+        <description>A dimmer1 device.</description>
 
         <channels>
             <channel id="command" typeId="command" />
             <channel id="contact" typeId="contact" />
+            <channel id="dimmingLevel" typeId="dimminglevel" />
         </channels>
 
         <config-description>
