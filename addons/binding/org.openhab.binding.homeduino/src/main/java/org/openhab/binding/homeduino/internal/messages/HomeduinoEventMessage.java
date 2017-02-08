@@ -8,23 +8,23 @@
  */
 package org.openhab.binding.homeduino.internal.messages;
 
-import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
-import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Dimmer1Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Pir1Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Shutter3Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Switch1Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Switch2Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Switch4Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.HomeduinoProtocol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
+import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Dimmer1Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.HomeduinoProtocol;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Pir1Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Shutter3Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Switch1Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Switch2Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Switch4Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HomeduinoEventMessage implements HomeduinoMessage {
     private final byte[] data;

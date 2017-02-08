@@ -8,13 +8,13 @@
  */
 package org.openhab.binding.homeduino.internal.messages;
 
-import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
-import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
+import static org.openhab.binding.homeduino.internal.messages.ResponseType.HOMEDUINO_RF_EVENT;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 
-import static org.openhab.binding.homeduino.internal.messages.ResponseType.HOMEDUINO_RF_EVENT;
+import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
+import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
 
 public class HomeduinoMessageFactory {
     public static HomeduinoMessage createMessage(byte[] packet) throws RFXComNotImpException, RFXComException {

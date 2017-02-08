@@ -5,22 +5,23 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- */package org.openhab.binding.homeduino.internal.messages;
-
-import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
-import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Dimmer1Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Pir1Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Shutter3Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Switch1Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Switch2Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.Switch4Message;
-import org.openhab.binding.homeduino.internal.messages.homeduino.HomeduinoProtocol;
+ */
+package org.openhab.binding.homeduino.internal.messages;
 
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
+import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Dimmer1Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.HomeduinoProtocol;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Pir1Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Shutter3Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Switch1Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Switch2Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Switch4Message;
 
 class RFXComHomeduinoMessageFactory {
     private static final Map<Class<? extends HomeduinoProtocol>, PacketType> MAP = Collections

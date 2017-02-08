@@ -8,13 +8,13 @@
  */
 package org.openhab.binding.homeduino.internal.messages;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.Type;
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * RFXCOM data class for lighting2 message.
@@ -69,7 +69,7 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
 
     @Override
     public byte[] decodeMessage() {
-return null;
+        return null;
     }
 
     @Override
@@ -79,7 +79,7 @@ return null;
 
     @Override
     public State convertToState(RFXComValueSelector valueSelector) throws RFXComException {
-    return null;
+        return null;
     }
 
     @Override

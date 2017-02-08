@@ -8,14 +8,15 @@
  */
 package org.openhab.binding.homeduino.internal.connector;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.util.Arrays;
+
+import javax.xml.bind.DatatypeConverter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 final class HomeduinoStreamReader extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeduinoStreamReader.class);

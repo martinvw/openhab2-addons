@@ -5,15 +5,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- */package org.openhab.binding.homeduino.internal.messages.homeduino;
+ */
+package org.openhab.binding.homeduino.internal.messages.homeduino;
+
+import static java.util.Collections.singletonList;
+
+import java.util.List;
 
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.messages.PacketType;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
-
-import java.util.List;
-
-import static java.util.Collections.singletonList;
 
 public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMessage {
     private static final int PULSE_COUNT = 82;

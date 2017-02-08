@@ -8,6 +8,21 @@
  */
 package org.openhab.binding.homeduino.internal.connector;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TooManyListenersException;
+
+import javax.xml.bind.DatatypeConverter;
+
+import org.apache.commons.io.IOUtils;
+import org.openhab.binding.homeduino.internal.config.RFXComBridgeConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
@@ -16,19 +31,6 @@ import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import gnu.io.UnsupportedCommOperationException;
-import org.apache.commons.io.IOUtils;
-import org.openhab.binding.homeduino.internal.config.RFXComBridgeConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.xml.bind.DatatypeConverter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TooManyListenersException;
 
 /**
  * RFXCOM connector for serial port communication.

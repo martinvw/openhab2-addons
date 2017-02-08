@@ -8,6 +8,8 @@
  */
 package org.openhab.binding.homeduino.internal.discovery;
 
+import java.util.Set;
+
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
@@ -20,8 +22,6 @@ import org.openhab.binding.homeduino.internal.messages.RFXComBaseMessage;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
 
 /**
  * The {@link RFXComDeviceDiscoveryService} class is used to discover RFXCOM

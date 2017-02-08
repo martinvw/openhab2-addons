@@ -8,14 +8,14 @@
  */
 package org.openhab.binding.homeduino.internal.messages.homeduino;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.messages.PacketType;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class Switch2Message extends RFXComHomeduinoMessage implements RFXComMessage {
     private static final Logger LOGGER = LoggerFactory.getLogger(Switch2Message.class);

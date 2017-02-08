@@ -8,7 +8,11 @@
  */
 package org.openhab.binding.homeduino.internal;
 
-import com.google.common.collect.Sets;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -24,10 +28,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 /**
  * The {@link RFXComHandlerFactory} is responsible for creating things and thing
@@ -51,7 +52,6 @@ public class RFXComHandlerFactory extends BaseThingHandlerFactory {
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
         return SUPPORTED_THING_TYPES.contains(thingTypeUID);
     }
-
 
     @Override
     protected ThingHandler createHandler(Thing thing) {

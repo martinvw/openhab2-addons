@@ -8,9 +8,9 @@
  */
 package org.openhab.binding.homeduino.internal.connector;
 
-import org.openhab.binding.homeduino.internal.config.RFXComBridgeConfiguration;
-
 import java.io.IOException;
+
+import org.openhab.binding.homeduino.internal.config.RFXComBridgeConfiguration;
 
 /**
  * This interface defines interface to communicate RFXCOM controller.

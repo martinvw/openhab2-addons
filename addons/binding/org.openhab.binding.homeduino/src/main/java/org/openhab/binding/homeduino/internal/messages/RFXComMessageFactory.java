@@ -8,14 +8,15 @@
  */
 package org.openhab.binding.homeduino.internal.messages;
 
+import java.lang.reflect.Constructor;
+
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
 import org.openhab.binding.homeduino.internal.messages.homeduino.RFXComHomeduinoMessage;
 
-import java.lang.reflect.Constructor;
-
 public class RFXComMessageFactory {
-    public static RFXComHomeduinoMessage createMessage(PacketType packetType) throws RFXComException, RFXComNotImpException {
+    public static RFXComHomeduinoMessage createMessage(PacketType packetType)
+            throws RFXComException, RFXComNotImpException {
 
         try {
             Class<? extends RFXComHomeduinoMessage> clazz = packetType.getMessageClass();

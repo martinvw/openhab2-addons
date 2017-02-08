@@ -16,8 +16,6 @@ import org.eclipse.smarthome.core.library.items.RollershutterItem;
 import org.eclipse.smarthome.core.library.items.StringItem;
 import org.eclipse.smarthome.core.library.items.SwitchItem;
 
-import java.io.InvalidClassException;
-
 /**
  * Represents all valid value selectors which could be processed by RFXCOM
  * devices.

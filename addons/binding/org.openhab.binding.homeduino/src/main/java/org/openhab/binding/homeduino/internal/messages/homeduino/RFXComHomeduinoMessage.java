@@ -8,6 +8,8 @@
  */
 package org.openhab.binding.homeduino.internal.messages.homeduino;
 
+import java.math.BigDecimal;
+
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.library.types.PercentType;
@@ -18,8 +20,6 @@ import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
-
-import java.math.BigDecimal;
 
 abstract public class RFXComHomeduinoMessage implements RFXComMessage {
     private HomeduinoProtocol.Result result;
@@ -70,7 +70,6 @@ abstract public class RFXComHomeduinoMessage implements RFXComMessage {
 
         throw new RFXComException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
     }
-
 
     /**
      * Convert a 0-15 scale value to a percent type.

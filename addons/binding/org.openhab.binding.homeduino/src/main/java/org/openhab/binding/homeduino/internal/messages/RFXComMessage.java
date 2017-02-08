@@ -8,12 +8,12 @@
  */
 package org.openhab.binding.homeduino.internal.messages;
 
+import java.util.List;
+
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.Type;
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
-
-import java.util.List;
 
 /**
  * This interface defines interface which every message class should implement.

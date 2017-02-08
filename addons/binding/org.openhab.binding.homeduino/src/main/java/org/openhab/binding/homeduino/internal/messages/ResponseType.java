@@ -27,8 +27,8 @@ public enum ResponseType {
     }
 
     static ResponseType valueOfString(String messagePrefix) {
-        for (ResponseType packetType: values()){
-            if (packetType.messagePrefix.equals(messagePrefix)){
+        for (ResponseType packetType : values()) {
+            if (packetType.messagePrefix.equals(messagePrefix)) {
                 return packetType;
             }
         }

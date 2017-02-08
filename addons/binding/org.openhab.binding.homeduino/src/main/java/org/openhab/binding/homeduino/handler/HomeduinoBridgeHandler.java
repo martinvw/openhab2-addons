@@ -1,5 +1,13 @@
 package org.openhab.binding.homeduino.handler;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.bind.DatatypeConverter;
+
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -18,17 +26,10 @@ import org.openhab.binding.homeduino.internal.messages.HomeduinoMessage;
 import org.openhab.binding.homeduino.internal.messages.HomeduinoMessageFactory;
 import org.openhab.binding.homeduino.internal.messages.HomeduinoReadyMessage;
 import org.openhab.binding.homeduino.internal.messages.HomeduinoResponseMessage;
-import org.openhab.binding.homeduino.internal.messages.homeduino.RFXComHomeduinoMessage;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
+import org.openhab.binding.homeduino.internal.messages.homeduino.RFXComHomeduinoMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.xml.bind.DatatypeConverter;
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 public class HomeduinoBridgeHandler extends BaseBridgeHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeduinoBridgeHandler.class);
