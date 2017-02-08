@@ -8,13 +8,14 @@
  */
 package org.openhab.binding.homeduino;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.openhab.binding.homeduino.internal.messages.PacketType;
 
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * The {@link RFXComBindingConstants} class defines common constants, which are
@@ -29,7 +30,7 @@ public class RFXComBindingConstants {
     public static final String DEVICE_ID = "deviceId";
     public static final String SUB_TYPE = "subType";
 
-    private static final String BRIDGE_TYPE_HOMEDUINO = "Homeduino";
+    private static final String BRIDGE_TYPE_HOMEDUINO = "homeduino";
 
     public final static ThingTypeUID BRIDGE_HOMEDUINO = new ThingTypeUID(BINDING_ID, BRIDGE_TYPE_HOMEDUINO);
 
@@ -78,17 +79,13 @@ public class RFXComBindingConstants {
     /**
      * Presents all supported Thing types by RFXCOM binding.
      */
-    public final static Set<ThingTypeUID> SUPPORTED_DEVICE_THING_TYPES_UIDS = ImmutableSet.of(
-            THING_TYPE_SWITCH1,
-            THING_TYPE_SWITCH2, THING_TYPE_SWITCH4, THING_TYPE_DIMMER1, THING_TYPE_PIR1,
-            THING_TYPE_SHUTTER3
-    );
+    public final static Set<ThingTypeUID> SUPPORTED_DEVICE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_SWITCH1,
+            THING_TYPE_SWITCH2, THING_TYPE_SWITCH4, THING_TYPE_DIMMER1, THING_TYPE_PIR1, THING_TYPE_SHUTTER3);
     /**
      * Map RFXCOM packet types to RFXCOM Thing types and vice versa.
      */
     public final static Map<PacketType, ThingTypeUID> packetTypeThingMap = ImmutableMap
-            .<PacketType, ThingTypeUID>builder()
-            .put(PacketType.SWITCH1, RFXComBindingConstants.THING_TYPE_SWITCH1)
+            .<PacketType, ThingTypeUID>builder().put(PacketType.SWITCH1, RFXComBindingConstants.THING_TYPE_SWITCH1)
             .put(PacketType.SWITCH2, RFXComBindingConstants.THING_TYPE_SWITCH2)
             .put(PacketType.SWITCH4, RFXComBindingConstants.THING_TYPE_SWITCH4)
             .put(PacketType.DIMMER1, RFXComBindingConstants.THING_TYPE_DIMMER1)

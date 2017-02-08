@@ -5,27 +5,30 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- */
-package org.openhab.binding.homeduino.internal.messages;
+ */package org.openhab.binding.homeduino.internal.messages.homeduino;
 
 import org.openhab.binding.homeduino.RFXComValueSelector;
+import org.openhab.binding.homeduino.internal.messages.PacketType;
+import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class Switch4Message extends RFXComHomeduinoMessage implements RFXComMessage {
-    public Switch4Message(HomeduinoProtocol.Result result) {
+import static org.openhab.binding.homeduino.RFXComValueSelector.CONTACT;
+
+public class Pir1Message extends RFXComHomeduinoMessage implements RFXComMessage {
+    public Pir1Message(HomeduinoProtocol.Result result) {
         super(result);
     }
 
     @Override
     public PacketType getPacketType() {
-        return PacketType.SWITCH4;
+        return PacketType.PIR1;
     }
 
     @Override
     public List<RFXComValueSelector> getSupportedInputValueSelectors() {
-        return Arrays.asList(RFXComValueSelector.COMMAND, RFXComValueSelector.CONTACT);
+        return Arrays.asList(CONTACT);
     }
 
     @Override
@@ -38,7 +41,7 @@ public class Switch4Message extends RFXComHomeduinoMessage implements RFXComMess
         return new Protocol();
     }
 
-    public static final class Protocol extends HomeduinoCoCo1 {
+    public static class Protocol extends HomeduinoCoCo1 {
 
     }
 }

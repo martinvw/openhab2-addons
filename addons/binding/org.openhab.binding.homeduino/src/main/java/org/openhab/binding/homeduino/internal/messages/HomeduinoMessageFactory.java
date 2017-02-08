@@ -14,25 +14,27 @@ import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 
+import static org.openhab.binding.homeduino.internal.messages.ResponseType.HOMEDUINO_RF_EVENT;
+
 public class HomeduinoMessageFactory {
     public static HomeduinoMessage createMessage(byte[] packet) throws RFXComNotImpException, RFXComException {
-        PacketTypeHomeduino packetTypeHomeduino = getPacketType(Arrays.copyOfRange(packet, 0, 3));
+        ResponseType responseType = getResponseType(Arrays.copyOfRange(packet, 0, 3));
 
         try {
-            Class<? extends HomeduinoMessage> clazz = packetTypeHomeduino.getMessageClass();
-            try {
+            Class<? extends HomeduinoMessage> clazz = responseType.getMessageClass();
+
+            if (responseType == HOMEDUINO_RF_EVENT) {
                 Constructor<? extends HomeduinoMessage> c = clazz.getConstructor(byte[].class);
                 return c.newInstance(packet);
-            } catch (NoSuchMethodException e) {
-                Constructor<? extends HomeduinoMessage> c = clazz.getConstructor();
-                return c.newInstance();
+            } else {
+                return clazz.newInstance();
             }
         } catch (Exception e) {
             throw new RFXComException(e);
         }
     }
 
-    private static PacketTypeHomeduino getPacketType(byte[] copyOfRange) {
-        return HomeduinoBaseMessage.valueOfString(new String(copyOfRange));
+    private static ResponseType getResponseType(byte[] copyOfRange) {
+        return ResponseType.valueOfString(new String(copyOfRange));
     }
 }

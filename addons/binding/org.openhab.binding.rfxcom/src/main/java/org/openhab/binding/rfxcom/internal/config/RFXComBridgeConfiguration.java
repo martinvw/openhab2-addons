@@ -29,12 +29,12 @@ public class RFXComBridgeConfiguration {
 
     public String transceiverType;
 
-    // Won't configure protocols to RFXCOM transceiver
+    // Won't configure org.openhab.binding.homeduino.internal.protocols to RFXCOM transceiver
     public boolean ignoreConfig;
 
     public String setMode;
 
-    // Enabled protocols
+    // Enabled org.openhab.binding.homeduino.internal.protocols
     public boolean enableUndecoded;
     public boolean enableImagintronixOpus;
     public boolean enableByronSX;

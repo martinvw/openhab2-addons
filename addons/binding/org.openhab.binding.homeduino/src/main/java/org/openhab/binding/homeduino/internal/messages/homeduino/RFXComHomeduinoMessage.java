@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.homeduino.internal.messages;
+package org.openhab.binding.homeduino.internal.messages.homeduino;
 
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
@@ -17,6 +17,7 @@ import org.eclipse.smarthome.core.types.Type;
 import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
+import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
 import java.math.BigDecimal;
 

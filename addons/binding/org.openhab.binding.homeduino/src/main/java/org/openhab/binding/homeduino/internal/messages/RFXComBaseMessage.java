@@ -19,7 +19,7 @@ public abstract class RFXComBaseMessage implements RFXComMessage {
 
     public final static String ID_DELIMITER = ".";
 
-    private PacketType packetType = PacketType.UNKNOWN;
+    private PacketType packetType;
     public byte subType = 0;
     private byte seqNbr = 0;
     private byte id1 = 0;

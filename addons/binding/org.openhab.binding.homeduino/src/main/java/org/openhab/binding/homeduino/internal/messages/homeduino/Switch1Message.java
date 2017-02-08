@@ -6,10 +6,12 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.homeduino.internal.messages;
+package org.openhab.binding.homeduino.internal.messages.homeduino;
 
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
+import org.openhab.binding.homeduino.internal.messages.PacketType;
+import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
 import java.util.Arrays;
 import java.util.List;

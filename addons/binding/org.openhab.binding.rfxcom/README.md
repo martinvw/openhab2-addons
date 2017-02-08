@@ -2,7 +2,7 @@
 
 This binding integrates large number of sensors and actuators from several different manufactures through [RFXCOM transceivers](http://www.rfxcom.com).
 
-RFXCOM transceivers support RF 433 Mhz protocols like: 
+RFXCOM transceivers support RF 433 Mhz org.openhab.binding.homeduino.internal.protocols like: 
 * HomeEasy 
 * Cresta 
 * X10 

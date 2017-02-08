@@ -10,6 +10,7 @@ package org.openhab.binding.homeduino.internal.messages;
 
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
+import org.openhab.binding.homeduino.internal.messages.homeduino.RFXComHomeduinoMessage;
 
 import java.lang.reflect.Constructor;
 

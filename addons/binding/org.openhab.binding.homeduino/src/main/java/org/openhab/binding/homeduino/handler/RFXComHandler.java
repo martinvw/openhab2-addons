@@ -27,7 +27,7 @@ import org.openhab.binding.homeduino.internal.config.RFXComDeviceConfiguration;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
 import org.openhab.binding.homeduino.internal.messages.PacketType;
-import org.openhab.binding.homeduino.internal.messages.RFXComHomeduinoMessage;
+import org.openhab.binding.homeduino.internal.messages.homeduino.RFXComHomeduinoMessage;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessageFactory;
 import org.slf4j.Logger;

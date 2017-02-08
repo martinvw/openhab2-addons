@@ -10,7 +10,7 @@ package org.openhab.binding.homeduino.internal.messages;
 
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
 
-public class HomeduinoReadyMessage extends HomeduinoBaseMessage {
+public class HomeduinoReadyMessage implements HomeduinoMessage {
     @Override
     public PacketType getPacketType() throws RFXComException {
         return null; // return add type?

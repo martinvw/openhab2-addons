@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.homeduino.internal.messages;
+package org.openhab.binding.homeduino.internal.messages.homeduino;
 
 import org.eclipse.smarthome.core.types.Type;
 import org.openhab.binding.homeduino.RFXComValueSelector;
@@ -30,7 +30,7 @@ public class Command {
         this.group = group;
     }
 
-    void setSubType(Object subType) {
+    public void setSubType(Object subType) {
         // we don't care about sub types
     }
 
@@ -58,7 +58,7 @@ public class Command {
         return command;
     }
 
-    void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
+    public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
         this.valueSelector = valueSelector;
         this.command = type;
     }

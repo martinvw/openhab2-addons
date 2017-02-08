@@ -8,5 +8,5 @@
  */
 package org.openhab.binding.homeduino.internal.messages;
 
-public abstract class HomeduinoResponseMessage extends HomeduinoBaseMessage {
+public abstract class HomeduinoResponseMessage implements HomeduinoMessage {
 }

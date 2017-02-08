@@ -9,6 +9,13 @@
 
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Dimmer1Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Pir1Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Shutter3Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Switch1Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Switch2Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Switch4Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.HomeduinoProtocol;
 
 import java.lang.reflect.Constructor;
 import java.util.Collections;

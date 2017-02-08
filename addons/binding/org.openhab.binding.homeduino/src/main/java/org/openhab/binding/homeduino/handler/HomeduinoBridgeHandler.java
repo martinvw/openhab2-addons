@@ -18,7 +18,7 @@ import org.openhab.binding.homeduino.internal.messages.HomeduinoMessage;
 import org.openhab.binding.homeduino.internal.messages.HomeduinoMessageFactory;
 import org.openhab.binding.homeduino.internal.messages.HomeduinoReadyMessage;
 import org.openhab.binding.homeduino.internal.messages.HomeduinoResponseMessage;
-import org.openhab.binding.homeduino.internal.messages.RFXComHomeduinoMessage;
+import org.openhab.binding.homeduino.internal.messages.homeduino.RFXComHomeduinoMessage;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
