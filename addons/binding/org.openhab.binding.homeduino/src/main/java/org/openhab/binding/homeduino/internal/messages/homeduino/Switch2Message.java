@@ -9,7 +9,9 @@
 package org.openhab.binding.homeduino.internal.messages.homeduino;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.messages.PacketType;
@@ -19,8 +21,6 @@ import org.slf4j.LoggerFactory;
 
 public class Switch2Message extends RFXComHomeduinoMessage implements RFXComMessage {
     private static final Logger LOGGER = LoggerFactory.getLogger(Switch2Message.class);
-    private static final int[] PULSE_LENGTHS = { 306, 957, 9808 };
-    private static final int PULSE_COUNT = 50;
 
     public Switch2Message() {
         // deliberately empty
@@ -51,24 +51,32 @@ public class Switch2Message extends RFXComHomeduinoMessage implements RFXComMess
     }
 
     public static final class Protocol extends HomeduinoProtocol {
+        private static final String POSTFIX = "02";
+
+        private static final int[] PULSE_LENGTHS = { 306, 957, 9808 };
+        private static final int PULSE_COUNT = 50;
+
+        private static Map<String, Character> PULSES_TO_BINARY_MAPPING = initializePulseBinaryMapping();
+        private static Map<Character, String> BINARY_TO_PULSE_MAPPING = inverse(PULSES_TO_BINARY_MAPPING);
+
         public Protocol() {
             super(PULSE_COUNT, PULSE_LENGTHS);
         }
 
+        private static Map<String, Character> initializePulseBinaryMapping() {
+            Map<String, Character> map = new HashMap<>();
+            map.put("0110", '0');
+            map.put("0101", '1');
+            return map;
+        }
+
         @Override
         public Result process(String pulses) {
-            pulses = pulses.replace("02", "");
+            pulses = pulses.replace(POSTFIX, "");
             StringBuilder output = new StringBuilder();
             for (int i = 0; i < pulses.length(); i += 4) {
                 String pulse = pulses.substring(i, i + 4);
-                char c;
-                if ("0101".equals(pulse)) {
-                    c = '1';
-                } else {
-                    c = '0';
-                }
-
-                output.append(c);
+                output.append((char) PULSES_TO_BINARY_MAPPING.get(pulse));
             }
 
             int unit = Integer.parseInt(output.substring(0, 5), 2);
@@ -76,6 +84,23 @@ public class Switch2Message extends RFXComHomeduinoMessage implements RFXComMess
             int state = 1 - Integer.parseInt(output.substring(11), 2);
 
             return new Result(id, unit, state, false, null);
+        }
+
+        @Override
+        public String decode(Command command, int transmitterPin) {
+            StringBuilder binary = getMessageStart(transmitterPin, PULSE_LENGTHS);
+
+            convert(binary, printBinaryWithWidth(command.getSensorId(), 5), BINARY_TO_PULSE_MAPPING);
+            convert(binary, printBinaryWithWidth(command.getUnitCodeAsInt(), 5), BINARY_TO_PULSE_MAPPING);
+            convert(binary, commandToBinaryState(command.getCommand()), BINARY_TO_PULSE_MAPPING);
+            convert(binary, inverse(commandToBinaryState(command.getCommand())), BINARY_TO_PULSE_MAPPING);
+
+            return binary.append(POSTFIX).toString();
+        }
+
+        private String inverse(String s) {
+            if ("1".equals(s)) return "0";
+            return "1";
         }
     }
 }

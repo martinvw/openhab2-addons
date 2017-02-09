@@ -8,24 +8,23 @@
  */
 package org.openhab.binding.homeduino.internal.messages.homeduino;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.types.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
-    private static final String MESSAGE_PREFIX = "RF send ";
 
     private static final Logger logger = LoggerFactory.getLogger(HomeduinoCoCo2.class);
 
     private static final String PREFIX = "02";
     private static final String POSTFIX = "03";
 
-    private static int[] PULSE_LENGTHS = { 260, 1300, 2700, 10400 };
+    private static int[] PULSE_LENGTHS = {260, 1300, 2700, 10400};
     private static Map<String, Character> PULSES_TO_BINARY_MAPPING = initializePulseBinaryMapping();
     private static Map<Character, String> BINARY_TO_PULSE_MAPPING = inverse(PULSES_TO_BINARY_MAPPING);
 
@@ -44,20 +43,12 @@ public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
         return map;
     }
 
-    private static Map<Character, String> inverse(Map<String, Character> input) {
-        Map<Character, String> result = new HashMap<>();
-        for (Map.Entry<String, Character> entry : input.entrySet()) {
-            result.put(entry.getValue(), entry.getKey());
-        }
-        return result;
-    }
 
     @Override
     public String decode(Command command, int transmitterPi) {
         // first convert it to a binary string
-        StringBuilder binary = new StringBuilder(MESSAGE_PREFIX).append(transmitterPi).append(" 3 ");
+        StringBuilder binary = getMessageStart(transmitterPi, PULSE_LENGTHS).append(PREFIX);
 
-        prettyPrintBuckets(binary, PULSE_LENGTHS).append(PREFIX);
         System.out.println("Length: " + binary.length());
         convert(binary, printBinaryWithWidth(command.getSensorId(), 26), BINARY_TO_PULSE_MAPPING);
         System.out.println("Length: " + binary.length());
@@ -69,26 +60,6 @@ public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
         System.out.println("Length: " + binary.length());
 
         return binary.append(POSTFIX).toString();
-    }
-
-    private StringBuilder prettyPrintBuckets(StringBuilder sb, int[] pulseLenghts) {
-        for (int i = 0; i < 8; i++) {
-            if (i < pulseLenghts.length) {
-                sb.append(pulseLenghts[i]);
-            } else {
-                sb.append(0);
-            }
-            sb.append(' ');
-        }
-
-        // handy for chaining
-        return sb;
-    }
-
-    private void convert(StringBuilder sb, String input, Map<Character, String> mapping) {
-        for (char c : input.toCharArray()) {
-            sb.append(mapping.get(c));
-        }
     }
 
     @Override

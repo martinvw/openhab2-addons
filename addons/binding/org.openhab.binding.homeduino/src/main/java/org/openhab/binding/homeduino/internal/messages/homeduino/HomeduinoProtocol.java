@@ -8,12 +8,20 @@
  */
 package org.openhab.binding.homeduino.internal.messages.homeduino;
 
+import org.eclipse.smarthome.core.library.types.OnOffType;
+import org.eclipse.smarthome.core.library.types.OpenClosedType;
+import org.eclipse.smarthome.core.types.Type;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class HomeduinoProtocol {
+    static final String MESSAGE_PREFIX = "RF send ";
+
     private int pulseCount;
     private int[] pulseLengths;
 
@@ -30,6 +38,53 @@ public abstract class HomeduinoProtocol {
     public String decode(Command command, int transmitterPin) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    static Map<Character, String> inverse(Map<String, Character> input) {
+        Map<Character, String> result = new HashMap<>();
+        for (Map.Entry<String, Character> entry : input.entrySet()) {
+            result.put(entry.getValue(), entry.getKey());
+        }
+        return result;
+    }
+
+    StringBuilder getMessageStart(int transmitterPi, int[] pulseLengths) {
+        StringBuilder append = new StringBuilder(MESSAGE_PREFIX).append(transmitterPi).append(" 3 ");
+        return prettyPrintBuckets(append, pulseLengths);
+    }
+
+    void convert(StringBuilder sb, String input, Map<Character, String> mapping) {
+        for (char c : input.toCharArray()) {
+            sb.append(mapping.get(c));
+        }
+    }
+
+    static String commandToBinaryState(Type type) {
+        if (type == OnOffType.ON || type == OpenClosedType.OPEN) {
+            return "1";
+        } else if (type == OnOffType.OFF || type == OpenClosedType.CLOSED) {
+            return "0";
+        } else {
+            return "N";
+        }
+    }
+
+    static String printBinaryWithWidth(int number, int width) {
+        return String.format("%" + width + "s", Integer.toBinaryString(number)).replace(' ', '0');
+    }
+
+    private StringBuilder prettyPrintBuckets(StringBuilder sb, int[] pulseLenghts) {
+        for (int i = 0; i < 8; i++) {
+            if (i < pulseLenghts.length) {
+                sb.append(pulseLenghts[i]);
+            } else {
+                sb.append(0);
+            }
+            sb.append(' ');
+        }
+
+        // handy for chaining
+        return sb;
     }
 
     /**
