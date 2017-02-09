@@ -60,7 +60,7 @@ final class HomeduinoStreamReader extends Thread {
             while ((len = in.read(tmpData)) > 0 && !interrupted) {
 
                 byte[] logData = Arrays.copyOf(tmpData, len);
-                LOGGER.debug("Received data (len={}): {}", len, DatatypeConverter.printHexBinary(logData));
+                LOGGER.trace("Received data (len={}): {}", len, DatatypeConverter.printHexBinary(logData));
 
                 for (int i = 0; i < len; i++) {
 
@@ -88,6 +88,7 @@ final class HomeduinoStreamReader extends Thread {
 
                             System.arraycopy(dataBuffer, 0, msg, 0, index);
 
+                            LOGGER.debug("Received message: {}", DatatypeConverter.printHexBinary(msg));
                             connector.sendMsgToListeners(msg);
 
                             // find new start
