@@ -22,6 +22,10 @@ public class Switch2Message extends RFXComHomeduinoMessage implements RFXComMess
     private static final int[] PULSE_LENGTHS = { 306, 957, 9808 };
     private static final int PULSE_COUNT = 50;
 
+    public Switch2Message() {
+        // deliberately empty
+    }
+
     public Switch2Message(HomeduinoProtocol.Result result) {
         super(result);
     }

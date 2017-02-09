@@ -8,14 +8,18 @@
  */
 package org.openhab.binding.homeduino.internal.messages.homeduino;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.messages.PacketType;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Switch4Message extends RFXComHomeduinoMessage implements RFXComMessage {
+    public Switch4Message() {
+        // deliberately empty
+    }
+
     public Switch4Message(HomeduinoProtocol.Result result) {
         super(result);
     }

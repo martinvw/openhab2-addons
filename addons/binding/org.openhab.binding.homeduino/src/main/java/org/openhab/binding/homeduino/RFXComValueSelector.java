@@ -77,7 +77,6 @@ public enum RFXComValueSelector {
      * @return corresponding selector value.
      */
     public static RFXComValueSelector getValueSelector(String valueSelectorText) {
-
         for (RFXComValueSelector c : RFXComValueSelector.values()) {
             if (c.text.equals(valueSelectorText)) {
                 return c;

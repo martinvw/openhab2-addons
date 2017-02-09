@@ -79,7 +79,7 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
         RFXComMessage event = rfEvent.getInterpretations().get(0);
 
-        Assert.assertEquals("2.7", event.getDeviceId());
+        Assert.assertEquals("4.14", event.getDeviceId());
         Assert.assertEquals(event.convertToState(RFXComValueSelector.CONTACT), OpenClosedType.OPEN);
     }
 

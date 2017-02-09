@@ -58,10 +58,15 @@ public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
         StringBuilder binary = new StringBuilder(MESSAGE_PREFIX).append(transmitterPi).append(" 3 ");
 
         prettyPrintBuckets(binary, PULSE_LENGTHS).append(PREFIX);
+        System.out.println("Length: " + binary.length());
         convert(binary, printBinaryWithWidth(command.getSensorId(), 26), BINARY_TO_PULSE_MAPPING);
+        System.out.println("Length: " + binary.length());
         convert(binary, command.isGroup() ? "1" : "0", BINARY_TO_PULSE_MAPPING);
+        System.out.println("Length: " + binary.length());
         convert(binary, commandToBinaryState(command.getCommand()), BINARY_TO_PULSE_MAPPING);
+        System.out.println("Length: " + binary.length());
         convert(binary, printBinaryWithWidth(command.getUnitCodeAsInt() - 1, 4), BINARY_TO_PULSE_MAPPING);
+        System.out.println("Length: " + binary.length());
 
         return binary.append(POSTFIX).toString();
     }
