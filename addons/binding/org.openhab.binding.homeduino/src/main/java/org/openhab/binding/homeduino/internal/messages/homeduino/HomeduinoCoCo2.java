@@ -48,16 +48,10 @@ public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
     public String decode(Command command, int transmitterPi) {
         // first convert it to a binary string
         StringBuilder binary = getMessageStart(transmitterPi, PULSE_LENGTHS).append(PREFIX);
-
-        System.out.println("Length: " + binary.length());
         convert(binary, printBinaryWithWidth(command.getSensorId(), 26), BINARY_TO_PULSE_MAPPING);
-        System.out.println("Length: " + binary.length());
         convert(binary, command.isGroup() ? "1" : "0", BINARY_TO_PULSE_MAPPING);
-        System.out.println("Length: " + binary.length());
         convert(binary, commandToBinaryState(command.getCommand()), BINARY_TO_PULSE_MAPPING);
-        System.out.println("Length: " + binary.length());
         convert(binary, printBinaryWithWidth(command.getUnitCodeAsInt() - 1, 4), BINARY_TO_PULSE_MAPPING);
-        System.out.println("Length: " + binary.length());
 
         return binary.append(POSTFIX).toString();
     }

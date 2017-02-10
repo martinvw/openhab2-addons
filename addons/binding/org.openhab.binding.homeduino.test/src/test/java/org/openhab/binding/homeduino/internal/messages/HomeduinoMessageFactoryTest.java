@@ -36,7 +36,6 @@ public class HomeduinoMessageFactoryTest {
     // RFControl test cases
     private static final String RF_EVENT_PIR1 = "RF receive 358 1095 11244 0 0 0 0 0 01100101011001100110011001100110011001010110011002";
     private static final String RF_EVENT_SWITCH1 = "RF receive 268 1282 2632 10168 0 0 0 0 020001000101000001000100010100010001000100000101000001000101000001000100010100000100010100010000010100000100010100000100010001000103";
-    private static final String RF_EVENT_SWITCH2 = "RF receive 312 956 8700 0 0 0 0 0 01010101011001100101010101100110011001100101011002";
 
     private static final String ACKNOWLEDGEMENT = "ACK";
     private static final String ERROR = "ERR";
@@ -79,7 +78,7 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
         RFXComMessage event = rfEvent.getInterpretations().get(0);
 
-        Assert.assertEquals("4.14", event.getDeviceId());
+        Assert.assertEquals("14.4", event.getDeviceId());
         Assert.assertEquals(event.convertToState(RFXComValueSelector.CONTACT), OpenClosedType.OPEN);
     }
 
@@ -124,21 +123,6 @@ public class HomeduinoMessageFactoryTest {
 
         Assert.assertEquals(PacketType.SWITCH1, event.getPacketType());
         Assert.assertEquals("9390234.1", event.getDeviceId());
-        Assert.assertEquals(event.convertToState(RFXComValueSelector.COMMAND), OnOffType.ON);
-    }
-
-	@Test
-    public void testHomeduinoMessageSwitch2() throws Exception {
-        HomeduinoMessage result = HomeduinoMessageFactory
-                .createMessage(RF_EVENT_SWITCH2.getBytes(StandardCharsets.US_ASCII));
-        Assert.assertNotEquals(result, null);
-        Assert.assertTrue(result instanceof HomeduinoEventMessage);
-
-        HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
-        RFXComMessage event = rfEvent.getInterpretations().get(0);
-
-        Assert.assertEquals(PacketType.SWITCH2, event.getPacketType());
-        Assert.assertEquals("16.25", event.getDeviceId());
         Assert.assertEquals(event.convertToState(RFXComValueSelector.COMMAND), OnOffType.ON);
     }
 

@@ -79,11 +79,11 @@ public class Switch2Message extends RFXComHomeduinoMessage implements RFXComMess
                 output.append((char) PULSES_TO_BINARY_MAPPING.get(pulse));
             }
 
-            int unit = Integer.parseInt(output.substring(0, 5), 2);
-            int id = Integer.parseInt(output.substring(5, 10), 2);
+            int houseCode = Integer.parseInt(output.substring(0, 5), 2);
+            int unitCode = Integer.parseInt(output.substring(5, 10), 2);
             int state = 1 - Integer.parseInt(output.substring(11), 2);
 
-            return new Result(id, unit, state, false, null);
+            return new Result(houseCode, unitCode, state, false, null);
         }
 
         @Override
