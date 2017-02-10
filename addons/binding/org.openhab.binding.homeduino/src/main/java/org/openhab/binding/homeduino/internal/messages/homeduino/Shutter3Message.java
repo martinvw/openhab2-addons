@@ -8,17 +8,23 @@
  */
 package org.openhab.binding.homeduino.internal.messages.homeduino;
 
-import static java.util.Collections.singletonList;
-
-import java.util.List;
-
+import org.eclipse.smarthome.core.library.types.StopMoveType;
+import org.eclipse.smarthome.core.library.types.UpDownType;
+import org.eclipse.smarthome.core.types.Type;
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.messages.PacketType;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.singletonList;
+
 public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMessage {
-    private static final int PULSE_COUNT = 82;
-    private static final int[] PULSE_LENGTHS = { 366, 736, 1600, 5204, 10896 };
+    public Shutter3Message() {
+        // deliberately empty
+    }
 
     public Shutter3Message(HomeduinoProtocol.Result result) {
         super(result);
@@ -45,24 +51,33 @@ public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMes
     }
 
     public static final class Protocol extends HomeduinoProtocol {
+        private static final String PREFIX = "32";
+        private static final String POSTFIX_PROGRAM = "04";
+        private static final String POSTFIX = "14";
+
+        private static final int PULSE_COUNT = 82;
+        private static final int[] PULSE_LENGTHS = {366, 736, 1600, 5204, 10896};
+        private static Map<String, Character> PULSES_TO_BINARY_MAPPING = initializePulseBinaryMapping();
+        private static Map<Character, String> BINARY_TO_PULSE_MAPPING = inverse(PULSES_TO_BINARY_MAPPING);
+
         public Protocol() {
             super(PULSE_COUNT, PULSE_LENGTHS);
         }
 
+        private static Map<String, Character> initializePulseBinaryMapping() {
+            Map<String, Character> map = new HashMap<>();
+            map.put("01", '0');
+            map.put("10", '1');
+            return map;
+        }
+
         @Override
         public Result process(String pulses) {
-            pulses = pulses.replace("32", "").replace("14", "").replace("04", "");
+            pulses = pulses.replace(PREFIX, "").replace(POSTFIX, "").replace(POSTFIX_PROGRAM, "");
             StringBuilder output = new StringBuilder();
             for (int i = 0; i < pulses.length(); i += 2) {
                 String pulse = pulses.substring(i, i + 2);
-                char c;
-                if ("01".equals(pulse)) {
-                    c = '0';
-                } else {
-                    c = '1';
-                }
-
-                output.append(c);
+                output.append(PULSES_TO_BINARY_MAPPING.get(pulse));
             }
 
             int id = Integer.parseInt(output.substring(0, 29), 2);
@@ -70,6 +85,36 @@ public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMes
             int state = Integer.parseInt(output.substring(33, 36), 2);
 
             return new Result(id, channel, state, false, null);
+        }
+
+        @Override
+        public String decode(Command command, int transmitterPi) {
+            // first convert it to a binary string
+            StringBuilder binary = getMessageStart(transmitterPi, PULSE_LENGTHS).append(PREFIX);
+            convert(binary, printBinaryWithWidth(command.getSensorId(), 29), BINARY_TO_PULSE_MAPPING);
+            convert(binary, printBinaryWithWidth(command.getUnitCodeAsInt(), 3), BINARY_TO_PULSE_MAPPING);
+            convert(binary, command.isGroup() ? "1" : "0", BINARY_TO_PULSE_MAPPING);
+            binary.append("01");
+            convert(binary, shutterCommandToBinaryState(command.getCommand()), BINARY_TO_PULSE_MAPPING);
+
+            return binary.append(POSTFIX).toString();
+        }
+
+        private String shutterCommandToBinaryState(Type command) {
+            if (command instanceof UpDownType) {
+                switch ((UpDownType) command) {
+                    case UP:
+                        return "001000";
+                    case DOWN:
+                        return "011001";
+                }
+            } else if (command instanceof StopMoveType){
+                switch ((StopMoveType) command) {
+                    case STOP:
+                        return "'101010'";
+                }
+            }
+            throw new IllegalArgumentException("Cannot convert command " + command + " to valid response");
         }
 
     }

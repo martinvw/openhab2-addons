@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 public class Switch2MessageTest {
     private static final String PULSES = "306 957 9808 0 0 0 0 0 ";
     private static final String ACTUAL_DATA = "01010101011001100101010101100110011001100101011002";
-    private static final String RF_EVENT_SWITCH2 = "RF receive " + PULSES +ACTUAL_DATA;
+    private static final String RF_EVENT_SWITCH2 = "RF receive " + PULSES + ACTUAL_DATA;
 
     @Test
     public void testOutgoingMessageSwitch2() throws Exception {
@@ -29,6 +29,21 @@ public class Switch2MessageTest {
     public void testHomeduinoMessageSwitch2() throws Exception {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage(RF_EVENT_SWITCH2.getBytes(StandardCharsets.US_ASCII));
+        Assert.assertNotEquals(result, null);
+        Assert.assertTrue(result instanceof HomeduinoEventMessage);
+
+        HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
+        RFXComMessage event = rfEvent.getInterpretations().get(0);
+
+        Assert.assertEquals(PacketType.SWITCH2, event.getPacketType());
+        Assert.assertEquals("25.16", event.getDeviceId());
+        Assert.assertEquals(event.convertToState(RFXComValueSelector.COMMAND), OnOffType.ON);
+    }
+
+    @Test
+    public void testIncommingStrangeMessage() throws Exception {
+        HomeduinoMessage result = HomeduinoMessageFactory
+                .createMessage("RF receive 312 944 9740 0 0 0 0 0 01100101011001010101011001100110011001101010101002".getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
         Assert.assertTrue(result instanceof HomeduinoEventMessage);
 
