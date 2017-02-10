@@ -98,9 +98,5 @@ public class Switch2Message extends RFXComHomeduinoMessage implements RFXComMess
             return binary.append(POSTFIX).toString();
         }
 
-        private String inverse(String s) {
-            if ("1".equals(s)) return "0";
-            return "1";
-        }
     }
 }

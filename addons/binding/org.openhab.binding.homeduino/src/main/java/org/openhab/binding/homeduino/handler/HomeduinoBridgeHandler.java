@@ -1,6 +1,8 @@
 package org.openhab.binding.homeduino.handler;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
@@ -213,7 +215,7 @@ public class HomeduinoBridgeHandler extends BaseBridgeHandler {
         public void packetReceived(byte[] packet) {
             try {
                 HomeduinoMessage message = HomeduinoMessageFactory.createMessage(packet);
-                LOGGER.debug("Message received: {}", message);
+                LOGGER.debug("Message received ({}): {}", message.getPacketType(), new String(packet, StandardCharsets.UTF_8));
 
                 if (message instanceof HomeduinoReadyMessage) {
                     if (configuration.receiverPin != null) {

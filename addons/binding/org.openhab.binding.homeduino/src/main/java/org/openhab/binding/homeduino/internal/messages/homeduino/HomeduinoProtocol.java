@@ -218,6 +218,11 @@ public abstract class HomeduinoProtocol {
         return process(pulses.pulses);
     }
 
+    protected String inverse(String s) {
+        if ("1".equals(s)) return "0";
+        return "1";
+    }
+
     public static class Pulses {
         private final int[] pulseLengths;
         private final String pulses;
