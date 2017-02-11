@@ -16,7 +16,7 @@ public class Switch4MessageTest {
     private static final String RF_EVENT_SWITCH4 = "RF receive " + PULSES + ACTUAL_DATA;
 
     @Test
-    public void testOutgoingMessageSwitch2() throws Exception {
+    public void testOutgoingMessage() throws Exception {
         RFXComHomeduinoMessage msg = RFXComMessageFactory.createMessage(PacketType.SWITCH4);
         msg.setDeviceId("2.20");
         msg.convertFromState(RFXComValueSelector.COMMAND, OnOffType.ON);
@@ -26,7 +26,7 @@ public class Switch4MessageTest {
     }
 
     @Test
-    public void testHomeduinoMessageSwitch2() throws Exception {
+    public void testIncomingMessage() throws Exception {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage(RF_EVENT_SWITCH4.getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);

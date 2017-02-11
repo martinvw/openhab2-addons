@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2010-2016 by the respective copyright holders.
- *
+ * <p>
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -215,10 +215,11 @@ public abstract class HomeduinoProtocol {
     abstract public Result process(String pulses);
 
     public Result process(Pulses pulses) {
+        System.out.println(pulses.pulses);
         return process(pulses.pulses);
     }
 
-    protected String inverse(String s) {
+    String inverse(String s) {
         if ("1".equals(s)) return "0";
         return "1";
     }
@@ -235,6 +236,11 @@ public abstract class HomeduinoProtocol {
         }
 
         String getPulses() {
+            return pulses;
+        }
+
+        @Override
+        public String toString() {
             return pulses;
         }
     }

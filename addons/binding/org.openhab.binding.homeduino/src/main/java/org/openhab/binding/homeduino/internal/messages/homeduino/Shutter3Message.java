@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2010-2016 by the respective copyright holders.
- *
+ * <p>
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,8 +52,8 @@ public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMes
 
     public static final class Protocol extends HomeduinoProtocol {
         private static final String PREFIX = "32";
-        private static final String POSTFIX_PROGRAM = "04";
-        private static final String POSTFIX = "14";
+        private static final String POSTFIX = "04";
+        private static final String POSTFIX_PROGRAM = "14";
 
         private static final int PULSE_COUNT = 82;
         private static final int[] PULSE_LENGTHS = {366, 736, 1600, 5204, 10896};
@@ -68,6 +68,13 @@ public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMes
             Map<String, Character> map = new HashMap<>();
             map.put("01", '0');
             map.put("10", '1');
+            return map;
+        }
+
+        private static Map<Character, String> nopMapping() {
+            Map<Character, String> map = new HashMap<>();
+            map.put('0', "0");
+            map.put('1', "1");
             return map;
         }
 
@@ -93,7 +100,6 @@ public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMes
             StringBuilder binary = getMessageStart(transmitterPi, PULSE_LENGTHS).append(PREFIX);
             convert(binary, printBinaryWithWidth(command.getSensorId(), 29), BINARY_TO_PULSE_MAPPING);
             convert(binary, printBinaryWithWidth(command.getUnitCodeAsInt(), 3), BINARY_TO_PULSE_MAPPING);
-            convert(binary, command.isGroup() ? "1" : "0", BINARY_TO_PULSE_MAPPING);
             binary.append("01");
             convert(binary, shutterCommandToBinaryState(command.getCommand()), BINARY_TO_PULSE_MAPPING);
 
@@ -108,10 +114,10 @@ public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMes
                     case DOWN:
                         return "011001";
                 }
-            } else if (command instanceof StopMoveType){
+            } else if (command instanceof StopMoveType) {
                 switch ((StopMoveType) command) {
                     case STOP:
-                        return "'101010'";
+                        return "101010";
                 }
             }
             throw new IllegalArgumentException("Cannot convert command " + command + " to valid response");

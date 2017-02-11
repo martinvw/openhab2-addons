@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.library.types.PercentType;
+import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.UpDownType;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.Type;
@@ -63,6 +64,8 @@ abstract public class RFXComHomeduinoMessage implements RFXComMessage {
                 return UpDownType.UP;
             } else if (result.getState() == 3) {
                 return UpDownType.DOWN;
+            //} else if (result.getState() == 5) {
+            //    return StopMoveType.STOP;
             } else {
                 return UnDefType.UNDEF;
             }
