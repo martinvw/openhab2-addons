@@ -77,6 +77,6 @@ public class HomeduinoEventMessage implements HomeduinoMessage {
 
     @Override
     public PacketType getPacketType() throws RFXComException {
-        return null;
+        return PacketType.HOMEDUINO_RF_EVENT;
     }
 }

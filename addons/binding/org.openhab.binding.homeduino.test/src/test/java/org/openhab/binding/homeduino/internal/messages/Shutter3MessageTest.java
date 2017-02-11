@@ -48,7 +48,7 @@ public class Shutter3MessageTest {
                 SHUTTER3,
                 RFXComValueSelector.SHUTTER,
                 UpDownType.DOWN,
-                "65542026.1", ACTUAL_DATA_DOWN, UpDownType.UP);
+                "65542026.1", ACTUAL_DATA_DOWN, UpDownType.DOWN);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class Shutter3MessageTest {
                 SHUTTER3,
                 RFXComValueSelector.SHUTTER,
                 UpDownType.UP,
-                "65542026.1", ACTUAL_DATA_UP, UpDownType.DOWN);
+                "65542026.1", ACTUAL_DATA_UP, UpDownType.UP);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class Shutter3MessageTest {
                 SHUTTER3,
                 RFXComValueSelector.SHUTTER,
                 UpDownType.UP,
-                "65542026.1", ACTUAL_DATA_UP_2, UpDownType.DOWN);
+                "65542026.1", ACTUAL_DATA_UP_2, UpDownType.UP);
     }
 
     @Test

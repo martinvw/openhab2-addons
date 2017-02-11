@@ -88,7 +88,6 @@ final class HomeduinoStreamReader extends Thread {
 
                             System.arraycopy(dataBuffer, 0, msg, 0, index);
 
-                            LOGGER.debug("Received message: {}", DatatypeConverter.printHexBinary(msg));
                             connector.sendMsgToListeners(msg);
 
                             // find new start

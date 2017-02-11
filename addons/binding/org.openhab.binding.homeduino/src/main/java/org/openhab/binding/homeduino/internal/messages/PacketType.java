@@ -20,6 +20,7 @@ import org.openhab.binding.homeduino.internal.messages.homeduino.Switch4Message;
 public enum PacketType {
     HOMEDUINO_ACK(null), // TODO map this properly
     HOMEDUINO_ERROR(null), // TODO map this properly
+    HOMEDUINO_RF_EVENT(null), // TODO map this properly
 
     SWITCH1(Switch1Message.class),
     SWITCH2(Switch2Message.class),
