@@ -39,10 +39,6 @@ abstract public class RFXComHomeduinoMessage implements RFXComMessage {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public byte[] decodeMessage() {
-        throw new UnsupportedOperationException();
-    }
 
     public String decodeToHomeduinoMessage(int transmitterPin) {
         return getProtocol().decode(command, transmitterPin);

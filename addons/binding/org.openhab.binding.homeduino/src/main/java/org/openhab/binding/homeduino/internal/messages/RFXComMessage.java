@@ -23,27 +23,12 @@ import java.util.List;
 public interface RFXComMessage {
 
     /**
-     * Procedure for present class information in string format. Used for
-     * logging purposes.
-     *
-     */
-    @Override
-    String toString();
-
-    /**
      * Procedure for encode raw data.
      *
      * @param data
      *            Raw data.
      */
     void encodeMessage(byte[] data);
-
-    /**
-     * Procedure for decode object to raw data.
-     *
-     * @return raw data.
-     */
-    byte[] decodeMessage();
 
     /**
      * Procedure for converting RFXCOM value to Openhab state.

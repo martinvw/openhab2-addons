@@ -63,12 +63,6 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
 
     @Override
     public void encodeMessage(byte[] data) {
-
-    }
-
-    @Override
-    public byte[] decodeMessage() {
-        return null;
     }
 
     @Override
