@@ -8,9 +8,33 @@
  */
 package org.openhab.binding.homeduino.handler;
 
-import static org.openhab.binding.homeduino.RFXComBindingConstants.*;
-
-import java.util.List;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_BATTERY_LEVEL;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_CHILL_FACTOR;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_COMMAND;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_CONTACT;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_DIMMING_LEVEL;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_FORECAST;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_GUST;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_HUMIDITY;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_HUMIDITY_STATUS;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_INSTANT_AMPS;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_INSTANT_POWER;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_MOOD;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_MOTION;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_PRESSURE;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_RAIN_RATE;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_RAIN_TOTAL;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_SET_POINT;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_SHUTTER;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_SIGNAL_LEVEL;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_STATUS;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_TEMPERATURE;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_TOTAL_AMP_HOUR;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_TOTAL_USAGE;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_VOLTAGE;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_WIND_DIRECTION;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.CHANNEL_WIND_SPEED;
+import static org.openhab.binding.homeduino.RFXComBindingConstants.packetTypeThingMap;
 
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
@@ -36,6 +60,8 @@ import org.openhab.binding.homeduino.internal.messages.RFXComMessageFactory;
 import org.openhab.binding.homeduino.internal.messages.homeduino.RFXComHomeduinoMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * The {@link RFXComHandler} is responsible for handling commands, which are
@@ -78,7 +104,6 @@ public class RFXComHandler extends BaseThingHandler implements DeviceMessageList
                     RFXComValueSelector valSelector = RFXComValueSelector.getValueSelector(channelUID.getId());
 
                     if (supportedValueSelectors.contains(valSelector)) {
-                        msg.setSubType(msg.convertSubType(config.subType));
                         msg.setDeviceId(config.deviceId);
                         msg.convertFromState(valSelector, command);
 
@@ -117,9 +142,9 @@ public class RFXComHandler extends BaseThingHandler implements DeviceMessageList
         logger.debug("initializeBridge {} for thing {}", bridgeStatus, getThing().getUID());
 
         config = getConfigAs(RFXComDeviceConfiguration.class);
-        if (config.deviceId == null || config.subType == null) {
+        if (config.deviceId == null) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
-                    "RFXCOM device missing deviceId or subType");
+                    "Homeduino device missing deviceId");
         } else if (thingHandler != null && bridgeStatus != null) {
 
             bridgeHandler = (HomeduinoBridgeHandler) thingHandler;

@@ -8,14 +8,13 @@
  */
 package org.openhab.binding.homeduino;
 
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.openhab.binding.homeduino.internal.messages.PacketType;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The {@link RFXComBindingConstants} class defines common constants, which are
@@ -28,7 +27,6 @@ public class RFXComBindingConstants {
     private static final String BINDING_ID = "homeduino";
 
     public static final String DEVICE_ID = "deviceId";
-    public static final String SUB_TYPE = "subType";
 
     private static final String BRIDGE_TYPE_HOMEDUINO = "homeduino";
 
@@ -75,20 +73,25 @@ public class RFXComBindingConstants {
     private static final ThingTypeUID THING_TYPE_DIMMER1 = new ThingTypeUID(BINDING_ID, "dimmer1");
     private static final ThingTypeUID THING_TYPE_PIR1 = new ThingTypeUID(BINDING_ID, "pir1");
     private static final ThingTypeUID THING_TYPE_SHUTTER3 = new ThingTypeUID(BINDING_ID, "shutter3");
+    private static final ThingTypeUID THING_TYPE_WEATHER1 = new ThingTypeUID(BINDING_ID, "weather1");
 
     /**
      * Presents all supported Thing types by RFXCOM binding.
      */
     public final static Set<ThingTypeUID> SUPPORTED_DEVICE_THING_TYPES_UIDS = ImmutableSet.of(THING_TYPE_SWITCH1,
-            THING_TYPE_SWITCH2, THING_TYPE_SWITCH4, THING_TYPE_DIMMER1, THING_TYPE_PIR1, THING_TYPE_SHUTTER3);
+            THING_TYPE_SWITCH2, THING_TYPE_SWITCH4, THING_TYPE_DIMMER1, THING_TYPE_PIR1, THING_TYPE_SHUTTER3,
+            THING_TYPE_WEATHER1);
     /**
      * Map RFXCOM packet types to RFXCOM Thing types and vice versa.
      */
     public final static Map<PacketType, ThingTypeUID> packetTypeThingMap = ImmutableMap
-            .<PacketType, ThingTypeUID>builder().put(PacketType.SWITCH1, RFXComBindingConstants.THING_TYPE_SWITCH1)
+            .<PacketType, ThingTypeUID>builder()
+            .put(PacketType.SWITCH1, RFXComBindingConstants.THING_TYPE_SWITCH1)
             .put(PacketType.SWITCH2, RFXComBindingConstants.THING_TYPE_SWITCH2)
             .put(PacketType.SWITCH4, RFXComBindingConstants.THING_TYPE_SWITCH4)
             .put(PacketType.DIMMER1, RFXComBindingConstants.THING_TYPE_DIMMER1)
             .put(PacketType.PIR1, RFXComBindingConstants.THING_TYPE_PIR1)
-            .put(PacketType.SHUTTER3, RFXComBindingConstants.THING_TYPE_SHUTTER3).build();
+            .put(PacketType.SHUTTER3, RFXComBindingConstants.THING_TYPE_SHUTTER3)
+            .put(PacketType.WEATHER1, RFXComBindingConstants.THING_TYPE_WEATHER1)
+            .build();
 }

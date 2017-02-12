@@ -22,10 +22,6 @@
                 <label>Device Id</label>
                 <description>Device Id. House code + unit code, separated by dot. Example A.1</description>
             </parameter>
-            <parameter name="subType" type="text" required="false">
-                <label>Sub Type</label>
-                <description>Specifies device sub type.</description>
-            </parameter>
         </config-description>
 	</thing-type>
 

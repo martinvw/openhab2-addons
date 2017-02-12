@@ -105,16 +105,6 @@ abstract public class RFXComHomeduinoMessage implements RFXComMessage {
     }
 
     @Override
-    public Object convertSubType(String subType) throws RFXComException {
-        return null;
-    }
-
-    @Override
-    public void setSubType(Object subType) throws RFXComException {
-        command.setSubType(subType);
-    }
-
-    @Override
     public String getDeviceId() throws RFXComException {
         return result.getId() + "." + result.getUnit();
     }
@@ -122,10 +112,5 @@ abstract public class RFXComHomeduinoMessage implements RFXComMessage {
     @Override
     public void setDeviceId(String deviceId) throws RFXComException {
         command.setDeviceId(deviceId);
-    }
-
-    @Override
-    public Object convertSubType() throws RFXComException {
-        return getPacketType();
     }
 }

@@ -8,13 +8,13 @@
  */
 package org.openhab.binding.homeduino.internal.messages;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.Type;
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * RFXCOM data class for lighting2 message.
@@ -52,7 +52,6 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
         String str = "";
 
         str += super.toString();
-        str += ", Sub type = " + subType;
         str += ", Device Id = " + getDeviceId();
         str += ", Command = " + command;
         byte dimmingLevel = 0;
@@ -83,10 +82,6 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
     }
 
     @Override
-    public void setSubType(Object subType) throws RFXComException {
-    }
-
-    @Override
     public void setDeviceId(String deviceId) throws RFXComException {
 
     }
@@ -94,11 +89,6 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
     @Override
     public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
 
-    }
-
-    @Override
-    public Object convertSubType(String subType) throws RFXComException {
-        return null;
     }
 
     @Override

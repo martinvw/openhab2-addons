@@ -19,7 +19,4 @@ public class RFXComDeviceConfiguration {
     // Device Id
     public String deviceId;
 
-    // Sub Type
-    public String subType;
-
 }

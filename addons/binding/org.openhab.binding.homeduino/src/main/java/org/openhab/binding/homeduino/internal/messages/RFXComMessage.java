@@ -8,12 +8,12 @@
  */
 package org.openhab.binding.homeduino.internal.messages;
 
-import java.util.List;
-
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.Type;
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
+
+import java.util.List;
 
 /**
  * This interface defines interface which every message class should implement.
@@ -59,26 +59,6 @@ public interface RFXComMessage {
      *
      */
     void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException;
-
-    /**
-     * Procedure for converting sub type as string to sub type object.
-     *
-     * @return sub type object.
-     */
-    Object convertSubType(String subType) throws RFXComException;
-
-    /**
-     * Procedure for converting the internal subtype to sub type object.
-     *
-     * @throws RFXComException
-     */
-    Object convertSubType() throws RFXComException;
-
-    /**
-     * Procedure to set sub type.
-     *
-     */
-    void setSubType(Object subType) throws RFXComException;
 
     /**
      * Procedure to get device id.

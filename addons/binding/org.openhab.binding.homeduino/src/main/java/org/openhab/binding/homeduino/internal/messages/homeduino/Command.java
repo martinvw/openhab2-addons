@@ -30,10 +30,6 @@ public class Command {
         this.group = group;
     }
 
-    public void setSubType(Object subType) {
-        // we don't care about sub types
-    }
-
     public int getSensorId() {
         return sensorId;
     }

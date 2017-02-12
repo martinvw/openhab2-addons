@@ -8,8 +8,6 @@
  */
 package org.openhab.binding.homeduino.internal.messages;
 
-import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
-
 /**
  * Base class for RFXCOM data classes. All other data classes should extend this class.
  *
@@ -20,7 +18,6 @@ public abstract class RFXComBaseMessage implements RFXComMessage {
     public final static String ID_DELIMITER = ".";
 
     private PacketType packetType;
-    public byte subType = 0;
     private byte seqNbr = 0;
     private byte id1 = 0;
     private byte id2 = 0;
@@ -56,11 +53,6 @@ public abstract class RFXComBaseMessage implements RFXComMessage {
     @Override
     public PacketType getPacketType() {
         return this.packetType;
-    }
-
-    @Override
-    public Object convertSubType() throws RFXComException {
-        return convertSubType(String.valueOf(this.subType));
     }
 
 }

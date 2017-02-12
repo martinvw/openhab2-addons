@@ -8,8 +8,6 @@
  */
 package org.openhab.binding.homeduino.internal.discovery;
 
-import java.util.Set;
-
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
@@ -22,6 +20,8 @@ import org.openhab.binding.homeduino.internal.messages.RFXComBaseMessage;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 /**
  * The {@link RFXComDeviceDiscoveryService} class is used to discover RFXCOM
@@ -64,19 +64,19 @@ public class RFXComDeviceDiscoveryService extends AbstractDiscoveryService imple
         logger.trace("Received: bridge: {} message: {}", bridge, message);
 
         try {
-            if (message instanceof RFXComMessage) {
+            if (message != null) {
                 String id = message.getDeviceId();
                 ThingTypeUID uid = RFXComBindingConstants.packetTypeThingMap.get(message.getPacketType());
                 ThingUID thingUID = new ThingUID(uid, bridge, id.replace(RFXComBaseMessage.ID_DELIMITER, "_"));
-                if (thingUID != null) {
-                    logger.trace("Adding new RFXCOM {} with id '{}' to smarthome inbox", thingUID, id);
-                    String subType = message.convertSubType().toString();
-                    String label = message.getPacketType() + "-" + id;
-                    DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID).withLabel(label)
-                            .withProperty(RFXComBindingConstants.DEVICE_ID, id)
-                            .withProperty(RFXComBindingConstants.SUB_TYPE, subType).withBridge(bridge).build();
-                    thingDiscovered(discoveryResult);
-                }
+                logger.trace("Adding new RFXCOM {} with id '{}' to smarthome inbox", thingUID, id);
+
+                String label = message.getPacketType() + "-" + id;
+                DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID)
+                        .withLabel(label)
+                        .withProperty(RFXComBindingConstants.DEVICE_ID, id)
+                        .withBridge(bridge)
+                        .build();
+                thingDiscovered(discoveryResult);
             } else {
                 logger.warn("An unsupported device, was talking");
             }
