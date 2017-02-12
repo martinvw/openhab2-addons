@@ -16,6 +16,7 @@ import org.openhab.binding.homeduino.internal.messages.homeduino.Shutter3Message
 import org.openhab.binding.homeduino.internal.messages.homeduino.Switch1Message;
 import org.openhab.binding.homeduino.internal.messages.homeduino.Switch2Message;
 import org.openhab.binding.homeduino.internal.messages.homeduino.Switch4Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Weather1Message;
 
 public enum PacketType {
     HOMEDUINO_ACK(null), // TODO map this properly
@@ -27,7 +28,8 @@ public enum PacketType {
     SWITCH4(Switch4Message.class),
     DIMMER1(Dimmer1Message.class),
     PIR1(Pir1Message.class),
-    SHUTTER3(Shutter3Message.class);
+    SHUTTER3(Shutter3Message.class),
+    WEATHER1(Weather1Message.class);
 
     private final Class<? extends RFXComHomeduinoMessage> messageClazz;
 

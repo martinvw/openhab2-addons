@@ -8,6 +8,8 @@
  */
 package org.openhab.binding.homeduino.internal.messages.homeduino;
 
+import static java.util.Collections.singletonList;
+
 import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.UpDownType;
 import org.eclipse.smarthome.core.types.Type;
@@ -19,14 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.singletonList;
-
 public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMessage {
     public Shutter3Message() {
         // deliberately empty
     }
 
-    public Shutter3Message(HomeduinoProtocol.Result result) {
+    public Shutter3Message(Result result) {
         super(result);
     }
 
@@ -84,14 +84,16 @@ public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMes
             StringBuilder output = new StringBuilder();
             for (int i = 0; i < pulses.length(); i += 2) {
                 String pulse = pulses.substring(i, i + 2);
-                output.append(PULSES_TO_BINARY_MAPPING.get(pulse));
+                output.append(map(PULSES_TO_BINARY_MAPPING, pulse));
             }
 
             int id = Integer.parseInt(output.substring(0, 29), 2);
             int channel = Integer.parseInt(output.substring(29, 32), 2);
             int state = Integer.parseInt(output.substring(33, 36), 2);
 
-            return new Result(id, channel, state, false, null);
+            return new Result.Builder(this.getClass(), id, channel)
+                    .withState(state)
+                    .build();
         }
 
         @Override

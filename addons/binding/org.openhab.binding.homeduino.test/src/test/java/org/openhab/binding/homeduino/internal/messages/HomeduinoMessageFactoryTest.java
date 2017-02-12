@@ -16,10 +16,6 @@ import org.eclipse.smarthome.core.types.UnDefType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openhab.binding.homeduino.RFXComValueSelector;
-import org.openhab.binding.homeduino.internal.messages.HomeduinoEventMessage;
-import org.openhab.binding.homeduino.internal.messages.HomeduinoMessage;
-import org.openhab.binding.homeduino.internal.messages.HomeduinoMessageFactory;
-import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
 import java.nio.charset.StandardCharsets;
 
@@ -35,6 +31,7 @@ public class HomeduinoMessageFactoryTest {
 
     // RFControl test cases
     private static final String RF_EVENT_PIR1 = "RF receive 358 1095 11244 0 0 0 0 0 01100101011001100110011001100110011001010110011002";
+    private static final String RF_EVENT_PIR1_2 = "RF receive 508 1524 15568 0 0 0 0 0 01100110011001100110011001100110011001100110011002";
     private static final String RF_EVENT_SWITCH1 = "RF receive 268 1282 2632 10168 0 0 0 0 020001000101000001000100010100010001000100000101000001000101000001000100010100000100010100010000010100000100010100000100010001000103";
 
     private static final String ACKNOWLEDGEMENT = "ACK";

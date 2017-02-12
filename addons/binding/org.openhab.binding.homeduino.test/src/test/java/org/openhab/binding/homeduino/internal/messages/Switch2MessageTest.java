@@ -1,5 +1,7 @@
 package org.openhab.binding.homeduino.internal.messages;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -7,8 +9,6 @@ import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.messages.homeduino.RFXComHomeduinoMessage;
 
 import java.nio.charset.StandardCharsets;
-
-import static org.junit.Assert.assertEquals;
 
 public class Switch2MessageTest {
     private static final String PULSES = "306 957 9808 0 0 0 0 0 ";
@@ -41,17 +41,15 @@ public class Switch2MessageTest {
     }
 
     @Test
-    public void testIncommingStrangeMessage() throws Exception {
+    public void testIncomingStrangeMessage() throws Exception {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage("RF receive 312 944 9740 0 0 0 0 0 01100101011001010101011001100110011001101010101002".getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
         Assert.assertTrue(result instanceof HomeduinoEventMessage);
 
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
-        RFXComMessage event = rfEvent.getInterpretations().get(0);
 
-        Assert.assertEquals(PacketType.SWITCH2, event.getPacketType());
-        Assert.assertEquals("25.16", event.getDeviceId());
-        Assert.assertEquals(event.convertToState(RFXComValueSelector.COMMAND), OnOffType.ON);
+        // no matches, but also no exceptions...
+        assertEquals(0, rfEvent.getInterpretations().size());
     }
 }

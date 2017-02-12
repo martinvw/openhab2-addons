@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2010-2016 by the respective copyright holders.
- *
+ * <p>
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,10 @@
  */
 package org.openhab.binding.homeduino.internal.messages.homeduino;
 
-import java.math.BigDecimal;
-
+import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.library.types.PercentType;
-import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.UpDownType;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.Type;
@@ -22,15 +20,17 @@ import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
+import java.math.BigDecimal;
+
 abstract public class RFXComHomeduinoMessage implements RFXComMessage {
-    private HomeduinoProtocol.Result result;
+    private Result result;
     private Command command;
 
     RFXComHomeduinoMessage() {
         this.command = new Command();
     }
 
-    RFXComHomeduinoMessage(HomeduinoProtocol.Result result) {
+    RFXComHomeduinoMessage(Result result) {
         this.result = result;
     }
 
@@ -57,7 +57,7 @@ abstract public class RFXComHomeduinoMessage implements RFXComMessage {
     @Override
     public State convertToState(RFXComValueSelector valueSelector) throws RFXComException {
         if (valueSelector == RFXComValueSelector.DIMMING_LEVEL) {
-            return getPercentTypeFromDimLevel(result.getDimlevel());
+            return getPercentTypeFromDimLevel(result.getDimLevel());
         } else if (valueSelector == RFXComValueSelector.COMMAND) {
             return result.getState() == 0 ? OnOffType.OFF : OnOffType.ON;
         } else if (valueSelector == RFXComValueSelector.CONTACT) {
@@ -70,6 +70,12 @@ abstract public class RFXComHomeduinoMessage implements RFXComMessage {
             } else {
                 return UnDefType.UNDEF;
             }
+        } else if (valueSelector == RFXComValueSelector.TEMPERATURE) {
+            return new DecimalType(result.getTemperature());
+        } else if (valueSelector == RFXComValueSelector.HUMIDITY) {
+            return new DecimalType(result.getHumidity());
+        } else if (valueSelector == RFXComValueSelector.LOW_BATTERY) {
+            return result.isLowBattery() ?  OnOffType.ON :  OnOffType.OFF;
         }
 
         throw new RFXComException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());

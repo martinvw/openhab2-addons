@@ -10,15 +10,15 @@ package org.openhab.binding.homeduino.internal.messages.homeduino;
 
 import static org.openhab.binding.homeduino.RFXComValueSelector.CONTACT;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.openhab.binding.homeduino.RFXComValueSelector;
 import org.openhab.binding.homeduino.internal.messages.PacketType;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Pir1Message extends RFXComHomeduinoMessage implements RFXComMessage {
-    public Pir1Message(HomeduinoProtocol.Result result) {
+    public Pir1Message(Result result) {
         super(result);
     }
 

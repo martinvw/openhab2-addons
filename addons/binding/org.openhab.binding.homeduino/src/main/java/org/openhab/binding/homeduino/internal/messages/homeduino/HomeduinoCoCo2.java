@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2010-2016 by the respective copyright holders.
- *
+ * <p>
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,7 +64,7 @@ public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
         StringBuilder output = new StringBuilder();
         for (int i = 0; i < pulses.length(); i += 4) {
             String pulse = pulses.substring(i, i + 4);
-            output.append(PULSES_TO_BINARY_MAPPING.get(pulse));
+            output.append(map(PULSES_TO_BINARY_MAPPING, pulse));
         }
 
         int id = Integer.parseInt(output.substring(0, 26), 2);
@@ -86,7 +86,11 @@ public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
             dimlevel = Integer.parseInt(output.substring(32), 2);
         }
 
-        return new Result(id, unit, state, all, dimlevel);
+        return new Result.Builder(this.getClass(), id, unit)
+                .withState(state)
+                .withAll(all)
+                .withDimLevel(dimlevel)
+                .build();
     }
 
     static String commandToBinaryState(Type type) {

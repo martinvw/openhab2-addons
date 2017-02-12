@@ -1,15 +1,5 @@
 package org.openhab.binding.homeduino.handler;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-import javax.xml.bind.DatatypeConverter;
-
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -32,6 +22,14 @@ import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 import org.openhab.binding.homeduino.internal.messages.homeduino.RFXComHomeduinoMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class HomeduinoBridgeHandler extends BaseBridgeHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeduinoBridgeHandler.class);
@@ -233,12 +231,11 @@ public class HomeduinoBridgeHandler extends BaseBridgeHandler {
 
                 } else if (message instanceof HomeduinoEventMessage) {
                     HomeduinoEventMessage event = (HomeduinoEventMessage) message;
-                    List<RFXComMessage> messages = event.getInterpretations();
 
-                    for (RFXComMessage interprentedMsg : messages) {
+                    for (RFXComMessage interpretedMsg : event.getInterpretations()) {
                         for (DeviceMessageListener deviceStatusListener : getDeviceStatusListeners()) {
                             try {
-                                deviceStatusListener.onDeviceMessageReceived(getThing().getUID(), interprentedMsg);
+                                deviceStatusListener.onDeviceMessageReceived(getThing().getUID(), interpretedMsg);
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 LOGGER.error("An exception occurred while calling the DeviceStatusListener", e);

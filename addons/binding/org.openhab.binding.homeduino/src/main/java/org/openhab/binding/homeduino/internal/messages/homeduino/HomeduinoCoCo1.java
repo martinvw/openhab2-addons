@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2010-2016 by the respective copyright holders.
- *
+ * <p>
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,13 @@
  */
 package org.openhab.binding.homeduino.internal.messages.homeduino;
 
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class HomeduinoCoCo1 extends HomeduinoProtocol {
     private static final String POSTFIX = "02";
 
-    private static int[] PULSE_LENGTHS = { 358, 1095, 11244 };
+    private static int[] PULSE_LENGTHS = {358, 1095, 11244};
     private static int PULSE_COUNT = 50;
 
     private static Map<String, Character> PULSES_TO_BINARY_MAPPING = initializePulseBinaryMapping();
@@ -38,14 +37,14 @@ public abstract class HomeduinoCoCo1 extends HomeduinoProtocol {
         StringBuilder output = new StringBuilder();
         for (int i = 0; i < pulses.length(); i += 4) {
             String pulse = pulses.substring(i, i + 4);
-            output.append((char) PULSES_TO_BINARY_MAPPING.get(pulse));
+            output.append(map(PULSES_TO_BINARY_MAPPING, pulse));
         }
 
         int unit = Integer.parseInt(output.substring(0, 5), 2);
         int id = Integer.parseInt(output.substring(5, 10), 2);
         int state = 1 - Integer.parseInt(output.substring(11), 2);
 
-        return new Result(id, unit, state, false, null);
+        return new Result.Builder(this.getClass(), id, unit).withState(state).build();
     }
 
     @Override

@@ -11,6 +11,7 @@ package org.openhab.binding.homeduino.internal.messages.homeduino;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.types.Type;
+import org.openhab.binding.homeduino.internal.exceptions.InvalidInputForProtocol;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -33,6 +34,13 @@ public abstract class HomeduinoProtocol {
     public static Pulses prepareAndFixCompressedPulses(byte[] data) {
         Pulses result = prepareCompressedPulses(data);
         return fixPulses(result);
+    }
+
+    protected Character map(Map<String, Character> pulsesToBinaryMapping, String pulse) {
+        if (pulsesToBinaryMapping.containsKey(pulse)) {
+            return pulsesToBinaryMapping.get(pulse);
+        }
+        throw new InvalidInputForProtocol("Unsupported token :'"+pulse+"' for protocol " + getClass().getSimpleName());
     }
 
     public String decode(Command command, int transmitterPin) {
@@ -245,43 +253,4 @@ public abstract class HomeduinoProtocol {
         }
     }
 
-    public class Result {
-        private int id;
-        private boolean all;
-        private Integer state;
-        private int unit;
-        private Integer dimlevel;
-
-        Result(int id, int unit, Integer state, boolean all, Integer dimlevel) {
-            this.id = id;
-            this.unit = unit;
-            this.state = state;
-            this.all = all;
-            this.dimlevel = dimlevel;
-        }
-
-        public HomeduinoProtocol getProtocol() {
-            return HomeduinoProtocol.this;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public boolean getAll() {
-            return all;
-        }
-
-        public Integer getState() {
-            return state;
-        }
-
-        public int getUnit() {
-            return unit;
-        }
-
-        public Integer getDimlevel() {
-            return dimlevel;
-        }
-    }
 }

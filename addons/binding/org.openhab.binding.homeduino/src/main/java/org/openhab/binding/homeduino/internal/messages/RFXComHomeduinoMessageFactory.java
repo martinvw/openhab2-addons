@@ -8,20 +8,22 @@
  */
 package org.openhab.binding.homeduino.internal.messages;
 
-import java.lang.reflect.Constructor;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
 import org.openhab.binding.homeduino.internal.messages.homeduino.Dimmer1Message;
 import org.openhab.binding.homeduino.internal.messages.homeduino.HomeduinoProtocol;
 import org.openhab.binding.homeduino.internal.messages.homeduino.Pir1Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Result;
 import org.openhab.binding.homeduino.internal.messages.homeduino.Shutter3Message;
 import org.openhab.binding.homeduino.internal.messages.homeduino.Switch1Message;
 import org.openhab.binding.homeduino.internal.messages.homeduino.Switch2Message;
 import org.openhab.binding.homeduino.internal.messages.homeduino.Switch4Message;
+import org.openhab.binding.homeduino.internal.messages.homeduino.Weather1Message;
+
+import java.lang.reflect.Constructor;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 class RFXComHomeduinoMessageFactory {
     private static final Map<Class<? extends HomeduinoProtocol>, PacketType> MAP = Collections
@@ -33,17 +35,18 @@ class RFXComHomeduinoMessageFactory {
                     put(Switch1Message.Protocol.class, PacketType.SWITCH1);
                     put(Switch2Message.Protocol.class, PacketType.SWITCH2);
                     put(Switch4Message.Protocol.class, PacketType.SWITCH4);
+                    put(Weather1Message.Protocol.class, PacketType.WEATHER1);
                 }
             });
 
-    static RFXComMessage createMessage(HomeduinoProtocol.Result result) throws RFXComNotImpException, RFXComException {
+    static RFXComMessage createMessage(Result result) throws RFXComNotImpException, RFXComException {
 
         PacketType packetType = getPacketType(result);
 
         try {
             Class<? extends RFXComMessage> clazz = packetType.getMessageClass();
             try {
-                Constructor<? extends RFXComMessage> c = clazz.getConstructor(HomeduinoProtocol.Result.class);
+                Constructor<? extends RFXComMessage> c = clazz.getConstructor(Result.class);
                 return c.newInstance(result);
             } catch (NoSuchMethodException e) {
                 Constructor<? extends RFXComMessage> c = clazz.getConstructor();
@@ -54,7 +57,7 @@ class RFXComHomeduinoMessageFactory {
         }
     }
 
-    private static PacketType getPacketType(HomeduinoProtocol.Result result) {
-        return MAP.get(result.getProtocol().getClass());
+    private static PacketType getPacketType(Result result) {
+        return MAP.get(result.getProtocol());
     }
 }

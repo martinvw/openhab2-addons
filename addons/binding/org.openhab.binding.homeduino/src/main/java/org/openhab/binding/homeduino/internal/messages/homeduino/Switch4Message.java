@@ -13,6 +13,7 @@ import org.openhab.binding.homeduino.internal.messages.PacketType;
 import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Switch4Message extends RFXComHomeduinoMessage implements RFXComMessage {
@@ -20,7 +21,7 @@ public class Switch4Message extends RFXComHomeduinoMessage implements RFXComMess
         // deliberately empty
     }
 
-    public Switch4Message(HomeduinoProtocol.Result result) {
+    public Switch4Message(Result result) {
         super(result);
     }
 
@@ -36,7 +37,7 @@ public class Switch4Message extends RFXComHomeduinoMessage implements RFXComMess
 
     @Override
     public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
-        return Arrays.asList(RFXComValueSelector.COMMAND);
+        return Collections.singletonList(RFXComValueSelector.COMMAND);
     }
 
     @Override
