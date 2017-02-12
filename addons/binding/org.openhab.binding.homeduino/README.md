@@ -53,22 +53,22 @@ This binding currently supports following channels:
 | windspeed | Number | Average wind speed in meters per second. |
 
 ## Installation instructions - Binding
-* stop openhab2 by entering  `sudo systemclt stop openhab2`.
+* stop openhab2 by entering  `sudo systemctl stop openhab2`.
 * copy the .jar file to the addons folder ( `/usr/share/openhab2/addons/` if you installed via apt-get method)
-* start openhab2 by entering  `sudo systemclt start openhab2`.
+* start openhab2 by entering  `sudo systemctl start openhab2`.
 * check openhab.log file for errors such as:
 ```
 [ERROR] [org.openhab.binding.homeduino       ] - FrameworkEvent ERROR - org.openhab.binding.homeduino
 org.osgi.framework.BundleException: Could not resolve module: org.openhab.binding.homeduino [225]
   Unresolved requirement: Import-Package: gnu.io
 ```
-if you see these errors then you need to  install gnu.io library which can be installed by entering the karaf console (`ssh openhab@localhost -p 8101` user:openhab password:habopen - in default configuration karaf console is only available locally) and entering following command: `feature:install openhab-transport-serial` (This will install nrjavaserial, which packages rxtx (which implements gnu.io) and automatically unpacks the suitable binaries for your platform). Restart openhab2 by entering  `sudo systemclt restart openhab2`.
+if you see these errors then you need to  install gnu.io library which can be installed by entering the karaf console (`ssh openhab@localhost -p 8101` user:openhab password:habopen - in default configuration karaf console is only available locally) and entering following command: `feature:install openhab-transport-serial` (This will install nrjavaserial, which packages rxtx (which implements gnu.io) and automatically unpacks the suitable binaries for your platform). Restart openhab2 by entering  `sudo systemctl restart openhab2`.
 * you should now see `Homeduino 433.92MHz Tranciever` Thing in your Inbox in PaperUI and be able to add it by clicking the + button. If its status is OFFLINE check the openhab.log file again and look for errors:
 ```
 [ERROR] [duino.handler.HomeduinoBridgeHandler] - Connection to RFXCOM transceiver failed: null 
 [DEBUG] [duino.handler.HomeduinoBridgeHandler] - Checking Homeduino transceiver connection, thing status = OFFLINE
 ```
-If they are present, this means that openhab can't communicate with your homeduino and you need to add user openhab to the dialout group by entering: `sudo adduser openhab dialout` and restart openhab2 by entering  `sudo systemclt restart openhab2`.
+If they are present, this means that openhab can't communicate with your homeduino and you need to add user openhab to the dialout group by entering: `sudo adduser openhab dialout` and restart openhab2 by entering  `sudo systemctl restart openhab2`.
 * now all that is left is to configure the Homeduino 433.92MHz Tranciever Thing in the PaperUI:
     Serial port should be entered like `/dev/ttyUSB0` (check your /dev/ folder to determine the correct folder). if you use more than one USB device in your setup please see https://github.com/openhab/openhab1-addons/wiki/symlinks on how to handle serial port changes. If you have more than one USB device (e.g. a Zwave dongle and an RFXCOM dongle, the USB name will change every time you reboot.
     
