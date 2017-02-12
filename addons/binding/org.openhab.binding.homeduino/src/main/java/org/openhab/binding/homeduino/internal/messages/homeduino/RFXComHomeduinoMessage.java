@@ -24,10 +24,9 @@ import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
 abstract public class RFXComHomeduinoMessage implements RFXComMessage {
     private HomeduinoProtocol.Result result;
-    Command command;
+    private Command command;
 
     RFXComHomeduinoMessage() {
-        // deliberately empty
         this.command = new Command();
     }
 
@@ -51,6 +50,10 @@ abstract public class RFXComHomeduinoMessage implements RFXComMessage {
 
     abstract HomeduinoProtocol getProtocol();
 
+    public Command getCommand() {
+        return command;
+    }
+
     @Override
     public State convertToState(RFXComValueSelector valueSelector) throws RFXComException {
         if (valueSelector == RFXComValueSelector.DIMMING_LEVEL) {
@@ -64,8 +67,6 @@ abstract public class RFXComHomeduinoMessage implements RFXComMessage {
                 return UpDownType.UP;
             } else if (result.getState() == 3) {
                 return UpDownType.DOWN;
-            //} else if (result.getState() == 5) {
-            //    return StopMoveType.STOP;
             } else {
                 return UnDefType.UNDEF;
             }

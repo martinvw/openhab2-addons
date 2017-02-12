@@ -37,7 +37,7 @@ public class Shutter3Message extends RFXComHomeduinoMessage implements RFXComMes
 
     @Override
     public List<RFXComValueSelector> getSupportedInputValueSelectors() {
-        return singletonList(RFXComValueSelector.COMMAND);
+        return singletonList(RFXComValueSelector.SHUTTER);
     }
 
     @Override

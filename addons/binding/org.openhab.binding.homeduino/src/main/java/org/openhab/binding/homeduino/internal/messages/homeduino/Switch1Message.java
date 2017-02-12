@@ -50,8 +50,8 @@ public class Switch1Message extends RFXComHomeduinoMessage implements RFXComMess
     public void setDeviceId(String deviceId) throws RFXComException {
         super.setDeviceId(deviceId);
 
-        if ("0".equals(command.getUnitCode())) {
-            command.setGroup(true);
+        if ("0".equals(getCommand().getUnitCode())) {
+            getCommand().setGroup(true);
         }
     }
 
