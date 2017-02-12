@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="homeduino" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="switch2">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="homeduino" />
+		</supported-bridge-type-refs>
+		
+        <label>Homeduino Switch2 Actuator</label>
+        <description>A Switch2 device.</description>
+
+        <channels>
+            <channel id="command" typeId="command" />
+            <channel id="contact" typeId="contact" />
+        </channels>
+
+        <config-description>
+            <parameter name="deviceId" type="text" required="true">
+                <label>Device Id</label>
+                <description>Device Id. House code + unit code, separated by dot. Example A.1</description>
+            </parameter>
+        </config-description>
+	</thing-type>
+
+</thing:thing-descriptions>

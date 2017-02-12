@@ -3,7 +3,7 @@
 This is an openHAB binding for Tellstick devices produced by Telldus, a Swedish company based in Lund.
 
 The original Tellstick focused on controlling 433 MHz devices like switches, dimmers and reading sensors from different brands. <br>
-Many of the supported devices are cheaper and "low-end" and support have been made by reverse engineer the transmission protocols. <br>
+Many of the supported devices are cheaper and "low-end" and support have been made by reverse engineer the transmission org.openhab.binding.homeduino.internal.protocols. <br>
 All of these 433 MHz devices is one-way, so some versions of the Tellstick monitoring the air to keep the state of all devices.
 
 The latest versions have also implemented Z-Wave as transmission protocol which open up for more robust transmission due two-ways communication.

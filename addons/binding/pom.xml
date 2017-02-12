@@ -35,6 +35,8 @@
     <module>org.openhab.binding.hdpowerview</module>
     <module>org.openhab.binding.homematic</module>
     <module>org.openhab.binding.globalcache</module>
+    <module>org.openhab.binding.homeduino</module>
+    <module>org.openhab.binding.homeduino.test</module>
     <module>org.openhab.binding.ipp</module>
     <module>org.openhab.binding.keba</module>
     <module>org.openhab.binding.kodi</module>
