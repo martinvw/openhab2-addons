@@ -1,14 +1,20 @@
 Manifest-Version: 1.0
+Automatic-Module-Name: org.openhab.binding.icloud
 Bundle-ManifestVersion: 2
 Bundle-Name: iCloud Binding
 Bundle-SymbolicName: org.openhab.binding.icloud;singleton:=true
 Bundle-Vendor: openHAB
-Bundle-Version: 2.3.0.qualifier
+Bundle-Version: 2.4.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
-Import-Package: com.google.gson;resolution:=optional,
+Import-Package: com.google.gson,
  com.google.gson.annotations,
  org.eclipse.jdt.annotation;resolution:=optional,
+ org.eclipse.jetty.client,
+ org.eclipse.jetty.client.api,
+ org.eclipse.jetty.client.util,
+ org.eclipse.jetty.util.component,
+ org.eclipse.jetty.http,
  org.eclipse.smarthome.config.core,
  org.eclipse.smarthome.config.discovery,
  org.eclipse.smarthome.core.cache,
@@ -19,10 +25,10 @@ Import-Package: com.google.gson;resolution:=optional,
  org.eclipse.smarthome.core.thing.binding.builder,
  org.eclipse.smarthome.core.thing.type,
  org.eclipse.smarthome.core.types,
+ org.eclipse.smarthome.io.net.http,
  org.openhab.binding.icloud,
  org.openhab.binding.icloud.handler,
  org.osgi.framework,
- org.osgi.service.component.annotations;resolution:=optional,
  org.slf4j
 Service-Component: OSGI-INF/*.xml
 Export-Package: org.openhab.binding.icloud,

@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
  * SSE communication
  *
  * @author Tobias Bräutigam
- * @since 2.0.0
  */
 @Path(Config.COMETVISU_BACKEND_ALIAS + "/" + Config.COMETVISU_BACKEND_READ_ALIAS)
 public class ReadResource implements EventBroadcaster, RESTResource {
@@ -226,12 +225,8 @@ public class ReadResource implements EventBroadcaster, RESTResource {
      */
     @Override
     public void broadcastEvent(final Object eventObject) {
-        executorService.execute(new Runnable() {
-
-            @Override
-            public void run() {
-                broadcaster.broadcast(SseUtil.buildEvent(eventObject));
-            }
+        executorService.execute(() -> {
+            broadcaster.broadcast(SseUtil.buildEvent(eventObject));
         });
     }
 

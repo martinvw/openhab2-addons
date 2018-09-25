@@ -32,12 +32,12 @@ import org.slf4j.LoggerFactory;
  * {@link NikoHomeControlBridgeDiscoveryService} is used to discover a Niko Home Control IP-interface in the local
  * network.
  *
- * @author Mark Herwege
+ * @author Mark Herwege - Initial Contribution
  */
 @Component(service = DiscoveryService.class, immediate = true, configurationPid = "discovery.nikohomecontrol")
 public class NikoHomeControlBridgeDiscoveryService extends AbstractDiscoveryService {
 
-    private Logger logger = LoggerFactory.getLogger(NikoHomeControlBridgeDiscoveryService.class);
+    private final Logger logger = LoggerFactory.getLogger(NikoHomeControlBridgeDiscoveryService.class);
 
     private ScheduledFuture<?> nhcDiscoveryJob;
 
@@ -69,13 +69,6 @@ public class NikoHomeControlBridgeDiscoveryService extends AbstractDiscoveryServ
         }
     }
 
-    private Runnable nhcDiscoveryRunnable = new Runnable() {
-        @Override
-        public void run() {
-            discoverBridge();
-        }
-    };
-
     private void addBridge(InetAddress addr, String bridgeId) {
         logger.debug("Niko Home Control: bridge found at {}", addr);
 
@@ -102,7 +95,7 @@ public class NikoHomeControlBridgeDiscoveryService extends AbstractDiscoveryServ
     protected void startBackgroundDiscovery() {
         logger.debug("Niko Home Control: Start background bridge discovery");
         if (nhcDiscoveryJob == null || nhcDiscoveryJob.isCancelled()) {
-            nhcDiscoveryJob = scheduler.scheduleWithFixedDelay(nhcDiscoveryRunnable, 0, REFRESH_INTERVAL,
+            nhcDiscoveryJob = scheduler.scheduleWithFixedDelay(this::discoverBridge, 0, REFRESH_INTERVAL,
                     TimeUnit.SECONDS);
         }
     }

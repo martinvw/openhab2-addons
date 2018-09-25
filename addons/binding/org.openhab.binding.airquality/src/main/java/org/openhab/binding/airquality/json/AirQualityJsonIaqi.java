@@ -19,7 +19,7 @@ import com.google.gson.annotations.SerializedName;
  * as well as some basic weather metrics.
  *
  * @author Kuba Wolanin - Initial contribution
- * @author Łukasz Dywicki
+ * @author Łukasz Dywicki - Initial contribution
  */
 public class AirQualityJsonIaqi {
 
@@ -34,8 +34,10 @@ public class AirQualityJsonIaqi {
     private AirQualityValue<BigDecimal> pressure;
     private AirQualityValue<BigDecimal> h;
 
-    public AirQualityJsonIaqi() {
+    @SerializedName("w")
+    private AirQualityValue<BigDecimal> wind;
 
+    public AirQualityJsonIaqi() {
     }
 
     public BigDecimal getPm25() {
@@ -68,6 +70,10 @@ public class AirQualityJsonIaqi {
 
     public BigDecimal getH() {
         return h.getValue();
+    }
+
+    public BigDecimal getW() {
+        return wind.getValue();
     }
 
 }

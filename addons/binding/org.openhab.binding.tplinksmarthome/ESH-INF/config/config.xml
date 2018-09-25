@@ -2,7 +2,7 @@
 <config-description:config-descriptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:config-description="http://eclipse.org/smarthome/schemas/config-description/v1.0.0"
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/config-description/v1.0.0
-        http://eclipse.org/smarthome/schemas/config-description-1.0.0.xsd">
+		http://eclipse.org/smarthome/schemas/config-description-1.0.0.xsd">
 
 	<config-description uri="thing-type:device:bulb">
 		<parameter name="ipAddress" type="text" required="true">
@@ -16,7 +16,7 @@
 			<unitLabel>milliseconds</unitLabel>
 			<default>0</default>
 		</parameter>
-		<parameter name="refresh" type="integer" min="0">
+		<parameter name="refresh" type="integer" min="1">
 			<label>Refresh rate</label>
 			<description>Refresh of device state in seconds.</description>
 			<unitLabel>seconds</unitLabel>
@@ -30,7 +30,7 @@
 			<label>IP Address</label>
 			<description>IP Address of the device.</description>
 		</parameter>
-		<parameter name="refresh" type="integer">
+		<parameter name="refresh" type="integer" min="1">
 			<label>Refresh rate</label>
 			<description>Refresh of device state in seconds.</description>
 			<unitLabel>seconds</unitLabel>
@@ -44,7 +44,7 @@
 			<label>IP Address</label>
 			<description>IP Address of the device.</description>
 		</parameter>
-		<parameter name="refresh" type="integer">
+		<parameter name="refresh" type="integer" min="1">
 			<label>Refresh rate</label>
 			<description>Refresh of device state in seconds.</description>
 			<unitLabel>seconds</unitLabel>

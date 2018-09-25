@@ -3,7 +3,6 @@
 	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
-	<!-- Sample Thing Type -->
 	<thing-type id="kecontact">
 		<label>KeContact EV Charging Station</label>
 		<description>This Thing supports the KeContact EV Charging station</description>
@@ -13,7 +12,7 @@
 			<channel id="error1" typeId="error1" />
 			<channel id="error2" typeId="error2" />
 			<channel id="wallbox" typeId="plug" />
-			<channel id="vehicule" typeId="plug" />
+			<channel id="vehicle" typeId="plug" />
 			<channel id="locked" typeId="locked" />
 			<channel id="enabled" typeId="switch" />
 			<channel id="maxpilotcurrent" typeId="current" />

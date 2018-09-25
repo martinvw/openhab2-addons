@@ -98,14 +98,11 @@ public class OneWireGPIOHandler extends BaseThingHandler {
     }
 
     private void startAutomaticRefresh() {
-        Runnable refresher = new Runnable() {
-            @Override
-            public void run() {
-                List<Channel> channels = getThing().getChannels();
-                for (Channel channel : channels) {
-                    if (isLinked(channel.getUID().getId())) {
-                        publishSensorValue(channel.getUID());
-                    }
+        Runnable refresher = () -> {
+            List<Channel> channels = getThing().getChannels();
+            for (Channel channel : channels) {
+                if (isLinked(channel.getUID().getId())) {
+                    publishSensorValue(channel.getUID());
                 }
             }
         };
@@ -152,7 +149,7 @@ public class OneWireGPIOHandler extends BaseThingHandler {
                 return null;
             }
         } catch (IOException | InvalidPathException e) {
-            logger.debug("error reading GPIO bus file. File path is: {}.  Check if path is proper. {}", gpioFile, e);
+            logger.debug("error reading GPIO bus file. File path is: {}.  Check if path is proper.", gpioFile, e);
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Error reading GPIO bus file.");
             return null;
         }

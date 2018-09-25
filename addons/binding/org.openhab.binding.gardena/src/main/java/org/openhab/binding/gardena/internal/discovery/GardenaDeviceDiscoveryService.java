@@ -8,7 +8,7 @@
  */
 package org.openhab.binding.gardena.internal.discovery;
 
-import static org.openhab.binding.gardena.GardenaBindingConstants.BINDING_ID;
+import static org.openhab.binding.gardena.internal.GardenaBindingConstants.BINDING_ID;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
@@ -19,9 +19,9 @@ import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
-import org.openhab.binding.gardena.handler.GardenaAccountHandler;
 import org.openhab.binding.gardena.internal.GardenaSmart;
 import org.openhab.binding.gardena.internal.exception.GardenaException;
+import org.openhab.binding.gardena.internal.handler.GardenaAccountHandler;
 import org.openhab.binding.gardena.internal.model.Device;
 import org.openhab.binding.gardena.internal.model.Location;
 import org.openhab.binding.gardena.internal.util.UidUtils;
@@ -80,35 +80,31 @@ public class GardenaDeviceDiscoveryService extends AbstractDiscoveryService {
      */
     public void loadDevices() {
         if (scanFuture == null) {
-            scanFuture = scheduler.submit(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        GardenaSmart gardena = accountHandler.getGardenaSmart();
-                        gardena.loadAllDevices();
-                        for (Location location : gardena.getLocations()) {
-                            for (String deviceId : location.getDeviceIds()) {
-                                deviceDiscovered(gardena.getDevice(deviceId));
-                            }
+            scanFuture = scheduler.submit(() -> {
+                try {
+                    GardenaSmart gardena = accountHandler.getGardenaSmart();
+                    gardena.loadAllDevices();
+                    for (Location location : gardena.getLocations()) {
+                        for (String deviceId : location.getDeviceIds()) {
+                            deviceDiscovered(gardena.getDevice(deviceId));
                         }
-
-                        for (Thing thing : accountHandler.getThing().getThings()) {
-                            try {
-                                gardena.getDevice(UidUtils.getGardenaDeviceId(thing));
-                            } catch (GardenaException ex) {
-                                thingRemoved(thing.getUID());
-                            }
-                        }
-
-                        logger.debug("Finished Gardena device discovery scan on gateway '{}'",
-                                accountHandler.getGardenaSmart().getId());
-                    } catch (Throwable ex) {
-                        logger.error("{}", ex.getMessage(), ex);
-                    } finally {
-                        scanFuture = null;
-                        removeOlderResults(getTimestampOfLastScan());
                     }
+
+                    for (Thing thing : accountHandler.getThing().getThings()) {
+                        try {
+                            gardena.getDevice(UidUtils.getGardenaDeviceId(thing));
+                        } catch (GardenaException ex) {
+                            thingRemoved(thing.getUID());
+                        }
+                    }
+
+                    logger.debug("Finished Gardena device discovery scan on gateway '{}'",
+                            accountHandler.getGardenaSmart().getId());
+                } catch (GardenaException ex) {
+                    logger.error("{}", ex.getMessage(), ex);
+                } finally {
+                    scanFuture = null;
+                    removeOlderResults(getTimestampOfLastScan());
                 }
             });
         } else {

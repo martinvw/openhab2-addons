@@ -12,8 +12,7 @@ package org.openhab.binding.pulseaudio.internal.items;
  * GenericAudioItems are any kind of items that deal with audio data and can be
  * muted or their volume can be changed.
  *
- * @author Tobias Bräutigam
- * @since 1.2.0
+ * @author Tobias Bräutigam - Initial contribution
  */
 public abstract class AbstractAudioDeviceConfig extends AbstractDeviceConfig {
 

@@ -58,4 +58,14 @@ public interface ZoneControl extends IStateUpdatable {
     void setInput(String name) throws IOException, ReceivedMessageParseException;
 
     void setSurroundProgram(String name) throws IOException, ReceivedMessageParseException;
+
+    void setDialogueLevel(int level) throws IOException, ReceivedMessageParseException;
+
+    /**
+     * Sets the active scene for the zone.
+     * @param scene
+     * @throws IOException
+     * @throws ReceivedMessageParseException
+     */
+    void setScene(String scene) throws IOException, ReceivedMessageParseException;
 }

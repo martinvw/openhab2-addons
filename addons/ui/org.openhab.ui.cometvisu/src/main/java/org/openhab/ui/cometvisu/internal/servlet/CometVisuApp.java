@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
  * registers the CometVisuServlet-Service
  *
  * @author Tobias Bräutigam
- * @since 2.0.0
  */
 public class CometVisuApp {
 
@@ -190,7 +189,16 @@ public class CometVisuApp {
                 Config.COMETVISU_WEBAPP_ALIAS = (String) properties.get(Config.COMETVISU_WEBAPP_ALIAS_PROPERTY);
             }
             if (properties.get(Config.COMETVISU_AUTODOWNLOAD_PROPERTY) != null) {
-                Boolean newValue = (Boolean) properties.get(Config.COMETVISU_AUTODOWNLOAD_PROPERTY);
+                Object propertyValue = properties.get(Config.COMETVISU_AUTODOWNLOAD_PROPERTY);
+
+                // Value might be a string or a boolean
+                Boolean newValue = false;
+                if (propertyValue instanceof String) {
+                    newValue = Boolean.valueOf((String) propertyValue);
+                } else if (propertyValue instanceof Boolean) {
+                    newValue = (Boolean) propertyValue;
+                }
+
                 boolean changed = Config.COMETVISU_AUTO_DOWNLOAD != newValue;
                 Config.COMETVISU_AUTO_DOWNLOAD = newValue;
                 if (Config.COMETVISU_AUTO_DOWNLOAD && changed) {

@@ -8,7 +8,7 @@
  */
 package org.openhab.binding.kodi.internal;
 
-import static org.openhab.binding.kodi.KodiBindingConstants.*;
+import static org.openhab.binding.kodi.internal.KodiBindingConstants.*;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -24,11 +24,10 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
-import org.openhab.binding.kodi.handler.KodiHandler;
+import org.openhab.binding.kodi.internal.handler.KodiHandler;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +37,9 @@ import org.slf4j.LoggerFactory;
  * handlers.
  *
  * @author Paul Frank - Initial contribution
+ * @author Christoph Weitkamp - Improvements on channels for opening PVR TV or Radio streams
  */
-@Component(service = ThingHandlerFactory.class, immediate = true, configurationPid = "binding.kodi", configurationPolicy = ConfigurationPolicy.OPTIONAL)
+@Component(service = ThingHandlerFactory.class, configurationPid = "binding.kodi")
 public class KodiHandlerFactory extends BaseThingHandlerFactory {
 
     private Logger logger = LoggerFactory.getLogger(KodiHandlerFactory.class);
@@ -51,6 +51,8 @@ public class KodiHandlerFactory extends BaseThingHandlerFactory {
     private String callbackUrl = null;
 
     private Map<String, ServiceRegistration<AudioSink>> audioSinkRegistrations = new ConcurrentHashMap<>();
+
+    private KodiDynamicStateDescriptionProvider stateDescriptionProvider;
 
     @Override
     protected void activate(ComponentContext componentContext) {
@@ -69,7 +71,7 @@ public class KodiHandlerFactory extends BaseThingHandlerFactory {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (thingTypeUID.equals(THING_TYPE_KODI)) {
-            KodiHandler handler = new KodiHandler(thing);
+            KodiHandler handler = new KodiHandler(thing, stateDescriptionProvider);
 
             // register the Kodi as an audio sink
             KodiAudioSink audioSink = new KodiAudioSink(handler, audioHTTPServer, createCallbackUrl());
@@ -132,4 +134,12 @@ public class KodiHandlerFactory extends BaseThingHandlerFactory {
         this.networkAddressService = null;
     }
 
+    @Reference
+    protected void setDynamicStateDescriptionProvider(KodiDynamicStateDescriptionProvider stateDescriptionProvider) {
+        this.stateDescriptionProvider = stateDescriptionProvider;
+    }
+
+    protected void unsetDynamicStateDescriptionProvider(KodiDynamicStateDescriptionProvider stateDescriptionProvider) {
+        this.stateDescriptionProvider = null;
+    }
 }

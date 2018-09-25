@@ -13,8 +13,7 @@ package org.openhab.binding.pulseaudio.internal.items;
  * pulseaudio server has a name and a unique id which can be inherited by this
  * class.
  *
- * @author Tobias Bräutigam
- * @since 1.2.0
+ * @author Tobias Bräutigam - Initial contribution
  */
 public abstract class AbstractDeviceConfig {
 

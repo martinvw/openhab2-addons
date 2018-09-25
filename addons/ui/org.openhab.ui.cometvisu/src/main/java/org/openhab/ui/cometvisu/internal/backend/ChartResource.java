@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
  * used by the diagram plugin
  *
  * @author Tobias Bräutigam
- * @since 2.0.0
  *
  */
 @Path(Config.COMETVISU_BACKEND_ALIAS + "/" + Config.COMETVISU_BACKEND_CHART_ALIAS)
@@ -153,9 +152,13 @@ public class ChartResource implements RESTResource {
                         .iterator();
                 if (pit.hasNext()) {
                     persistenceService = pit.next().getValue();
+                    logger.debug("required persistence service ({}) not found, using {} instead", service,
+                            persistenceService.getId());
                 } else {
                     throw new IllegalArgumentException("No Persistence service found.");
                 }
+            } else {
+                logger.debug("using {} persistence for item {}", persistenceService.getId(), itemName);
             }
             Object data = null;
             if (persistenceService.getId().equals("rrd4j")) {

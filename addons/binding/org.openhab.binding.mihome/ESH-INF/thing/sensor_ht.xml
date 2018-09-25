@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<thing:thing-descriptions bindingId="mihome" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<thing:thing-descriptions bindingId="mihome"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
@@ -9,7 +10,8 @@
 		</supported-bridge-type-refs>
 		<label>Xiaomi Mi Temperature &amp; Humidity Sensor</label>
 		<description>Reports temperature and humidity. Operating temperature: −20°C to 60°C. Operating humidity: 0 to 100%.
-		Sensor reports the temperature when there's a difference around 0.5°C. If there is no significant temperature change, sensor reports temperature once a 50 minutes.\
+			Sensor reports the temperature when there's a difference around 0.5°C. If there is no significant temperature change,
+			sensor reports temperature once a 50 minutes.\
 		</description>
 		<channels>
 			<channel id="temperature" typeId="temperature" />

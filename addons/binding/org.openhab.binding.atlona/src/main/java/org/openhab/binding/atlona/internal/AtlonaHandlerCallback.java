@@ -11,14 +11,13 @@ package org.openhab.binding.atlona.internal;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.types.State;
-import org.openhab.binding.atlona.handler.AtlonaHandler;
+import org.openhab.binding.atlona.internal.handler.AtlonaHandler;
 
 /**
  *
  * A callback to {@link AtlonaHandler} that can be used to update the status, properties and state of the thing.
  *
- * @author Tim Roberts
- *
+ * @author Tim Roberts - Initial contribution
  */
 public interface AtlonaHandlerCallback {
     /**

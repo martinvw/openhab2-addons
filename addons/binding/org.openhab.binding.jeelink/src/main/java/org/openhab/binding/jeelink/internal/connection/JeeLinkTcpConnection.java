@@ -47,6 +47,7 @@ public class JeeLinkTcpConnection extends AbstractJeeLinkConnection {
             reader = null;
             closeSocketSilently();
             socket = null;
+            notifyClosed();
         }
     }
 
@@ -123,11 +124,13 @@ public class JeeLinkTcpConnection extends AbstractJeeLinkConnection {
                     propagateLine(line);
                 }
             } catch (IOException ex) {
-                closeConnection();
-                notifyAbort(ex.getMessage());
+                if (isRunning) {
+                    closeConnection();
+                    notifyAbort(ex.getMessage());
+                }
+            } finally {
+                logger.debug("Reader for TCP port {} finished...", port);
             }
-
-            logger.debug("Reader for TCP port {} finished...", port);
         }
 
         public void close() {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<thing:thing-descriptions bindingId="mihome" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<thing:thing-descriptions bindingId="mihome"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
@@ -10,6 +11,7 @@
 		<label>Xiaomi Mi Smart Home Gateway</label>
 		<description>Multifunctional Gateway - has a built in light and ambient light sensor and can play sounds</description>
 		<channels>
+			<channel typeId="joinPermission" id="joinPermission" />
 			<channel id="brightness" typeId="brightness" />
 			<channel id="illumination" typeId="illumination" />
 			<channel id="color" typeId="color" />

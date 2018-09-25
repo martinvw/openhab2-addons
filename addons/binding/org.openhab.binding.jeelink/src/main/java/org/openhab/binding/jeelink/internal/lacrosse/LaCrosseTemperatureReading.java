@@ -18,20 +18,22 @@ import org.openhab.binding.jeelink.internal.Reading;
 public class LaCrosseTemperatureReading implements Reading {
     private String sensorId;
     private int sensorType;
-    private float temp;
-    private int humidity;
+    private int channel;
+    private Float temp;
+    private Integer humidity;
     private boolean batteryNew;
     private boolean batteryLow;
 
-    public LaCrosseTemperatureReading(int sensorId, int sensorType, float temp, int humidity, boolean batteryNew,
-            boolean batteryLow) {
-        this(String.valueOf(sensorId), sensorType, temp, humidity, batteryNew, batteryLow);
+    public LaCrosseTemperatureReading(int sensorId, int sensorType, int channel, Float temp, Integer humidity,
+            boolean batteryNew, boolean batteryLow) {
+        this(String.valueOf(sensorId), sensorType, channel, temp, humidity, batteryNew, batteryLow);
     }
 
-    public LaCrosseTemperatureReading(String sensorId, int sensorType, float temp, int humidity, boolean batteryNew,
-            boolean batteryLow) {
+    public LaCrosseTemperatureReading(String sensorId, int sensorType, int channel, Float temp, Integer humidity,
+            boolean batteryNew, boolean batteryLow) {
         this.sensorId = sensorId;
         this.sensorType = sensorType;
+        this.channel = channel;
         this.temp = temp;
         this.humidity = humidity;
         this.batteryNew = batteryNew;
@@ -47,11 +49,11 @@ public class LaCrosseTemperatureReading implements Reading {
         return sensorType;
     }
 
-    public float getTemperature() {
+    public Float getTemperature() {
         return temp;
     }
 
-    public int getHumidity() {
+    public Integer getHumidity() {
         return humidity;
     }
 
@@ -61,11 +63,15 @@ public class LaCrosseTemperatureReading implements Reading {
 
     @Override
     public String toString() {
-        return "sensorId=" + sensorId + ": temp=" + temp + ", hum=" + humidity + ", batLow=" + batteryLow + ", batNew="
-                + batteryNew;
+        return "sensorId=" + sensorId + ": channel=" + channel + ", temp=" + temp + ", hum=" + humidity + ", batLow="
+                + batteryLow + ", batNew=" + batteryNew;
     }
 
     public boolean isBatteryNew() {
         return batteryNew;
+    }
+
+    public int getChannel() {
+        return channel;
     }
 }

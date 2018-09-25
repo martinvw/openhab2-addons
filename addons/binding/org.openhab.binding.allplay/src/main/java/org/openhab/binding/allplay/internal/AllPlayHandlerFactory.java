@@ -8,7 +8,7 @@
  */
 package org.openhab.binding.allplay.internal;
 
-import static org.openhab.binding.allplay.AllPlayBindingConstants.SPEAKER_THING_TYPE;
+import static org.openhab.binding.allplay.internal.AllPlayBindingConstants.SPEAKER_THING_TYPE;
 
 import java.util.Collections;
 import java.util.Dictionary;
@@ -26,12 +26,10 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
-import org.openhab.binding.allplay.AllPlayBindingConstants;
-import org.openhab.binding.allplay.handler.AllPlayHandler;
+import org.openhab.binding.allplay.internal.handler.AllPlayHandler;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +43,7 @@ import de.kaizencode.tchaikovsky.exception.AllPlayException;
  *
  * @author Dominic Lerbs - Initial contribution
  */
-@Component(service = ThingHandlerFactory.class, immediate = true, configurationPid = "binding.allplay", configurationPolicy = ConfigurationPolicy.OPTIONAL)
+@Component(service = ThingHandlerFactory.class, configurationPid = "binding.allplay")
 public class AllPlayHandlerFactory extends BaseThingHandlerFactory {
 
     private final Logger logger = LoggerFactory.getLogger(AllPlayHandlerFactory.class);

@@ -8,12 +8,24 @@
  */
 package org.openhab.binding.mihome.handler;
 
+import static org.eclipse.smarthome.core.library.unit.MetricPrefix.*;
 import static org.openhab.binding.mihome.XiaomiGatewayBindingConstants.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
+import javax.measure.Unit;
+import javax.measure.quantity.Angle;
+import javax.measure.quantity.Dimensionless;
+import javax.measure.quantity.Pressure;
+import javax.measure.quantity.Temperature;
+import javax.measure.quantity.Time;
+
+import org.eclipse.smarthome.core.library.unit.SIUnits;
+import org.eclipse.smarthome.core.library.unit.SmartHomeUnits;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -45,15 +57,23 @@ import com.google.gson.JsonSyntaxException;
  */
 public abstract class XiaomiDeviceBaseHandler extends BaseThingHandler implements XiaomiItemUpdateListener {
 
-    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES = new HashSet<>(Arrays.asList(THING_TYPE_GATEWAY,
-            THING_TYPE_SENSOR_HT, THING_TYPE_SENSOR_AQARA_WEATHER_V1, THING_TYPE_SENSOR_MOTION,
-            THING_TYPE_SENSOR_AQARA_MOTION, THING_TYPE_SENSOR_SWITCH, THING_TYPE_SENSOR_AQARA_SWITCH,
-            THING_TYPE_SENSOR_MAGNET, THING_TYPE_SENSOR_AQARA_MAGNET, THING_TYPE_SENSOR_CUBE, THING_TYPE_SENSOR_AQARA1,
-            THING_TYPE_SENSOR_AQARA2, THING_TYPE_SENSOR_GAS, THING_TYPE_SENSOR_SMOKE, THING_TYPE_SENSOR_WATER,
-            THING_TYPE_ACTOR_AQARA1, THING_TYPE_ACTOR_AQARA2, THING_TYPE_ACTOR_PLUG, THING_TYPE_ACTOR_AQARA_ZERO1,
-            THING_TYPE_ACTOR_AQARA_ZERO2, THING_TYPE_ACTOR_CURTAIN));
+    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES = new HashSet<>(
+            Arrays.asList(THING_TYPE_GATEWAY, THING_TYPE_SENSOR_HT, THING_TYPE_SENSOR_AQARA_WEATHER_V1,
+                    THING_TYPE_SENSOR_MOTION, THING_TYPE_SENSOR_AQARA_MOTION, THING_TYPE_SENSOR_SWITCH,
+                    THING_TYPE_SENSOR_AQARA_SWITCH, THING_TYPE_SENSOR_MAGNET, THING_TYPE_SENSOR_AQARA_MAGNET,
+                    THING_TYPE_SENSOR_CUBE, THING_TYPE_SENSOR_AQARA_VIBRATION, THING_TYPE_SENSOR_AQARA1,
+                    THING_TYPE_SENSOR_AQARA2, THING_TYPE_SENSOR_GAS, THING_TYPE_SENSOR_SMOKE, THING_TYPE_SENSOR_WATER,
+                    THING_TYPE_ACTOR_AQARA1, THING_TYPE_ACTOR_AQARA2, THING_TYPE_ACTOR_PLUG,
+                    THING_TYPE_ACTOR_AQARA_ZERO1, THING_TYPE_ACTOR_AQARA_ZERO2, THING_TYPE_ACTOR_CURTAIN));
 
-    private static final long ONLINE_TIMEOUT_MILLIS = 2 * 60 * 60 * 1000; // 2 hours
+    protected static final Unit<Temperature> TEMPERATURE_UNIT = SIUnits.CELSIUS;
+    protected static final Unit<Pressure> PRESSURE_UNIT = KILO(SIUnits.PASCAL);
+    protected static final Unit<Dimensionless> PERCENT_UNIT = SmartHomeUnits.PERCENT;
+    protected static final Unit<Angle> ANGLE_UNIT = SmartHomeUnits.DEGREE_ANGLE;
+    protected static final Unit<Time> TIME_UNIT = MILLI(SmartHomeUnits.SECOND);
+
+    private static final long ONLINE_TIMEOUT_MILLIS = TimeUnit.HOURS.toMillis(2);
+    private ScheduledFuture<?> onlineCheckTask;
 
     private JsonParser parser = new JsonParser();
 
@@ -74,7 +94,8 @@ public abstract class XiaomiDeviceBaseHandler extends BaseThingHandler implement
     @Override
     public void initialize() {
         setItemId((String) getConfig().get(ITEM_ID));
-        updateThingStatus();
+        onlineCheckTask = scheduler.scheduleWithFixedDelay(this::updateThingStatus, 0, ONLINE_TIMEOUT_MILLIS / 2,
+                TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -87,13 +108,17 @@ public abstract class XiaomiDeviceBaseHandler extends BaseThingHandler implement
             }
             setItemId(null);
         }
+        if (!onlineCheckTask.isDone()) {
+            onlineCheckTask.cancel(false);
+        }
+
     }
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         logger.debug("Device {} on channel {} received command {}", getItemId(), channelUID, command);
         if (command instanceof RefreshType) {
-            JsonObject message = getXiaomiBridgeHandler().getRetentedMessage(getItemId());
+            JsonObject message = getXiaomiBridgeHandler().getDeferredMessage(getItemId());
             if (message != null) {
                 String cmd = message.get("cmd").getAsString();
                 logger.debug("Update Item {} with retented message", getItemId());
@@ -107,7 +132,9 @@ public abstract class XiaomiDeviceBaseHandler extends BaseThingHandler implement
     @Override
     public void onItemUpdate(String sid, String command, JsonObject message) {
         if (getItemId() != null && getItemId().equals(sid)) {
-            updateThingStatus();
+            if (getThing().getStatus() != ThingStatus.ONLINE) {
+                updateStatus(ThingStatus.ONLINE);
+            }
             logger.debug("Item got update: {}", message);
             try {
                 JsonObject data = parser.parse(message.get("data").getAsString()).getAsJsonObject();

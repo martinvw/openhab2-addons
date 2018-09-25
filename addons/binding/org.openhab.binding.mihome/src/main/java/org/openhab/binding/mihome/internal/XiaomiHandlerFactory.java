@@ -23,6 +23,7 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
+import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
 import org.openhab.binding.mihome.handler.XiaomiActorCurtainHandler;
 import org.openhab.binding.mihome.handler.XiaomiActorGatewayHandler;
 import org.openhab.binding.mihome.handler.XiaomiActorPlugHandler;
@@ -39,9 +40,11 @@ import org.openhab.binding.mihome.handler.XiaomiSensorMagnetHandler;
 import org.openhab.binding.mihome.handler.XiaomiSensorMotionHandler;
 import org.openhab.binding.mihome.handler.XiaomiSensorSmokeHandler;
 import org.openhab.binding.mihome.handler.XiaomiSensorSwitchHandler;
+import org.openhab.binding.mihome.handler.XiaomiSensorVibrationHandler;
 import org.openhab.binding.mihome.handler.XiaomiSensorWaterHandler;
 import org.openhab.binding.mihome.internal.discovery.XiaomiItemDiscoveryService;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.annotations.Component;
 
 import com.google.common.collect.Sets;
 
@@ -54,6 +57,7 @@ import com.google.common.collect.Sets;
  * @author Daniel Walters - Added Aqara Door/Window sensor and Aqara temperature, humidity and pressure sensor
  * @author Kuba Wolanin - Added Water Leak sensor and Aqara motion sensor
  */
+@Component(service = ThingHandlerFactory.class, configurationPid = "binding.mihome")
 public class XiaomiHandlerFactory extends BaseThingHandlerFactory {
 
     private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Sets
@@ -83,16 +87,17 @@ public class XiaomiHandlerFactory extends BaseThingHandlerFactory {
     private ThingUID getBridgeThingUID(ThingTypeUID thingTypeUID, ThingUID thingUID, Configuration configuration) {
         if (thingUID == null) {
             String serialNumber = (String) configuration.get(SERIAL_NUMBER);
-            thingUID = new ThingUID(thingTypeUID, serialNumber);
+            return new ThingUID(thingTypeUID, serialNumber);
         }
         return thingUID;
     }
 
     private ThingUID getThingUID(ThingTypeUID thingTypeUID, ThingUID thingUID, Configuration configuration,
             ThingUID bridgeUID) {
+
         if (thingUID == null) {
             String itemId = (String) configuration.get(ITEM_ID);
-            thingUID = new ThingUID(thingTypeUID, itemId, bridgeUID.getId());
+            return new ThingUID(thingTypeUID, itemId, bridgeUID.getId());
         }
         return thingUID;
     }
@@ -147,6 +152,8 @@ public class XiaomiHandlerFactory extends BaseThingHandlerFactory {
             return new XiaomiSensorMagnetHandler(thing);
         } else if (THING_TYPE_SENSOR_AQARA_MOTION.equals(thingTypeUID)) {
             return new XiaomiSensorMotionHandler(thing);
+        } else if (THING_TYPE_SENSOR_AQARA_VIBRATION.equals(thingTypeUID)) {
+            return new XiaomiSensorVibrationHandler(thing);
         } else {
             return null;
         }
@@ -155,22 +162,23 @@ public class XiaomiHandlerFactory extends BaseThingHandlerFactory {
     @Override
     protected synchronized void removeHandler(ThingHandler thingHandler) {
         if (thingHandler instanceof XiaomiBridgeHandler) {
-            ServiceRegistration<?> serviceReg = this.discoveryServiceRegs.get(thingHandler.getThing().getUID());
+            ServiceRegistration<?> serviceReg = this.discoveryServiceRegs.remove(thingHandler.getThing().getUID());
             if (serviceReg != null) {
                 // remove discovery service, if bridge handler is removed
                 XiaomiItemDiscoveryService service = (XiaomiItemDiscoveryService) bundleContext
                         .getService(serviceReg.getReference());
-                service.onHandlerRemoved();
-                service.deactivate();
                 serviceReg.unregister();
-                discoveryServiceRegs.remove(thingHandler.getThing().getUID());
+                if (service != null) {
+                    service.onHandlerRemoved();
+                    service.deactivate();
+                }
             }
         }
     }
 
     private synchronized void registerItemDiscoveryService(XiaomiBridgeHandler bridgeHandler) {
         XiaomiItemDiscoveryService discoveryService = new XiaomiItemDiscoveryService(bridgeHandler);
-        this.discoveryServiceRegs.put(bridgeHandler.getThing().getUID(), bundleContext
-                .registerService(DiscoveryService.class.getName(), discoveryService, new Hashtable<String, Object>()));
+        this.discoveryServiceRegs.put(bridgeHandler.getThing().getUID(),
+                bundleContext.registerService(DiscoveryService.class.getName(), discoveryService, new Hashtable<>()));
     }
 }

@@ -8,7 +8,7 @@
  */
 package org.openhab.binding.feican.internal;
 
-import static org.openhab.binding.feican.FeicanBindingConstants.*;
+import static org.openhab.binding.feican.internal.FeicanBindingConstants.*;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author Hilbrand Bouwkamp - Initial contribution
  */
 @NonNullByDefault
-@Component(service = DiscoveryService.class, immediate = true)
+@Component(service = DiscoveryService.class, immediate = true, configurationPid = "discovery.feican")
 public class FeicanDiscoveryService extends AbstractDiscoveryService {
 
     private static final int DISCOVERY_TIMEOUT_SECONDS = 5;

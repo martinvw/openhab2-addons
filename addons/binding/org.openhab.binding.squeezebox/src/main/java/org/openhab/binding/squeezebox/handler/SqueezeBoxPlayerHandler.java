@@ -10,8 +10,10 @@ package org.openhab.binding.squeezebox.handler;
 
 import static org.openhab.binding.squeezebox.SqueezeBoxBindingConstants.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
@@ -39,10 +41,12 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
+import org.eclipse.smarthome.core.types.StateOption;
 import org.eclipse.smarthome.core.types.UnDefType;
 import org.eclipse.smarthome.io.net.http.HttpUtil;
-import org.openhab.binding.squeezebox.SqueezeBoxBindingConstants;
+import org.openhab.binding.squeezebox.internal.SqueezeBoxStateDescriptionOptionsProvider;
 import org.openhab.binding.squeezebox.internal.config.SqueezeBoxPlayerConfig;
+import org.openhab.binding.squeezebox.internal.model.Favorite;
 import org.openhab.binding.squeezebox.internal.utils.SqueezeBoxTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +60,8 @@ import org.slf4j.LoggerFactory;
  * @author Mark Hilbush - Implement AudioSink and notifications
  * @author Mark Hilbush - Added duration channel
  * @author Patrik Gfeller - Timeout for TTS messages increased from 30 to 90s.
+ * @author Mark Hilbush - Get favorites from server and play favorite
+ * @author Mark Hilbush - Convert sound notification volume from channel to config parameter
  */
 public class SqueezeBoxPlayerHandler extends BaseThingHandler implements SqueezeBoxPlayerEventListener {
 
@@ -105,9 +111,11 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
     /**
      * Separate volume level for notifications
      */
-    private int notificationSoundVolume = -1;
+    private Integer notificationSoundVolume = null;
 
     private String callbackUrl;
+
+    private SqueezeBoxStateDescriptionOptionsProvider stateDescriptionProvider;
 
     private static final ExpiringCacheMap<String, RawType> IMAGE_CACHE = new ExpiringCacheMap<>(
             TimeUnit.MINUTES.toMillis(15)); // 15min
@@ -116,10 +124,13 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
      * Creates SqueezeBox Player Handler
      *
      * @param thing
+     * @param stateDescriptionProvider
      */
-    public SqueezeBoxPlayerHandler(@NonNull Thing thing, String callbackUrl) {
+    public SqueezeBoxPlayerHandler(@NonNull Thing thing, String callbackUrl,
+            SqueezeBoxStateDescriptionOptionsProvider stateDescriptionProvider) {
         super(thing);
         this.callbackUrl = callbackUrl;
+        this.stateDescriptionProvider = stateDescriptionProvider;
     }
 
     @Override
@@ -127,6 +138,7 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
         mac = getConfig().as(SqueezeBoxPlayerConfig.class).mac;
         timeCounter();
         updateBridgeStatus();
+        logger.debug("player thing {} initialized.", getThing().getUID());
     }
 
     @Override
@@ -274,8 +286,8 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
             case CHANNEL_CURRENT_PLAYLIST_REPEAT:
                 squeezeBoxServerHandler.setRepeatMode(mac, ((DecimalType) command).intValue());
                 break;
-            case CHANNEL_NOTIFICATION_SOUND_VOLUME:
-                setNotificationSoundVolume(((PercentType) command));
+            case CHANNEL_FAVORITES_PLAY:
+                squeezeBoxServerHandler.playFavorite(mac, command.toString());
                 break;
             default:
                 break;
@@ -298,7 +310,8 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
     @Override
     public synchronized void modeChangeEvent(String mac, String mode) {
         updateChannel(mac, CHANNEL_CONTROL, "play".equals(mode) ? PlayPauseType.PLAY : PlayPauseType.PAUSE);
-        updateChannel(mac, CHANNEL_STOP, mode.equals("stop") ? OnOffType.ON : OnOffType.OFF);
+        updateChannel(mac, CHANNEL_PLAY_PAUSE, "play".equals(mode) ? OnOffType.ON : OnOffType.OFF);
+        updateChannel(mac, CHANNEL_STOP, "stop".equals(mode) ? OnOffType.ON : OnOffType.OFF);
         if (isMe(mac)) {
             playing = "play".equalsIgnoreCase(mode);
         }
@@ -453,6 +466,16 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
         }
     }
 
+    @Override
+    public void updateFavoritesListEvent(List<Favorite> favorites) {
+        logger.debug("Player {} updating favorites list", mac);
+        List<StateOption> options = new ArrayList<>();
+        for (Favorite favorite : favorites) {
+            options.add(new StateOption(favorite.shortId, favorite.name));
+        }
+        stateDescriptionProvider.setStateOptions(new ChannelUID(getThing().getUID(), CHANNEL_FAVORITES_PLAY), options);
+    }
+
     /**
      * Update a channel if the mac matches our own
      *
@@ -466,11 +489,7 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
             if (prevState == null || !prevState.equals(state)) {
                 logger.trace("Updating channel {} for thing {} with mac {} to state {}", channelID, getThing().getUID(),
                         mac, state);
-                try {
-                    updateState(channelID, state);
-                } catch (Exception e) {
-                    logger.error("Could not update channel", e);
-                }
+                updateState(channelID, state);
             }
         }
     }
@@ -572,16 +591,11 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
      * Ticks away when in a play state to keep current track time
      */
     private void timeCounter() {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (playing) {
-                    updateChannel(mac, CHANNEL_CURRENT_PLAYING_TIME, new DecimalType(currentTime++));
-                }
+        timeCounterJob = scheduler.scheduleWithFixedDelay(() -> {
+            if (playing) {
+                updateChannel(mac, CHANNEL_CURRENT_PLAYING_TIME, new DecimalType(currentTime++));
             }
-        };
-
-        timeCounterJob = scheduler.scheduleWithFixedDelay(runnable, 0, 1, TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.SECONDS);
     }
 
     private boolean isMe(String mac) {
@@ -607,25 +621,41 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
     }
 
     /*
-     * The following methods were added to enable notifications using the ESH AudioSink
+     * Give the notification player access to the notification timeout
      */
-    public PercentType getNotificationSoundVolume() {
-        if (notificationSoundVolume == -1) {
-            // Initialize the value for the first time
-            logger.debug("Initializing notification volume to current player volume");
-            notificationSoundVolume = currentVolume();
-            if (notificationSoundVolume != 0) {
-                updateState(SqueezeBoxBindingConstants.CHANNEL_NOTIFICATION_SOUND_VOLUME,
-                        new PercentType(notificationSoundVolume));
-            }
-        }
-        return PercentType.valueOf(String.valueOf(notificationSoundVolume));
+    public int getNotificationTimeout() {
+        return getConfigAs(SqueezeBoxPlayerConfig.class).notificationTimeout;
     }
 
-    public void setNotificationSoundVolume(PercentType volume) {
-        if (volume != null) {
-            logger.debug("Set notification volume to: {}", volume.toString());
-            notificationSoundVolume = volume.intValue();
+    /*
+     * Used by the AudioSink to get the volume level that should be used for the notification.
+     * Priority for determining volume is:
+     * - volume is provided in the say/playSound actions
+     * - volume is contained in the player thing's configuration
+     * - current player volume setting
+     */
+    public PercentType getNotificationSoundVolume() {
+        // Get the notification sound volume from this player thing's configuration
+        Integer configNotificationSoundVolume = getConfigAs(SqueezeBoxPlayerConfig.class).notificationVolume;
+
+        // Determine which volume to use
+        Integer currentNotificationSoundVolume;
+        if (notificationSoundVolume != null) {
+            currentNotificationSoundVolume = notificationSoundVolume;
+        } else if (configNotificationSoundVolume != null) {
+            currentNotificationSoundVolume = configNotificationSoundVolume;
+        } else {
+            currentNotificationSoundVolume = Integer.valueOf(currentVolume());
+        }
+        return new PercentType(currentNotificationSoundVolume.intValue());
+    }
+
+    /*
+     * Used by the AudioSink to set the volume level that should be used to play the notification
+     */
+    public void setNotificationSoundVolume(PercentType newNotificationSoundVolume) {
+        if (newNotificationSoundVolume != null) {
+            notificationSoundVolume = Integer.valueOf(newNotificationSoundVolume.intValue());
         }
     }
 
@@ -638,8 +668,12 @@ public class SqueezeBoxPlayerHandler extends BaseThingHandler implements Squeeze
         try (SqueezeBoxNotificationPlayer notificationPlayer = new SqueezeBoxNotificationPlayer(this,
                 squeezeBoxServerHandler, uri)) {
             notificationPlayer.play();
-        } catch (InterruptedException | SqueezeBoxTimeoutException e) {
-            logger.warn("Problem during notification playback.", e);
+        } catch (InterruptedException e) {
+            logger.warn("Notification playback was interrupted", e);
+        } catch (SqueezeBoxTimeoutException e) {
+            logger.debug("SqueezeBoxTimeoutException during notification: {}", e.getMessage());
+        } finally {
+            notificationSoundVolume = null;
         }
     }
 
