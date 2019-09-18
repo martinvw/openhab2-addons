@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 
 /**
@@ -53,8 +52,8 @@ public class HeosChannelHandlerFavoriteSelect extends HeosChannelHandler {
         if (command.equals(OnOffType.ON)) {
             List<String[]> selectedPlayerList = bridge.getSelectedPlayerList();
             if (!selectedPlayerList.isEmpty()) {
-                for (int i = 0; i < selectedPlayerList.size(); i++) {
-                    String pid = selectedPlayerList.get(i)[0];
+                for (String[] strings : selectedPlayerList) {
+                    String pid = strings[0];
                     String mid = channelUID.getId(); // the channel ID represents the MID of the favorite
                     api.playStation(pid, FAVORIT_SID, mid);
                 }

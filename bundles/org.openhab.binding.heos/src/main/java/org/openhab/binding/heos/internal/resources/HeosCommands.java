@@ -83,13 +83,6 @@ public class HeosCommands {
     private String playInputSource = "heos://browse/play_input?pid=";
     private String playURL = "heos://browse/play_stream?pid=";
 
-    public HeosCommands() {
-    }
-
-    public HeosCommands(String playerID) {
-        this.playerID = playerID;
-    }
-
     public void setPlayerID(String playerID) {
         this.playerID = playerID;
     }
@@ -310,7 +303,7 @@ public class HeosCommands {
             player = "," + player;
             players = players + player;
         }
-        players = players.substring(1, players.length());
+        players = players.substring(1);
 
         return setGroup + players;
     }

@@ -98,7 +98,7 @@ public class HeosSystem {
                 logger.debug("HEOS failed command: {}", command);
                 i++;
                 if (i < 2) {
-                    logger.debug("HEOS System trys to send command again....");
+                    logger.debug("HEOS System try to send command again....");
                 } else {
                     logger.debug("Could not send command. Please check the system connection");
                 }
@@ -201,7 +201,7 @@ public class HeosSystem {
      * reconnect the method fires a bridgeEvent via the {@code HeosEvenController.class}
      *
      * @see establishConnection()
-     * @see HeosEvenController.class
+     * @see HeosEvenController
      */
     public void startHeartBeat(int heartbeatPulse) {
         keepAlive = Executors.newScheduledThreadPool(1);
@@ -218,7 +218,7 @@ public class HeosSystem {
         }
 
         sendCommand.setTelnetClient(commandLine);
-        logger.debug("HEOS System Event Listener succsessfully started");
+        logger.debug("HEOS System Event Listener successfully started");
 
         eventLine.getReadResultListener().addPropertyChangeListener(evt -> {
             heosDecoder.getHeosJsonParser().parseResult((String) evt.getNewValue());
@@ -280,8 +280,8 @@ public class HeosSystem {
                 logger.debug("Interrupted Exception - Message: {}", e.getMessage());
             }
         }
+        updatePlayerState(heosPlayer);
         heosPlayer.updatePlayerInfo(heosDecoder.getPayloadList().get(0));
-        heosPlayer = updatePlayerState(heosPlayer);
         heosPlayer.setOnline(true);
         return heosPlayer;
     }
@@ -317,7 +317,7 @@ public class HeosSystem {
         return playerMapNew;
     }
 
-    private synchronized HeosPlayer updatePlayerState(HeosPlayer heosPlayer) {
+    private synchronized void updatePlayerState(HeosPlayer heosPlayer) {
         String pid = heosPlayer.getPid();
         send(command().getPlayState(pid));
         heosPlayer.setState(heosDecoder.getPlayState());
@@ -330,7 +330,6 @@ public class HeosSystem {
         send(command().getPlayMode(pid));
         heosPlayer.setShuffle(heosDecoder.getShuffleMode());
         heosPlayer.setRepeatMode(heosDecoder.getRepeateMode());
-        return heosPlayer;
     }
 
     /**
@@ -345,7 +344,7 @@ public class HeosSystem {
         groupMapNew.clear();
         removedGroupMap.clear();
         send(command().getGroups());
-        if (heosDecoder.payloadListIsEmpty()) {
+        if (heosDecoder.getPayloadList().isEmpty()) {
             removedGroupMap = compareGroupMaps(groupMapNew, groupMapOld);
             groupMapOld.clear();
             return groupMapNew;
@@ -375,7 +374,7 @@ public class HeosSystem {
      * states and shall be used for initialization only. For ongoing
      * updates use the eventListener
      *
-     * @param gid Group GID from the group
+     * @param heosGroup Group
      * @return a HEOS group with the updated states
      */
     public synchronized HeosGroup getGroupState(HeosGroup heosGroup) {
@@ -439,8 +438,6 @@ public class HeosSystem {
     /**
      * Be used to fill the map which contains old Groups at startup
      * with existing HEOS groups.
-     *
-     * @param map a Map with {@code heosGroup.getNameHash(), heosGroup}
      */
     public void addHeosGroupToOldGroupMap(String hashValue, HeosGroup heosGroup) {
         groupMapOld.put(hashValue, heosGroup);
@@ -455,8 +452,8 @@ public class HeosSystem {
         List<String> playlistsList = new ArrayList<>();
         send(command().browseSource(PLAYLISTS_SID));
         List<Map<String, String>> payload = heosDecoder.getPayloadList();
-        for (int i = 0; i < payload.size(); i++) {
-            playlistsList.add(payload.get(i).get(CID));
+        for (Map<String, String> stringStringMap : payload) {
+            playlistsList.add(stringStringMap.get(CID));
         }
         return playlistsList;
     }
@@ -465,28 +462,12 @@ public class HeosSystem {
         return heosApi;
     }
 
-    public String getConnectionIP() {
-        return connectionIP;
-    }
-
     public void setConnectionIP(String connectionIP) {
         this.connectionIP = connectionIP;
     }
 
-    public int getConnectionPort() {
-        return connectionPort;
-    }
-
     public void setConnectionPort(int connectionPort) {
         this.connectionPort = connectionPort;
-    }
-
-    public Map<String, HeosPlayer> getPlayerMap() {
-        return playerMapNew;
-    }
-
-    public Map<String, HeosGroup> getGroupMap() {
-        return groupMapNew;
     }
 
     public Map<String, HeosGroup> getGroupsRemoved() {
@@ -507,7 +488,7 @@ public class HeosSystem {
         public void run() {
             try {
                 if (sendCommand.isConnectionAlive()) {
-                    logger.debug("Sending Heos Heart Beat");
+                    logger.debug("Sending HEOS Heart Beat");
                     if (!sendCommand.send(command().heartbeat())) {
                         logger.debug("Connection to HEOS Network lost!");
                         restartConnection();

@@ -83,7 +83,7 @@ public class HeosMediaObject {
     }
 
     private void initObject() {
-        mediaInfo = new HashMap<String, String>(9);
+        mediaInfo = new HashMap<>(9);
 
         for (String key : SUPPORTED_MEDIA_ITEM_STRINGS) {
             mediaInfo.put(key, null);

@@ -16,7 +16,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 
 /**

@@ -10,7 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.heos;
+package org.openhab.binding.heos.internal;
 
 import java.util.Collections;
 import java.util.Set;
@@ -43,7 +43,6 @@ public class HeosBindingConstants extends HeosConstants {
 
     public static final ChannelTypeUID CH_TYPE_PLAYER = new ChannelTypeUID(BINDING_ID, "chPlayer");
     public static final ChannelTypeUID CH_TYPE_FAVORITE = new ChannelTypeUID(BINDING_ID, "chFavorite");
-    public static final ChannelTypeUID CH_TYPE_GROUP = new ChannelTypeUID(BINDING_ID, "chGroup");
 
     // List of all Channel IDs
     public static final String CH_ID_CONTROL = "Control";
@@ -53,9 +52,7 @@ public class HeosBindingConstants extends HeosConstants {
     public static final String CH_ID_SONG = "Title";
     public static final String CH_ID_ARTIST = "Artist";
     public static final String CH_ID_ALBUM = "Album";
-    public static final String CH_ID_PLAYER = "Player";
     public static final String CH_ID_BUILDGROUP = "BuildGroup";
-    public static final String CH_ID_DYNGROUPSHAND = "DynamicGroupHandling";
     public static final String CH_ID_REBOOT = "Reboot";
     public static final String CH_ID_COVER = "Cover";
     public static final String CH_ID_PLAYLISTS = "Playlists";
@@ -79,25 +76,18 @@ public class HeosBindingConstants extends HeosConstants {
     public static final String PROP_GID = "Group ID";
     public static final String PROP_MODEL = "Model";
     public static final String PROP_IP = "IP Address";
-    public static final String PROP_NETOWRK = "Connection";
+    public static final String PROP_NETWORK = "Connection";
     public static final String PROP_VERSION = "Version";
     public static final String PROP_GROUP_HASH = "Members Hash value";
     public static final String PROP_GROUP_LEADER = "Group leader";
     public static final String PROP_ROLE = "Role";
-    public static final String PROP_BRIDGE = "Heos Bridge";
+    public static final String PROP_BRIDGE = "HEOS Bridge";
 
     public static final String HOST = "ipAddress";
-    public static final String PLAYER_TYPE = "model";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String HEARTBEAT = "heartbeat";
-    public static final String TYPE_BRIDGE = "heosBridge";
 
-    public static final String PLAYER = "Player";
-    public static final String GROUP = "Group";
-
-    public static final String ONLINE = "ONLINE";
-    public static final String OFFLINE = "OFFLINE";
 
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.unmodifiableSet(
             Stream.of(THING_TYPE_BRIDGE, THING_TYPE_GROUP, THING_TYPE_PLAYER).collect(Collectors.toSet()));

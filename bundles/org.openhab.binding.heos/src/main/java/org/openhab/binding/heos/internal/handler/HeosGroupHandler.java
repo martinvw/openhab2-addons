@@ -10,9 +10,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.heos.handler;
+package org.openhab.binding.heos.internal.handler;
 
-import static org.openhab.binding.heos.HeosBindingConstants.*;
+import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
  * @author Johannes Einig - Initial contribution
  */
 public class HeosGroupHandler extends HeosThingBaseHandler {
-
     private final Logger logger = LoggerFactory.getLogger(HeosGroupHandler.class);
 
     private String gid;

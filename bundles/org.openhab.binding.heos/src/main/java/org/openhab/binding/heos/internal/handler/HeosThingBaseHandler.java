@@ -10,9 +10,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.heos.handler;
+package org.openhab.binding.heos.internal.handler;
 
-import static org.openhab.binding.heos.HeosBindingConstants.*;
+import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
 //import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
@@ -42,7 +42,6 @@ import org.openhab.binding.heos.internal.HeosChannelHandlerFactory;
 import org.openhab.binding.heos.internal.HeosChannelManager;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 import org.openhab.binding.heos.internal.api.HeosSystem;
-import org.openhab.binding.heos.internal.handler.HeosChannelHandler;
 import org.openhab.binding.heos.internal.resources.HeosEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public abstract class HeosThingBaseHandler extends BaseThingHandler implements HeosEventListener {
-
     private final Logger logger = LoggerFactory.getLogger(HeosThingBaseHandler.class);
 
     protected String id;
@@ -178,8 +176,6 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
                     updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
                     break;
                 case PAUSE:
-                    updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
-                    break;
                 case STOP:
                     updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
                     break;
@@ -201,10 +197,10 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
             }
         }
         if (event.equals(CUR_POS)) {
-            updateState(CH_ID_CUR_POS, DecimalType.valueOf(command.toString()));
+            updateState(CH_ID_CUR_POS, DecimalType.valueOf(command));
         }
         if (event.equals(DURATION)) {
-            updateState(CH_ID_DURATION, DecimalType.valueOf(command.toString()));
+            updateState(CH_ID_DURATION, DecimalType.valueOf(command));
         }
         if (event.equals(SHUFFLE_MODE_CHANGED)) {
             if (ON.equals(command)) {
@@ -245,7 +241,7 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
                         }
                         break;
                     } catch (MalformedURLException e) {
-                        logger.debug("Cover can't be loaded. No propper URL: {}", info.get(key));
+                        logger.debug("Cover can't be loaded. No proper URL: {}", info.get(key));
                         break;
                     }
                 case STATION:

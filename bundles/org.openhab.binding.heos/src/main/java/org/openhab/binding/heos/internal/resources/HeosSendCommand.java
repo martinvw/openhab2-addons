@@ -29,11 +29,11 @@ import org.slf4j.LoggerFactory;
  * @author Johannes Einig - Initial contribution
  */
 public class HeosSendCommand {
+    private final Logger logger = LoggerFactory.getLogger(HeosSendCommand.class);
 
     private Telnet client;
     private HeosResponseDecoder decoder;
     private HeosEventController eventController;
-    private final Logger logger = LoggerFactory.getLogger(HeosSendCommand.class);
     private String command;
 
     public HeosSendCommand(Telnet client, HeosResponseDecoder decoder, HeosEventController eventController) {
@@ -64,8 +64,8 @@ public class HeosSendCommand {
                         }
                         List<String> readResultList = client.readLine(15000);
 
-                        for (int i = 0; i < readResultList.size(); i++) {
-                            decoder.getHeosJsonParser().parseResult(readResultList.get(i));
+                        for (String s : readResultList) {
+                            decoder.getHeosJsonParser().parseResult(s);
                             eventController.handleEvent(0); // Important don't remove it. Costs you some live time... ;)
                         }
                     }
@@ -106,8 +106,8 @@ public class HeosSendCommand {
         if (sendSuccess) {
             List<String> readResultList = client.readLine();
 
-            for (int i = 0; i < readResultList.size(); i++) {
-                decoder.getHeosJsonParser().parseResult(readResultList.get(i));
+            for (String s : readResultList) {
+                decoder.getHeosJsonParser().parseResult(s);
                 eventController.handleEvent(0);
             }
             return true;
@@ -119,10 +119,6 @@ public class HeosSendCommand {
     public boolean setTelnetClient(Telnet client) {
         this.client = client;
         return true;
-    }
-
-    public Telnet getTelnetClient() {
-        return client;
     }
 
     public boolean isConnected() {

@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
  * @author Johannes Einig - Initial contribution
  */
 public class HeosResponseEvent {
+    private final Logger logger = LoggerFactory.getLogger(HeosResponseEvent.class);
+
     // RAW Values filled by Gson not decoded more or less for information
     private String command;
     private String result;
@@ -37,8 +39,6 @@ public class HeosResponseEvent {
     // Error values
     private String errorCode;
     private String errorMessage;
-
-    private final Logger logger = LoggerFactory.getLogger(HeosResponseEvent.class);
 
     @Override
     public String toString() {

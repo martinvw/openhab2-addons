@@ -112,7 +112,7 @@ public class HeosDeserializerEvent implements JsonDeserializer<HeosResponseEvent
             stop = input.indexOf("&", start);
             String value;
             if (stop < 0) {
-                value = input.substring(start, input.length());
+                value = input.substring(start);
             } else {
                 value = input.substring(start, stop);
             }

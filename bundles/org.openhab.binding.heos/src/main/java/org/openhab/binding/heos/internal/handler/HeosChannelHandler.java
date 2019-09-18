@@ -14,9 +14,6 @@ package org.openhab.binding.heos.internal.handler;
 
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.types.Command;
-import org.openhab.binding.heos.handler.HeosBridgeHandler;
-import org.openhab.binding.heos.handler.HeosGroupHandler;
-import org.openhab.binding.heos.handler.HeosPlayerHandler;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

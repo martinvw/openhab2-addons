@@ -12,7 +12,7 @@
  */
 package org.openhab.binding.heos.internal.discovery;
 
-import static org.openhab.binding.heos.HeosBindingConstants.*;
+import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
 import static org.openhab.binding.heos.internal.resources.HeosConstants.NAME;
 
 import java.util.Collections;
@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 @Component(service = UpnpDiscoveryParticipant.class, immediate = true, configurationPid = "discovery.heos")
 public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
-
     private final Logger logger = LoggerFactory.getLogger(HeosDiscoveryParticipant.class);
 
     @Override

@@ -10,9 +10,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.heos.handler;
+package org.openhab.binding.heos.internal.handler;
 
-import static org.openhab.binding.heos.HeosBindingConstants.PROP_PID;
+import static org.openhab.binding.heos.internal.HeosBindingConstants.PROP_PID;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

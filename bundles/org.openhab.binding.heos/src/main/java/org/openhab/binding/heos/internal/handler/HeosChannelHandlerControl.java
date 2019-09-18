@@ -13,7 +13,6 @@
 package org.openhab.binding.heos.internal.handler;
 
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 
 /**
@@ -51,9 +50,11 @@ public class HeosChannelHandlerControl extends HeosChannelHandler {
         }
         switch (command.toString()) {
             case "PLAY":
+            case "ON":
                 api.play(id);
                 break;
             case "PAUSE":
+            case "OFF":
                 api.pause(id);
                 break;
             case "NEXT":
@@ -61,12 +62,6 @@ public class HeosChannelHandlerControl extends HeosChannelHandler {
                 break;
             case "PREVIOUS":
                 api.previous(id);
-                break;
-            case "ON":
-                api.play(id);
-                break;
-            case "OFF":
-                api.pause(id);
                 break;
         }
     }

@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class HeosGroup extends HeosMediaObject {
     private static final String[] SUPPORTED_GROUP_INFO = { NAME, GID, LEADER };
-    private static final String[] SUPPORTED_GRIOUP_STATE_STRINGS = { STATE, LEVEL, MUTE };
+    private static final String[] SUPPORTED_GROUP_STATE_STRINGS = { STATE, LEVEL, MUTE };
 
     private Map<String, String> groupInfo;
     private Map<String, String> groupState;
@@ -66,7 +66,7 @@ public class HeosGroup extends HeosMediaObject {
             groupInfo.put(key, null);
         }
 
-        for (String key : SUPPORTED_GRIOUP_STATE_STRINGS) {
+        for (String key : SUPPORTED_GROUP_STATE_STRINGS) {
             groupState.put(key, null);
         }
 
@@ -163,17 +163,6 @@ public class HeosGroup extends HeosMediaObject {
         return String.join(";", groupMemberPidList);
     }
 
-    public String generateGroupUID() {
-        List<String> groupUIDHashList = new ArrayList<>();
-        groupUIDHashList.add(name);
-        groupUIDHashList.add(gid);
-        groupUIDHashList.add(leader);
-        groupUIDHashList.add(groupMembersHash);
-        groupUIDHash = Integer.toUnsignedString(groupUIDHashList.hashCode());
-
-        return groupUIDHash;
-    }
-
     public Map<String, String> getGroupInfo() {
         return groupInfo;
     }
@@ -265,7 +254,7 @@ public class HeosGroup extends HeosMediaObject {
     }
 
     public String[] getSupportedGroupStates() {
-        return SUPPORTED_GRIOUP_STATE_STRINGS;
+        return SUPPORTED_GROUP_STATE_STRINGS;
     }
 
     public String getNameHash() {

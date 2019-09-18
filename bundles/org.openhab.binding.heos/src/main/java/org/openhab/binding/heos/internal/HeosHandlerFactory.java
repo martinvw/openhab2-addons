@@ -12,13 +12,6 @@
  */
 package org.openhab.binding.heos.internal;
 
-import static org.openhab.binding.heos.HeosBindingConstants.*;
-
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.audio.AudioHTTPServer;
 import org.eclipse.smarthome.core.audio.AudioSink;
@@ -31,9 +24,9 @@ import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
-import org.openhab.binding.heos.handler.HeosBridgeHandler;
-import org.openhab.binding.heos.handler.HeosGroupHandler;
-import org.openhab.binding.heos.handler.HeosPlayerHandler;
+import org.openhab.binding.heos.internal.handler.HeosBridgeHandler;
+import org.openhab.binding.heos.internal.handler.HeosGroupHandler;
+import org.openhab.binding.heos.internal.handler.HeosPlayerHandler;
 import org.openhab.binding.heos.internal.api.HeosAudioSink;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 import org.openhab.binding.heos.internal.api.HeosSystem;
@@ -45,6 +38,13 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
 
 /**
  * The {@link HeosHandlerFactory} is responsible for creating things and thing
@@ -64,8 +64,6 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
     private AudioHTTPServer audioHTTPServer;
     private Map<String, ServiceRegistration<AudioSink>> audioSinkRegistrations = new ConcurrentHashMap<>();
     private NetworkAddressService networkAddressService;
-
-    private String callbackUrl;
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -154,21 +152,17 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
     }
 
     private String createCallbackUrl() {
-        if (callbackUrl != null) {
-            return callbackUrl;
-        } else {
-            final String ipAddress = networkAddressService.getPrimaryIpv4HostAddress();
-            if (ipAddress == null) {
-                logger.warn("No network interface could be found.");
-                return null;
-            }
-            // we do not use SSL as it can cause certificate validation issues.
-            final int port = HttpServiceUtil.getHttpServicePort(bundleContext);
-            if (port == -1) {
-                logger.warn("Cannot find port of the http service.");
-                return null;
-            }
-            return "http://" + ipAddress + ":" + port;
+        final String ipAddress = networkAddressService.getPrimaryIpv4HostAddress();
+        if (ipAddress == null) {
+            logger.warn("No network interface could be found.");
+            return null;
         }
+        // we do not use SSL as it can cause certificate validation issues.
+        final int port = HttpServiceUtil.getHttpServicePort(bundleContext);
+        if (port == -1) {
+            logger.warn("Cannot find port of the http service.");
+            return null;
+        }
+        return "http://" + ipAddress + ":" + port;
     }
 }

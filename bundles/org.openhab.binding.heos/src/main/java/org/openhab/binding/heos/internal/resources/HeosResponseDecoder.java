@@ -214,14 +214,6 @@ public class HeosResponseDecoder {
         return response.getPayload().getPayloadList();
     }
 
-    public boolean payloadListIsEmpty() {
-        if (getPayloadList().isEmpty()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public HeosResponse getHeosResponse() {
         return response;
     }

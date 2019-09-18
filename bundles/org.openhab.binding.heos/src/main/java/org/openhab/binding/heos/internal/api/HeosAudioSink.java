@@ -27,7 +27,7 @@ import org.eclipse.smarthome.core.audio.UnsupportedAudioFormatException;
 import org.eclipse.smarthome.core.audio.utils.AudioStreamUtils;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.util.ThingHandlerHelper;
-import org.openhab.binding.heos.handler.HeosThingBaseHandler;
+import org.openhab.binding.heos.internal.handler.HeosThingBaseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class HeosAudioSink implements AudioSink {
-
     private final Logger logger = LoggerFactory.getLogger(HeosAudioSink.class);
 
     private static final Set<AudioFormat> SUPPORTED_AUDIO_FORMATS = new HashSet<>();

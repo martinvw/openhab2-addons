@@ -33,14 +33,14 @@ public class HeosResponsePayload {
     }
 
     private String payloadToString() {
-        String returnString = "";
+        StringBuilder returnString = new StringBuilder();
         for (int i = 0; i < payload.size(); i++) {
-            returnString = returnString + "\n\nPayload: " + (i + 1);
+            returnString.append("\n\nPayload: ").append(i + 1);
             for (String key : payload.get(i).keySet()) {
-                returnString = returnString + "\n" + key + ":\t " + payload.get(i).get(key);
+                returnString.append("\n").append(key).append(":\t ").append(payload.get(i).get(key));
             }
         }
-        return returnString;
+        return returnString.toString();
     }
 
     /**

@@ -12,14 +12,14 @@
  */
 package org.openhab.binding.heos.internal;
 
-import static org.openhab.binding.heos.HeosBindingConstants.*;
+import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
-import org.openhab.binding.heos.handler.HeosBridgeHandler;
+import org.openhab.binding.heos.internal.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 import org.openhab.binding.heos.internal.handler.HeosChannelHandler;
 import org.openhab.binding.heos.internal.handler.HeosChannelHandlerAlbum;

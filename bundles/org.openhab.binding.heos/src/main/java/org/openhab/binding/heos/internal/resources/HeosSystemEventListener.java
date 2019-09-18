@@ -77,8 +77,8 @@ public class HeosSystemEventListener {
      * @param command the command of the event
      */
     public void fireBridgeEvent(String event, String result, String command) {
-        for (int i = 0; i < listenerList.size(); i++) {
-            listenerList.get(i).bridgeChangeEvent(event, result, command);
+        for (HeosEventListener heosEventListener : listenerList) {
+            heosEventListener.bridgeChangeEvent(event, result, command);
         }
     }
 }

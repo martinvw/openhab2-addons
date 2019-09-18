@@ -181,8 +181,8 @@ public class HeosEventController extends HeosSystemEventListener {
         String duration = heosDecoder.getPlayerDuration();
         String pid = heosDecoder.getPid();
 
-        int intPosition = Integer.valueOf(pos) / 1000;
-        int intDuration = Integer.valueOf(duration) / 1000;
+        int intPosition = Integer.parseInt(pos) / 1000;
+        int intDuration = Integer.parseInt(duration) / 1000;
 
         fireStateEvent(pid, CUR_POS, String.valueOf(intPosition));
         fireStateEvent(pid, DURATION, String.valueOf(intDuration));
