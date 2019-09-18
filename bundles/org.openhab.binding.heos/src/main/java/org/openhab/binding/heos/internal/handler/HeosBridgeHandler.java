@@ -205,10 +205,10 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             return;
         } else if (HeosPlayerHandler.class.equals(childHandler.getClass())) {
             String channelIdentifier = "P" + childThing.getUID().getId();
-            updateThingChannels(channelManager.removeSingelChannel(channelIdentifier));
+            updateThingChannels(channelManager.removeSingleChannel(channelIdentifier));
         } else {
             String channelIdentifier = "G" + childThing.getUID().getId();
-            updateThingChannels(channelManager.removeSingelChannel(channelIdentifier));
+            updateThingChannels(channelManager.removeSingleChannel(channelIdentifier));
             // removes the handler from the groupMemberMap that handler is no longer called
             // if group is getting online
             removeGroupHandlerInformation((HeosGroupHandler) childHandler);
@@ -334,19 +334,19 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
      */
     @SuppressWarnings("null")
     private void addPlayerChannel(Thing childThing) {
-        String channelIdentifyer = "";
+        String channelIdentifier = "";
         String pid = "";
         if (HeosPlayerHandler.class.equals(childThing.getHandler().getClass())) {
-            channelIdentifyer = "P" + childThing.getUID().getId();
+            channelIdentifier = "P" + childThing.getUID().getId();
             pid = childThing.getConfiguration().get(PROP_PID).toString();
         } else if (HeosGroupHandler.class.equals(childThing.getHandler().getClass())) {
-            channelIdentifyer = "G" + childThing.getUID().getId();
+            channelIdentifier = "G" + childThing.getUID().getId();
             HeosGroupHandler handler = (HeosGroupHandler) childThing.getHandler();
             pid = handler.getGroupID();
         }
         Map<String, String> properties = new HashMap<>(2);
         String playerName = childThing.getLabel();
-        ChannelUID channelUID = new ChannelUID(getThing().getUID(), channelIdentifyer);
+        ChannelUID channelUID = new ChannelUID(getThing().getUID(), channelIdentifier);
         properties.put(NAME, playerName);
         properties.put(PID, pid);
 
