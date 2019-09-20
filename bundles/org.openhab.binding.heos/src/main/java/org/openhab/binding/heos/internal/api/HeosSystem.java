@@ -65,7 +65,7 @@ public class HeosSystem {
     private Map<String, HeosGroup> removedGroupMap = new HashMap<>();
     private HeosFacade heosApi = new HeosFacade(this, eventController);
 
-    private ScheduledExecutorService keepAlive;
+    private ScheduledExecutorService keepAliveExecutor;
 
     /**
      * Method to be used to send a command to the HEOS system.
@@ -201,8 +201,8 @@ public class HeosSystem {
      * @see HeosEvenController
      */
     public void startHeartBeat(int heartbeatPulse) {
-        keepAlive = Executors.newScheduledThreadPool(1);
-        keepAlive.scheduleWithFixedDelay(new KeepAliveRunnable(), START_DELAY, heartbeatPulse, TimeUnit.SECONDS);
+        keepAliveExecutor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "HeosKeepAlive"));
+        keepAliveExecutor.scheduleWithFixedDelay(new KeepAliveRunnable(), START_DELAY, heartbeatPulse, TimeUnit.SECONDS);
     }
 
     public synchronized void startEventListener() {
@@ -225,8 +225,8 @@ public class HeosSystem {
 
     public void closeConnection() {
         logger.debug("Shutting down HEOS Heart Beat");
-        if (keepAlive != null) {
-            keepAlive.shutdown();
+        if (keepAliveExecutor != null) {
+            keepAliveExecutor.shutdown();
         }
         logger.debug("Stopping HEOS event line listener");
         eventLine.stopInputListener();
