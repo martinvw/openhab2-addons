@@ -30,7 +30,7 @@
 				<description>Password for login to the HEOS account</description>
 				<required>false</required>
 			</parameter>
-			<parameter name="heartbeat" type="integer" min="0" max="3600" unit="s">
+			<parameter name="heartbeat" type="integer" min="3" max="3600" unit="s">
 				<required>false</required>
 				<unitLabel>seconds</unitLabel>
 				<label>Heartbeat</label>
