@@ -12,18 +12,7 @@
  */
 package org.openhab.binding.heos.internal.api;
 
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-
-import org.eclipse.smarthome.core.audio.AudioFormat;
-import org.eclipse.smarthome.core.audio.AudioHTTPServer;
-import org.eclipse.smarthome.core.audio.AudioSink;
-import org.eclipse.smarthome.core.audio.AudioStream;
-import org.eclipse.smarthome.core.audio.FileAudioStream;
-import org.eclipse.smarthome.core.audio.FixedLengthAudioStream;
-import org.eclipse.smarthome.core.audio.URLAudioStream;
-import org.eclipse.smarthome.core.audio.UnsupportedAudioFormatException;
+import org.eclipse.smarthome.core.audio.*;
 import org.eclipse.smarthome.core.audio.utils.AudioStreamUtils;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.util.ThingHandlerHelper;
@@ -31,11 +20,14 @@ import org.openhab.binding.heos.internal.handler.HeosThingBaseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+
 /**
  * This makes HEOS to serve as an {@link AudioSink}.
  *
  * @author Johannes Einig - Initial contribution
- *
  */
 public class HeosAudioSink implements AudioSink {
     private final Logger logger = LoggerFactory.getLogger(HeosAudioSink.class);
@@ -52,9 +44,9 @@ public class HeosAudioSink implements AudioSink {
         SUPPORTED_AUDIO_STREAMS.add(FixedLengthAudioStream.class);
     }
 
-    private AudioHTTPServer audioHTTPServer;
-    private HeosThingBaseHandler handler;
-    private String callbackUrl;
+    private final HeosThingBaseHandler handler;
+    private final AudioHTTPServer audioHTTPServer;
+    private final String callbackUrl;
 
     public HeosAudioSink(HeosThingBaseHandler handler, AudioHTTPServer audioHTTPServer, String callbackUrl) {
         this.handler = handler;
@@ -74,33 +66,30 @@ public class HeosAudioSink implements AudioSink {
 
     @Override
     public void process(AudioStream audioStream) throws UnsupportedAudioFormatException {
-        String url = null;
         if (audioStream instanceof URLAudioStream) {
             // it is an external URL, the speaker can access it itself and play it.
             URLAudioStream urlAudioStream = (URLAudioStream) audioStream;
-            url = urlAudioStream.getURL();
-            handler.playURL(url);
+            handler.playURL(urlAudioStream.getURL());
         } else if (audioStream instanceof FixedLengthAudioStream) {
             if (callbackUrl != null) {
                 // we serve it on our own HTTP server for 30 seconds as HEOS requests the stream several times
-                String relativeUrl = audioHTTPServer.serve((FixedLengthAudioStream) audioStream, 30).toString();
-                url = callbackUrl + relativeUrl;
+                String relativeUrl = audioHTTPServer.serve((FixedLengthAudioStream) audioStream, 30);
+                String url = callbackUrl + relativeUrl + AudioStreamUtils.EXTENSION_SEPARATOR;
                 AudioFormat audioFormat = audioStream.getFormat();
                 if (!ThingHandlerHelper.isHandlerInitialized(handler)) {
                     logger.debug("HEOS speaker '{}' is not initialized - status is {}", handler.getThing().getUID(),
                             handler.getThing().getStatus());
                 } else if (AudioFormat.MP3.isCompatible(audioFormat)) {
-                    handler.playURL(url + AudioStreamUtils.EXTENSION_SEPARATOR + FileAudioStream.MP3_EXTENSION);
+                    handler.playURL(url + FileAudioStream.MP3_EXTENSION);
                 } else if (AudioFormat.WAV.isCompatible(audioFormat)) {
-                    handler.playURL(url + AudioStreamUtils.EXTENSION_SEPARATOR + FileAudioStream.WAV_EXTENSION);
-                } else if (AudioFormat.WAV.isCompatible(audioFormat)) {
-                    handler.playURL(url + AudioStreamUtils.EXTENSION_SEPARATOR + FileAudioStream.AAC_EXTENSION);
+                    handler.playURL(url + FileAudioStream.WAV_EXTENSION);
+                } else if (AudioFormat.AAC.isCompatible(audioFormat)) {
+                    handler.playURL(url + FileAudioStream.AAC_EXTENSION);
                 } else {
                     throw new UnsupportedAudioFormatException("HEOS only supports MP3 or WAV.", audioFormat);
                 }
             } else {
                 logger.warn("We do not have any callback url, so HEOS cannot play the audio stream!");
-                return;
             }
         } else {
             throw new UnsupportedAudioFormatException("HEOS can only handle FixedLengthAudioStreams.", null);
