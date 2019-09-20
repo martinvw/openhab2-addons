@@ -56,19 +56,44 @@ import org.slf4j.LoggerFactory;
 public abstract class HeosThingBaseHandler extends BaseThingHandler implements HeosEventListener {
     private final Logger logger = LoggerFactory.getLogger(HeosThingBaseHandler.class);
 
-    protected String id;
-    protected HeosSystem heos;
-    protected HeosFacade api;
-    protected HeosChannelHandlerFactory channelHandlerFactory;
+    private HeosChannelHandlerFactory channelHandlerFactory;
     protected HeosBridgeHandler bridge;
     protected HeosChannelManager channelManager = new HeosChannelManager(this);
 
-    public HeosThingBaseHandler(Thing thing, HeosSystem heos, HeosFacade api) {
+    HeosThingBaseHandler(Thing thing) {
         super(thing);
-        this.heos = heos;
-        this.api = api;
-        setId();
+
+        // TODO use configuration object
     }
+
+    @Override
+    public void initialize() {
+        if (getBridge() != null) {
+            bridge = (HeosBridgeHandler) getBridge().getHandler();
+            channelHandlerFactory = bridge.getChannelHandlerFactory();
+        } else {
+            logger.warn("No Bridge set within child handler");
+        }
+
+        getApi().registerForChangeEvents(this);
+    }
+
+    public HeosFacade getApi(){
+        return getHeosSystem().getAPI();
+    }
+
+    @Deprecated
+    public HeosSystem getHeosSystem() {
+        HeosBridgeHandler localBridge = bridge;
+        if (localBridge != null) {
+            return localBridge.getSystem();
+        } else {
+            // TODO handle this?
+            return null;
+        }
+    }
+
+    protected abstract String getId();
 
     public abstract void setStatusOffline();
 
@@ -90,9 +115,10 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         }
         HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID, channelTypeUID);
         if (channelHandler != null) {
-            channelHandler.handleCommand(command, id, this, channelUID);
+            channelHandler.handleCommand(command, getId(), this, channelUID);
         }
     }
+
 
     @Override
     public void bridgeStatusChanged(ThingStatusInfo bridgeStatusInfo) {
@@ -105,33 +131,10 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         }
     }
 
-    private void setId() {
-        if (thing.getConfiguration().containsKey(GID)) {
-            id = thing.getConfiguration().get(GID).toString();
-        }
-        if (thing.getConfiguration().containsKey(PROP_PID)) {
-            id = thing.getConfiguration().get(PROP_PID).toString();
-        }
-    }
-
     protected void updateThingChannels(List<Channel> channelList) {
         ThingBuilder thingBuilder = editThing();
         thingBuilder.withChannels(channelList);
         updateThing(thingBuilder.build());
-    }
-
-    /**
-     * Has to be called by the player or group handler to initialize
-     * {@link HeosChannelHandlerFactory}
-     */
-    @SuppressWarnings("null")
-    protected void initChannelHandlerFactory() {
-        if (getBridge() != null) {
-            bridge = (HeosBridgeHandler) getBridge().getHandler();
-            channelHandlerFactory = bridge.getChannelHandlerFactory();
-        } else {
-            logger.warn("No Bridge set within child handler");
-        }
     }
 
     /**
@@ -140,7 +143,7 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
      */
     @Override
     public void dispose() {
-        api.unregisterForChangeEvents(this);
+        getApi().unregisterForChangeEvents(this);
         super.dispose();
     }
 
@@ -153,7 +156,8 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     public void playURL(String urlStr) {
         try {
             URL url = new URL(urlStr);
-            api.playURL(id, url);
+            // TODO this is not nice
+            getApi().playURL(getId(), url);
         } catch (MalformedURLException e) {
             logger.debug("Command '{}' is not a propper URL. Error: {}", urlStr, e.getMessage());
         }

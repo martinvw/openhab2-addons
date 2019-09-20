@@ -22,8 +22,8 @@ import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.types.Command;
-import org.openhab.binding.heos.internal.api.HeosFacade;
 import org.openhab.binding.heos.internal.api.HeosSystem;
+import org.openhab.binding.heos.internal.configuration.PlayerConfiguration;
 import org.openhab.binding.heos.internal.resources.HeosConstants;
 import org.openhab.binding.heos.internal.resources.HeosPlayer;
 
@@ -35,12 +35,11 @@ import org.openhab.binding.heos.internal.resources.HeosPlayer;
  */
 public class HeosPlayerHandler extends HeosThingBaseHandler {
 
-    private final String pid;
+    private String pid;
     private HeosPlayer player = new HeosPlayer();
 
-    public HeosPlayerHandler(Thing thing, HeosSystem heos, HeosFacade api) {
-        super(thing, heos, api);
-        pid = thing.getConfiguration().get(PROP_PID).toString();
+    public HeosPlayerHandler(Thing thing) {
+        super(thing);
     }
 
     @Override
@@ -50,22 +49,33 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
 
     @Override
     public void initialize() {
-        api.registerForChangeEvents(this);
+        super.initialize();
+
+        PlayerConfiguration configuration = thing.getConfiguration().as(PlayerConfiguration.class);
+
+        pid = configuration.pid;
+
+        // TODO this is not nice
         // Because initialization can take longer a scheduler with an extra thread is created
         scheduler.schedule(() -> {
-            initChannelHandlerFactory();
-            player = heos.getPlayerState(pid);
+            // TODO this is not nice
+            player = getApi().getPlayerState(pid);
             if (!player.isOnline()) {
                 setStatusOffline();
-                bridge.setThingStatusOffline(thing.getUID());
                 return;
             }
             // Adding the favorite channel to the player
             if (bridge.isLoggedin()) {
-                updateThingChannels(channelManager.addFavoriteChannels(heos.getFavorites()));
+                updateThingChannels(channelManager.addFavoriteChannels(getApi().getFavorites()));
             }
+
             updateStatus(ThingStatus.ONLINE);
         }, 3, TimeUnit.SECONDS);
+    }
+
+    @Override
+    protected String getId() {
+        return pid;
     }
 
     @Override
@@ -75,7 +85,7 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
 
     @Override
     public void setNotificationSoundVolume(PercentType volume) {
-        api.setVolume(volume.toString(), pid);
+        getApi().setVolume(volume.toString(), pid);
     }
 
     @Override
@@ -96,13 +106,13 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
     @Override
     public void bridgeChangeEvent(String event, String result, String command) {
         if (HeosConstants.USER_CHANGED.equals(command)) {
-            updateThingChannels(channelManager.addFavoriteChannels(heos.getFavorites()));
+            updateThingChannels(channelManager.addFavoriteChannels(getApi().getFavorites()));
         }
     }
 
     @Override
     public void setStatusOffline() {
-        api.unregisterForChangeEvents(this);
+        getApi().unregisterForChangeEvents(this);
         updateStatus(ThingStatus.OFFLINE);
     }
 

@@ -28,10 +28,14 @@ import org.slf4j.LoggerFactory;
 public abstract class HeosChannelHandler {
     protected final Logger logger = LoggerFactory.getLogger(HeosChannelHandler.class);
 
-    protected Object handler;
-    protected HeosBridgeHandler bridge;
-    protected HeosFacade api;
+
+    protected final HeosBridgeHandler bridge;
+    protected final HeosFacade api;
+
+    // FIXME make sure we know this id ASAP
     protected String id;
+
+    protected Object handler;
     protected Command command;
     protected ChannelUID channelUID;
 

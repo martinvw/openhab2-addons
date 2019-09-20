@@ -208,10 +208,12 @@ public class Telnet {
      * Input Listener which fires event if input is detected
      */
     public void startInputListener() {
+        logger.warn("Starting input listener");
         client.registerInputListener(this::inputAvailableRead);
     }
 
     public void stopInputListener() {
+        logger.warn("Stopping input listener");
         client.unregisterInputListener();
     }
 

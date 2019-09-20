@@ -25,6 +25,8 @@ import java.util.Map;
  * The {@link HeosGroup} represents the group within the
  * HEOS network
  *
+ * TODO MvW it seems that a lot fields here are unused, we should look into that
+ *
  * @author Johannes Einig - Initial contribution
  */
 public class HeosGroup extends HeosMediaObject {

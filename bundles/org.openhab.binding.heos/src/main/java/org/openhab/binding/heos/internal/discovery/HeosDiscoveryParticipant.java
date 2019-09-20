@@ -12,15 +12,6 @@
  */
 package org.openhab.binding.heos.internal.discovery;
 
-import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
-import static org.openhab.binding.heos.internal.resources.HeosConstants.NAME;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
@@ -29,12 +20,17 @@ import org.eclipse.smarthome.config.discovery.upnp.UpnpDiscoveryParticipant;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.jupnp.model.meta.DeviceDetails;
-import org.jupnp.model.meta.ManufacturerDetails;
-import org.jupnp.model.meta.ModelDetails;
 import org.jupnp.model.meta.RemoteDevice;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
 
 /**
  * The {@link HeosDiscoveryParticipant} discovers the HEOS Player of the
@@ -57,9 +53,8 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
         ThingUID uid = getThingUID(device);
         if (uid != null) {
             Map<String, Object> properties = new HashMap<>(3);
-            properties.put(HOST, device.getIdentity().getDescriptorURL().getHost());
-            properties.put(NAME, device.getDetails().getModelDetails().getModelName());
-            properties.put(PROP_ROLE, PROP_BRIDGE); // Used to hide other bridges if one is already used
+            properties.put(IP_ADDRESS, device.getIdentity().getDescriptorURL().getHost());
+            properties.put(PROP_NAME, device.getDetails().getModelDetails().getModelName());
             DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
                     .withLabel(" Bridge - " + device.getDetails().getFriendlyName())
                     .withRepresentationProperty("Device").build();
@@ -71,19 +66,17 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
 
     @Override
     public @Nullable ThingUID getThingUID(RemoteDevice device) {
-        Optional<RemoteDevice> optDevice = Optional.ofNullable(device);
-        String modelName = optDevice.map(RemoteDevice::getDetails).map(DeviceDetails::getModelDetails)
-                .map(ModelDetails::getModelName).orElse("UNKNOWN");
-        String modelManufacturer = optDevice.map(RemoteDevice::getDetails).map(DeviceDetails::getManufacturerDetails)
-                .map(ManufacturerDetails::getManufacturer).orElse("UNKNOWN");
+        if (device == null) {
+            return null;
+        }
 
-        if (modelManufacturer.equals("Denon")) {
-            if (modelName.startsWith("HEOS") || modelName.endsWith("H")) {
-                String deviceType = device.getType().getType();
-                if (deviceType.startsWith("ACT") || deviceType.startsWith("Aios")) {
-                    return new ThingUID(THING_TYPE_BRIDGE,
-                            optDevice.get().getIdentity().getUdn().getIdentifierString());
-                }
+        DeviceDetails details = device.getDetails();
+        String modelName = details.getModelDetails().getModelName();
+        String modelManufacturer = details.getManufacturerDetails().getManufacturer();
+        if (modelManufacturer.equals("Denon") && (modelName.startsWith("HEOS") || modelName.endsWith("H"))) {
+            String deviceType = device.getType().getType();
+            if (deviceType.startsWith("ACT") || deviceType.startsWith("Aios")) {
+                return new ThingUID(THING_TYPE_BRIDGE, device.getIdentity().getUdn().getIdentifierString());
             }
         }
         return null;

@@ -58,9 +58,6 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
 
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
-    private HeosSystem heos = new HeosSystem();
-    private HeosFacade api = heos.getAPI();
-
     private AudioHTTPServer audioHTTPServer;
     private Map<String, ServiceRegistration<AudioSink>> audioSinkRegistrations = new ConcurrentHashMap<>();
     private NetworkAddressService networkAddressService;
@@ -81,7 +78,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (THING_TYPE_BRIDGE.equals(thingTypeUID)) {
-            HeosBridgeHandler bridgeHandler = new HeosBridgeHandler((Bridge) thing, heos, api);
+            HeosBridgeHandler bridgeHandler = new HeosBridgeHandler((Bridge) thing);
             HeosPlayerDiscovery playerDiscovery = new HeosPlayerDiscovery(bridgeHandler);
             discoveryServiceRegs.put(bridgeHandler.getThing().getUID(), bundleContext
                     .registerService(DiscoveryService.class.getName(), playerDiscovery, new Hashtable<>()));
@@ -90,7 +87,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
             return bridgeHandler;
         }
         if (THING_TYPE_PLAYER.equals(thingTypeUID)) {
-            HeosPlayerHandler playerHandler = new HeosPlayerHandler(thing, heos, api);
+            HeosPlayerHandler playerHandler = new HeosPlayerHandler(thing);
             // register the speaker as an audio sink
             HeosAudioSink audioSink = new HeosAudioSink(playerHandler, audioHTTPServer, createCallbackUrl());
             @SuppressWarnings("unchecked")
@@ -100,7 +97,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
             return playerHandler;
         }
         if (THING_TYPE_GROUP.equals(thingTypeUID)) {
-            HeosGroupHandler groupHandler = new HeosGroupHandler(thing, heos, api);
+            HeosGroupHandler groupHandler = new HeosGroupHandler(thing);
             // register the group as an audio sink
             HeosAudioSink audioSink = new HeosAudioSink(groupHandler, audioHTTPServer, createCallbackUrl());
             @SuppressWarnings("unchecked")

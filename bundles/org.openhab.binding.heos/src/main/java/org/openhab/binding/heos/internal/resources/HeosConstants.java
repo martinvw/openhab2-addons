@@ -101,7 +101,6 @@ public class HeosConstants {
 
     // Several command
 
-    public static final String ROLE = "role";
     public static final String LEADER = "leader";
     public static final String NAME = "name";
 

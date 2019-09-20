@@ -12,7 +12,15 @@
  */
 package org.openhab.binding.heos.internal.api;
 
-import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
+import org.openhab.binding.heos.internal.resources.HeosCommands;
+import org.openhab.binding.heos.internal.resources.HeosGroup;
+import org.openhab.binding.heos.internal.resources.HeosPlayer;
+import org.openhab.binding.heos.internal.resources.HeosResponseDecoder;
+import org.openhab.binding.heos.internal.resources.HeosSendCommand;
+import org.openhab.binding.heos.internal.resources.Telnet;
+import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,17 +31,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-// import org.eclipse.smarthome.core.thing.ThingStatus;
-// import org.eclipse.smarthome.core.thing.ThingStatusDetail;
-import org.openhab.binding.heos.internal.resources.HeosCommands;
-import org.openhab.binding.heos.internal.resources.HeosGroup;
-import org.openhab.binding.heos.internal.resources.HeosPlayer;
-import org.openhab.binding.heos.internal.resources.HeosResponseDecoder;
-import org.openhab.binding.heos.internal.resources.HeosSendCommand;
-import org.openhab.binding.heos.internal.resources.Telnet;
-import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
+
 
 /**
  * The {@link HeosSystem} is handling the main commands, which are
@@ -45,25 +44,26 @@ public class HeosSystem {
     private final Logger logger = LoggerFactory.getLogger(HeosSystem.class);
 
     private static final int START_DELAY = 30;
-    private static final int WAIT_TIME_AFTER_RECONNECT = 15000;
 
     private String connectionIP = "";
     private int connectionPort;
 
-    private Telnet commandLine = new Telnet();
-    private Telnet eventLine = new Telnet();
-    private HeosCommands heosCommand = new HeosCommands();
-    private HeosResponseDecoder heosDecoder = new HeosResponseDecoder();
-    private HeosEventController eventController = new HeosEventController(heosDecoder, heosCommand, this);
-    private HeosSendCommand sendCommand = new HeosSendCommand(commandLine, heosDecoder, eventController);
+    private final Telnet commandLine = new Telnet();
+    private final Telnet eventLine = new Telnet();
+    private final HeosCommands heosCommand = new HeosCommands();
+    private final HeosResponseDecoder heosDecoder = new HeosResponseDecoder();
+    private final HeosEventController eventController = new HeosEventController(heosDecoder, heosCommand, this);
+    private final HeosSendCommand eventSendCommand = new HeosSendCommand(eventLine, heosDecoder, eventController);
+    private final HeosSendCommand sendCommand = new HeosSendCommand(commandLine, heosDecoder, eventController);
+    private final HeosFacade heosApi = new HeosFacade(this, eventController);
 
-    private Map<String, HeosPlayer> playerMapNew = new HashMap<>();
-    private Map<String, HeosGroup> groupMapNew = new HashMap<>();
-    private Map<String, HeosPlayer> playerMapOld = new HashMap<>();
-    private Map<String, HeosGroup> groupMapOld = new HashMap<>();
+    private final Map<String, HeosPlayer> playerMapNew = new HashMap<>();
+    private final Map<String, HeosPlayer> playerMapOld = new HashMap<>();
     private Map<String, HeosPlayer> removedPlayerMap = new HashMap<>();
+
+    private final Map<String, HeosGroup> groupMapNew = new HashMap<>();
+    private final Map<String, HeosGroup> groupMapOld = new HashMap<>();
     private Map<String, HeosGroup> removedGroupMap = new HashMap<>();
-    private HeosFacade heosApi = new HeosFacade(this, eventController);
 
     private ScheduledExecutorService keepAliveExecutor;
 
@@ -83,28 +83,13 @@ public class HeosSystem {
      * @return true if sending and reading successful
      */
     public synchronized boolean send(String command) {
-        for (int i = 0; i < 2;) {
-            logger.debug("Sending Command: {}", command);
-            try {
-                if (sendCommand.send(command)) {
-                    return true;
-                } else {
-                    logger.debug("Could not send message. HEOS bridge is not connected");
-                    return false;
-                }
-            } catch (ReadException e) {
-                logger.debug("HEOS System read failure during response. message: {}", e.getMessage());
-                logger.debug("HEOS failed command: {}", command);
-                i++;
-                if (i < 2) {
-                    logger.debug("HEOS System try to send command again....");
-                } else {
-                    logger.debug("Could not send command. Please check the system connection");
-                }
-            } catch (IOException e) {
-                logger.debug("IO Exception during send HEOS command with message: {}", e.getMessage());
-                return false;
-            }
+        try {
+            return sendCommand.send(command);
+        } catch (ReadException e) {
+            logger.debug("HEOS System read failure during response. message: {}", e.getMessage());
+            logger.debug("HEOS failed command: {}", command);
+        } catch (IOException e) {
+            logger.debug("IO Exception during send HEOS command with message: {}", e.getMessage());
         }
         return false;
     }
@@ -140,10 +125,9 @@ public class HeosSystem {
      * set. The caller has to handle the retry to establish the connection
      * if the method returns {@code false}.
      *
-     * @param connectionDelay if set to true system waits for 10 seconds before connecting to event line
      * @return {@code true} if connection is established else returns {@code false}
      */
-    public boolean establishConnection(boolean connectionDelay) {
+    public boolean establishConnection() {
         boolean commandLineConnected;
         boolean eventLineConnected;
 
@@ -153,11 +137,13 @@ public class HeosSystem {
             logger.debug("Exception during connection to bridge with message: {}", e.getMessage());
             logger.debug("Could not connect HEOS command line at IP {} @ port {}", connectionIP, connectionPort);
             commandLineConnected = false;
+
+            // TODO good moment to bail out
         }
         if (commandLineConnected) {
             logger.debug("HEOS command line connected at IP {} @ port {}", connectionIP, connectionPort);
-            sendCommand.setTelnetClient(commandLine);
-            send(command().registerChangeEventOFF());
+            // TODO does it make sense to send this to the normal sendcommand endpoint?
+            // send(sendCommand, command().registerChangeEventOFF());
         }
 
         try {
@@ -166,28 +152,22 @@ public class HeosSystem {
             logger.debug("Exception during connection to bridge with message: {}", e.getMessage());
             logger.debug("Could not connect HEOS event line at IP {} @ port {}", connectionIP, connectionPort);
             eventLineConnected = false;
+
+            // TODO good moment to bail out
         }
         if (eventLineConnected) {
             logger.debug("HEOS event line connected at IP {} @ port {}", connectionIP, connectionPort);
-            if (connectionDelay) {
-                // Allows the HEOS system to find all needed things internally.
-                // During the first connection after a restart or long sleep of the HEOS system,
-                // the system needs time to activate all internal processes to provide the information
-                // to the bridge
-                try {
-                    logger.warn("Sleeping inside Thread {}", Thread.currentThread().getName());
-                    Thread.sleep(WAIT_TIME_AFTER_RECONNECT);
-                } catch (InterruptedException e) {
-                    logger.debug("Thread.sleep interrupt during waiting time for HEOS Network");
-                }
+            try {
+                eventSendCommand.send(command().registerChangeEventOFF());
+            } catch (IOException | ReadException e){
+                logger.debug("Failed to send command to unregister change event");
+
+                // TODO good moment to bail out
             }
-            sendCommand.setTelnetClient(eventLine);
-            send(command().registerChangeEventOFF());
         }
         // Setting back the TelnetClient to the commandLine so that all
         // commands are send via the commandLine.
-        sendCommand.setTelnetClient(commandLine);
-        return commandLine.isConnected() && eventLine.isConnected();
+        return sendCommand.isConnected() && eventSendCommand.isConnected();
     }
 
     /**
@@ -206,15 +186,9 @@ public class HeosSystem {
     }
 
     public synchronized void startEventListener() {
-        logger.debug("HEOS System Event Listener is booting....");
+        logger.debug("HEOS System Event Listener is starting....");
+        eventSendCommand.startInputListener(command().registerChangeEventOn());
 
-        if (sendCommand.setTelnetClient(eventLine)) {
-            send(command().registerChangeEventOn());
-            logger.debug("HEOS System Event Listener is starting....");
-            eventLine.startInputListener();
-        }
-
-        sendCommand.setTelnetClient(commandLine);
         logger.debug("HEOS System Event Listener successfully started");
 
         eventLine.getReadResultListener().addPropertyChangeListener(evt -> {
@@ -228,28 +202,10 @@ public class HeosSystem {
         if (keepAliveExecutor != null) {
             keepAliveExecutor.shutdown();
         }
-        logger.debug("Stopping HEOS event line listener");
-        eventLine.stopInputListener();
-        if (eventLine.isConnected()) {
-            logger.debug("HEOS event line is still open closing it....");
-            if (eventLine.isConnectionAlive()) {
-                sendCommand.setTelnetClient(eventLine);
-                send(command().registerChangeEventOFF());
-                try {
-                    logger.warn("Sleeping inside Thread {}", Thread.currentThread().getName());
-                    Thread.sleep(300);
-                    sendCommand.setTelnetClient(commandLine);
-                    logger.debug("Disconnecting HEOS event line");
-                    eventLine.disconnect();
-                    logger.debug("Disconnecting HEOS command line");
-                    commandLine.disconnect();
-                } catch (IOException | InterruptedException e) {
-                    logger.error("Failure during closing connection to HEOS with message: {}", e.getMessage());//
-                    return;
-                }
-            }
-            logger.debug("Connection to HEOS system closed");
-        }
+
+        eventSendCommand.stopInputListener(command().registerChangeEventOFF());
+        eventSendCommand.disconnect();
+        sendCommand.disconnect();
     }
 
     /**
@@ -296,16 +252,8 @@ public class HeosSystem {
         playerMapNew.clear();
 
         send(command().getPlayers());
-        boolean resultIsEmpty = heosDecoder.getPayloadList().isEmpty();
 
-        while (resultIsEmpty) {
-            send(command().getPlayers());
-            resultIsEmpty = heosDecoder.getPayloadList().isEmpty();
-            logger.debug("HEOS System found no players.");
-        }
-        List<Map<String, String>> playerList = heosDecoder.getPayloadList();
-
-        for (Map<String, String> player : playerList) {
+        for (Map<String, String> player : heosDecoder.getPayloadList()) {
             HeosPlayer heosPlayer = new HeosPlayer();
             heosPlayer.updatePlayerInfo(player);
             playerMapNew.put(heosPlayer.getPid(), heosPlayer);
@@ -392,15 +340,14 @@ public class HeosSystem {
                     Thread.sleep(1500);
                     send(command().getGroupInfo(gid));
                 }
-                heosGroup.setOnline(false);
                 return heosGroup;
             } catch (InterruptedException e) {
                 logger.debug("Interrupted Exception - Message: {}", e.getMessage());
             }
         }
-        heosGroup.setOnline(true);
         heosGroup.updateGroupInfo(heosDecoder.getPayloadList().get(0));
         heosGroup.updateGroupPlayers((heosDecoder.getPlayerList().get(0)));
+
         send(command().getPlayState(gid));
         heosGroup.setState(heosDecoder.getPlayState());
         send(command().getGroupMute(gid));

@@ -16,7 +16,6 @@ import java.util.EventListener;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-//import org.openhab.binding.heos.internal.api.HeosEventController;
 
 /**
  * The {@link HeosEventListener } is an Event Listener
@@ -34,5 +33,4 @@ public interface HeosEventListener extends EventListener {
     void playerMediaChangeEvent(String pid, Map<String, String> info);
 
     void bridgeChangeEvent(String event, String result, String command);
-
 }

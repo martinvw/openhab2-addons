@@ -32,7 +32,6 @@ public class HeosEventController extends HeosSystemEventListener {
     private HeosResponseDecoder heosDecoder;
     private HeosSystem system;
     private HeosCommands command;
-    private String eventType;
     private String eventCommand;
 
     public HeosEventController(HeosResponseDecoder heosDecoder, HeosCommands command, HeosSystem system) {
@@ -54,7 +53,7 @@ public class HeosEventController extends HeosSystemEventListener {
 
             logger.debug("HEOS System response failure with error code '{}' and message '{}'", errorCode, errorMessage);
         } else {
-            this.eventType = heosDecoder.getEventType();
+            String eventType = heosDecoder.getEventType();
             this.eventCommand = heosDecoder.getCommandType();
 
             switch (eventType) {
@@ -171,9 +170,8 @@ public class HeosEventController extends HeosSystemEventListener {
 
     private void playerStateChanged() {
         String pid = heosDecoder.getPid();
-        String event = STATE;
         String command = heosDecoder.getPlayState();
-        fireStateEvent(pid, event, command);
+        fireStateEvent(pid, STATE, command);
     }
 
     private void playerProgressChanged() {
@@ -190,19 +188,16 @@ public class HeosEventController extends HeosSystemEventListener {
 
     private void volumeChanged() {
         String pid = heosDecoder.getPid();
-        String event = VOLUME;
         String command = heosDecoder.getPlayerVolume();
-        fireStateEvent(pid, event, command);
-        event = MUTE;
+        fireStateEvent(pid, VOLUME, command);
         command = heosDecoder.getPlayerMuteState();
-        fireStateEvent(pid, event, command);
+        fireStateEvent(pid, MUTE, command);
     }
 
     private void muteChanged() {
         String pid = heosDecoder.getPid();
-        String event = MUTE;
         String command = heosDecoder.getPlayerMuteState();
-        fireStateEvent(pid, event, command);
+        fireStateEvent(pid, MUTE, command);
     }
 
     private void playModeChanged() {

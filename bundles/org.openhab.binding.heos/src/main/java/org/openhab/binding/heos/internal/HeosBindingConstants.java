@@ -83,7 +83,7 @@ public class HeosBindingConstants extends HeosConstants {
     public static final String PROP_ROLE = "Role";
     public static final String PROP_BRIDGE = "HEOS Bridge";
 
-    public static final String HOST = "ipAddress";
+    public static final String IP_ADDRESS = "ipAddress";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String HEARTBEAT = "heartbeat";

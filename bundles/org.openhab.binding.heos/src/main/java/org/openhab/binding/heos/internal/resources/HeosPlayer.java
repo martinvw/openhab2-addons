@@ -21,6 +21,8 @@ import java.util.Map;
  * The {@link HeosPlayer} represents a player within the HEOS
  * network
  *
+ * TODO MvW it seems that a lot fields here are unused, we should look into that
+ *
  * @author Johannes Einig - Initial contribution
  */
 public class HeosPlayer extends HeosMediaObject {

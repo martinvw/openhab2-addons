@@ -12,15 +12,15 @@
  */
 package org.openhab.binding.heos.internal.resources;
 
-import static org.openhab.binding.heos.internal.resources.HeosConstants.FAIL;
-
-import java.io.IOException;
-import java.util.List;
-
 import org.openhab.binding.heos.internal.api.HeosEventController;
 import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.openhab.binding.heos.internal.resources.HeosConstants.FAIL;
 
 /**
  * The {@link HeosSendCommand} is responsible to send a command
@@ -31,10 +31,9 @@ import org.slf4j.LoggerFactory;
 public class HeosSendCommand {
     private final Logger logger = LoggerFactory.getLogger(HeosSendCommand.class);
 
+    private final Telnet client;
     private final HeosResponseDecoder decoder;
     private final HeosEventController eventController;
-
-    private Telnet client;
 
     public HeosSendCommand(Telnet client, HeosResponseDecoder decoder, HeosEventController eventController) {
         this.client = client;
@@ -63,7 +62,7 @@ public class HeosSendCommand {
                         } catch (InterruptedException e) {
                             logger.debug("Interrupted Exception - Message: {}", e.getMessage());
                         }
-                        List<String> readResultList = client.readLine(15000);
+                        List<String> readResultList = client.readLine(15000); // FIXME can this timeout be decreased?
 
                         for (String s : readResultList) {
                             decoder.getHeosJsonParser().parseResult(s);
@@ -117,15 +116,49 @@ public class HeosSendCommand {
         }
     }
 
-    public boolean setTelnetClient(Telnet client) {
-        this.client = client;
-
-        logger.debug("Set client: {}, connection={}", client, client.isConnected());
-
-        return true;
-    }
-
     public boolean isConnectionAlive() {
         return client.isConnectionAlive();
+    }
+
+    public boolean isConnected() {
+        return client.isConnected();
+    }
+
+    public void stopInputListener(String registerChangeEventOFF) {
+        logger.debug("Stopping HEOS event line listener");
+        client.stopInputListener();
+
+        if (client.isConnected()) {
+            logger.debug("HEOS event line is still open closing it....");
+            try {
+                client.send(registerChangeEventOFF);
+            } catch (IOException e) {
+                logger.error("Failure during closing connection to HEOS with message: {}", e.getMessage());
+            }
+        }
+    }
+
+    public void disconnect() {
+        if (client.isConnected()) {
+            return;
+        }
+
+        try {
+            logger.debug("Disconnecting HEOS command line");
+            client.disconnect();
+        } catch (IOException e) {
+            logger.error("Failure during closing connection to HEOS with message: {}", e.getMessage());
+        }
+
+        logger.debug("Connection to HEOS system closed");
+    }
+
+    public void startInputListener(String command) {
+        try {
+            send(command);
+            client.startInputListener();
+        } catch (IOException | ReadException e) {
+            logger.debug("Failed to start input listener");
+        }
     }
 }
