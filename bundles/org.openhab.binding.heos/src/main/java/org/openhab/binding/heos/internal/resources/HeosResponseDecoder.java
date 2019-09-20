@@ -181,11 +181,7 @@ public class HeosResponseDecoder {
     }
 
     public boolean isCommandUnderProgress() {
-        if (response.getEvent().getMessagesMap().get(COM_UNDER_PROCESS).equals(TRUE)) {
-            return true;
-        } else {
-            return false;
-        }
+        return response.getEvent().getMessagesMap().get(COM_UNDER_PROCESS).equals(TRUE);
     }
 
     // HEOS Response Messages
@@ -214,12 +210,7 @@ public class HeosResponseDecoder {
         return response.getPayload().getPayloadList();
     }
 
-    public HeosResponse getHeosResponse() {
-        return response;
-    }
-
     public HeosJsonParser getHeosJsonParser() {
         return parser;
     }
-
 }

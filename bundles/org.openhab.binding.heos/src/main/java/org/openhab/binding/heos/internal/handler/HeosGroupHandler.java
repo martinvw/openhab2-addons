@@ -76,7 +76,7 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
         }
         // Generates the groupMember from the properties. Is needed to generate group after restart of OpenHab.
         heosGroup.updateGroupPlayers(thing.getConfiguration().get(PROP_GROUP_MEMBERS).toString());
-        api.registerforChangeEvents(this);
+        api.registerForChangeEvents(this);
         scheduledStartUp();
     }
 
@@ -127,7 +127,7 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
      */
     @Override
     public void setStatusOffline() {
-        api.unregisterforChangeEvents(this);
+        api.unregisterForChangeEvents(this);
         updateState(CH_ID_UNGROUP, OnOffType.OFF);
         updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
         updateStatus(ThingStatus.OFFLINE);

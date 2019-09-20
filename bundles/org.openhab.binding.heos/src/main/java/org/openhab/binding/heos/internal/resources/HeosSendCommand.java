@@ -31,10 +31,10 @@ import org.slf4j.LoggerFactory;
 public class HeosSendCommand {
     private final Logger logger = LoggerFactory.getLogger(HeosSendCommand.class);
 
+    private final HeosResponseDecoder decoder;
+    private final HeosEventController eventController;
+
     private Telnet client;
-    private HeosResponseDecoder decoder;
-    private HeosEventController eventController;
-    private String command;
 
     public HeosSendCommand(Telnet client, HeosResponseDecoder decoder, HeosEventController eventController) {
         this.client = client;
@@ -43,21 +43,22 @@ public class HeosSendCommand {
     }
 
     public synchronized boolean send(String command) throws ReadException, IOException {
-        if (!isConnected()) {
+        if (!client.isConnected()) {
+            logger.debug("Not connected");
             return false;
         }
         int sendTryCounter = 0;
-        this.command = command;
 
-        if (executeSendCommand()) {
+        if (executeSendCommand(command)) {
             while (sendTryCounter < 1) {
                 if (decoder.getSendResult().equals(FAIL)) {
-                    executeSendCommand();
+                    executeSendCommand(command);
                     ++sendTryCounter;
                 }
                 if (decoder.isCommandUnderProgress()) {
                     while (decoder.isCommandUnderProgress()) {
                         try {
+                            logger.warn("Sleeping inside Thread {}", Thread.currentThread().getName());
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             logger.debug("Interrupted Exception - Message: {}", e.getMessage());
@@ -101,7 +102,7 @@ public class HeosSendCommand {
      * shall be prevented with an Map which reads until no
      * End of line is detected.
      */
-    private boolean executeSendCommand() throws ReadException, IOException {
+    private boolean executeSendCommand(String command) throws ReadException, IOException {
         boolean sendSuccess = client.send(command);
         if (sendSuccess) {
             List<String> readResultList = client.readLine();
@@ -118,11 +119,10 @@ public class HeosSendCommand {
 
     public boolean setTelnetClient(Telnet client) {
         this.client = client;
-        return true;
-    }
 
-    public boolean isConnected() {
-        return client.isConnected();
+        logger.debug("Set client: {}, connection={}", client, client.isConnected());
+
+        return true;
     }
 
     public boolean isConnectionAlive() {

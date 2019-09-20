@@ -50,8 +50,8 @@ public class HeosSystem {
     private String connectionIP = "";
     private int connectionPort;
 
-    private Telnet commandLine;
-    private Telnet eventLine;
+    private Telnet commandLine = new Telnet();
+    private Telnet eventLine = new Telnet();
     private HeosCommands heosCommand = new HeosCommands();
     private HeosResponseDecoder heosDecoder = new HeosResponseDecoder();
     private HeosEventController eventController = new HeosEventController(heosDecoder, heosCommand, this);
@@ -66,7 +66,6 @@ public class HeosSystem {
     private HeosFacade heosApi = new HeosFacade(this, eventController);
 
     private ScheduledExecutorService keepAlive;
-    private KeepAliveRunnable keepAliveRunnable = new KeepAliveRunnable();
 
     /**
      * Method to be used to send a command to the HEOS system.
@@ -145,11 +144,8 @@ public class HeosSystem {
      * @return {@code true} if connection is established else returns {@code false}
      */
     public boolean establishConnection(boolean connectionDelay) {
-        this.commandLine = new Telnet();
-        this.eventLine = new Telnet();
-
-        boolean commandLineConnected = false;
-        boolean eventLineConnected = false;
+        boolean commandLineConnected;
+        boolean eventLineConnected;
 
         try {
             commandLineConnected = commandLine.connect(connectionIP, connectionPort);
@@ -179,6 +175,7 @@ public class HeosSystem {
                 // the system needs time to activate all internal processes to provide the information
                 // to the bridge
                 try {
+                    logger.warn("Sleeping inside Thread {}", Thread.currentThread().getName());
                     Thread.sleep(WAIT_TIME_AFTER_RECONNECT);
                 } catch (InterruptedException e) {
                     logger.debug("Thread.sleep interrupt during waiting time for HEOS Network");
@@ -205,7 +202,7 @@ public class HeosSystem {
      */
     public void startHeartBeat(int heartbeatPulse) {
         keepAlive = Executors.newScheduledThreadPool(1);
-        keepAlive.scheduleWithFixedDelay(this.keepAliveRunnable, START_DELAY, heartbeatPulse, TimeUnit.SECONDS);
+        keepAlive.scheduleWithFixedDelay(new KeepAliveRunnable(), START_DELAY, heartbeatPulse, TimeUnit.SECONDS);
     }
 
     public synchronized void startEventListener() {
@@ -239,6 +236,7 @@ public class HeosSystem {
                 sendCommand.setTelnetClient(eventLine);
                 send(command().registerChangeEventOFF());
                 try {
+                    logger.warn("Sleeping inside Thread {}", Thread.currentThread().getName());
                     Thread.sleep(300);
                     sendCommand.setTelnetClient(commandLine);
                     logger.debug("Disconnecting HEOS event line");
@@ -271,6 +269,7 @@ public class HeosSystem {
                 for (int i = 2; i > 0; i--) {
                     logger.debug("HEOS System waiting for player with PID: '{}' to be available. Open tries: {}", pid,
                             i);
+                    logger.warn("Sleeping inside Thread {}", Thread.currentThread().getName());
                     Thread.sleep(3000);
                     send(command().getPlayerInfo(pid));
                 }
@@ -389,6 +388,7 @@ public class HeosSystem {
                 for (int i = 2; i > 0; i--) {
                     logger.debug("HEOS System waiting for group with PID: '{}' to be available. Open tries: {}", gid,
                             i);
+                    logger.warn("Sleeping inside Thread {}", Thread.currentThread().getName());
                     Thread.sleep(1500);
                     send(command().getGroupInfo(gid));
                 }
@@ -489,21 +489,20 @@ public class HeosSystem {
             try {
                 if (sendCommand.isConnectionAlive()) {
                     logger.debug("Sending HEOS Heart Beat");
-                    if (!sendCommand.send(command().heartbeat())) {
-                        logger.debug("Connection to HEOS Network lost!");
-                        restartConnection();
+                    if (sendCommand.send(command().heartbeat())) {
+                        return;
                     }
-                } else {
-                    logger.debug("Connection to HEOS Network lost!");
-                    restartConnection();
                 }
+                logger.debug("Connection to HEOS Network lost!");
+
                 // catches a failure during a heart beat send message if connection was
                 // getting lost between last Heart Beat but Bridge is online again and not
                 // detected by isConnectionAlive()
             } catch (ReadException | IOException e) {
                 logger.debug("Failure during HEOS Heart Beat command with message: {}", e.getMessage());
-                restartConnection();
+
             }
+            restartConnection();
         }
 
         private void restartConnection() {
@@ -512,9 +511,11 @@ public class HeosSystem {
             try {
                 while (!sendCommand.isConnectionAlive()) {
                     logger.debug("Trying to reconnect to HEOS Network...");
+                    logger.warn("Sleeping inside Thread {}", Thread.currentThread().getName());
                     Thread.sleep(5000);
                 }
                 logger.debug("Reconnecting to Bridge with IP {} @ port {}", connectionIP, connectionPort);
+                logger.warn("Sleeping inside Thread {}", Thread.currentThread().getName());
                 Thread.sleep(15000); // Waiting time is needed because System needs some time to start up
             } catch (InterruptedException e) {
                 logger.debug("Failure during restart procedure. Trying again simplified....");

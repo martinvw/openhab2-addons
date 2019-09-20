@@ -148,7 +148,7 @@ public class Telnet {
         readResultList.clear();
         long timeZero = System.currentTimeMillis();
         long timeAfterTry;
-        long timeTryiedToRead;
+        long timeTriedToRead;
         if (client.isConnected()) {
             readLineResult = "";
             int i = 1;
@@ -159,8 +159,8 @@ public class Telnet {
                 String str = new String(buffer, StandardCharsets.UTF_8);
                 i = concatReadLineResult(str);
                 timeAfterTry = System.currentTimeMillis();
-                timeTryiedToRead = timeAfterTry - timeZero;
-                if (timeTryiedToRead >= timeOut) {
+                timeTriedToRead = timeAfterTry - timeZero;
+                if (timeTriedToRead >= timeOut) {
                     throw new ReadException();
                 }
             }
@@ -258,11 +258,19 @@ public class Telnet {
      */
     public boolean isConnectionAlive() {
         try {
-            return address.isReachable(IS_ALIVE_TIMEOUT);
+            return address != null && address.isReachable(IS_ALIVE_TIMEOUT);
         } catch (IOException e) {
             logger.debug("IO Exception- Message: {}", e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Telnet{" +
+                "ip='" + ip + '\'' +
+                ", port=" + port +
+                '}';
     }
 
     public HeosStringPropertyChangeListener getReadResultListener() {

@@ -50,7 +50,7 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
 
     @Override
     public void initialize() {
-        api.registerforChangeEvents(this);
+        api.registerForChangeEvents(this);
         // Because initialization can take longer a scheduler with an extra thread is created
         scheduler.schedule(() -> {
             initChannelHandlerFactory();
@@ -102,7 +102,7 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
 
     @Override
     public void setStatusOffline() {
-        api.unregisterforChangeEvents(this);
+        api.unregisterForChangeEvents(this);
         updateStatus(ThingStatus.OFFLINE);
     }
 

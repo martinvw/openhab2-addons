@@ -25,8 +25,8 @@ import org.openhab.binding.heos.internal.resources.HeosEventListener;
  */
 public class HeosFacade {
 
-    private HeosSystem controller;
-    private HeosEventController event;
+    private final HeosSystem controller;
+    private final HeosEventController event;
 
     public HeosFacade(HeosSystem controller, HeosEventController event) {
         this.controller = controller;
@@ -249,18 +249,6 @@ public class HeosFacade {
     }
 
     /**
-     * Sets the connection parameter if the HOES system and connects to the system
-     *
-     * @param ip   The IP address of the HEOS player which is used as bridge
-     * @param port The port the system shall establish the connection
-     */
-    public void setHeosConnection(String ip, int port) {
-        controller.setConnectionIP(ip);
-        controller.setConnectionPort(port);
-        controller.establishConnection(false);
-    }
-
-    /**
      * Reboot the bridge to which the connection is established
      */
     public void reboot() {
@@ -274,7 +262,6 @@ public class HeosFacade {
      * @param password The password of the user
      */
     public void logIn(String name, String password) {
-        controller.command().setUsernamePwassword(name, password);
         controller.send(controller.command().signIn(name, password));
     }
 
@@ -483,15 +470,7 @@ public class HeosFacade {
     }
 
     /**
-     *
-     * @param pid The ID of the dedicated player or group
-     */
-    public void setActivePlayer(String pid) {
-        controller.command().setPlayerID(pid);
-    }
-
-    /**
-     * Sends a RAW command to the HESO bridge. The command has to be
+     * Sends a RAW command to the HEOS bridge. The command has to be
      * in accordance with the HEOS CLI specification
      *
      * @param command to send
@@ -505,7 +484,7 @@ public class HeosFacade {
      *
      * @param listener The HeosEventListener
      */
-    public void registerforChangeEvents(HeosEventListener listener) {
+    public void registerForChangeEvents(HeosEventListener listener) {
         event.addListener(listener);
     }
 
@@ -514,7 +493,7 @@ public class HeosFacade {
      *
      * @param listener The HeosEventListener
      */
-    public void unregisterforChangeEvents(HeosEventListener listener) {
+    public void unregisterForChangeEvents(HeosEventListener listener) {
         event.removeListener(listener);
     }
 }

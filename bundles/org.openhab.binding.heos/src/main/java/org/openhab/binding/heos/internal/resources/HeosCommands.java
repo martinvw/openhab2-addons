@@ -13,44 +13,38 @@
 package org.openhab.binding.heos.internal.resources;
 
 /**
- * The {@link HeosCommand} provides the available command for the
- * HEOS network.
+ * The {@link HeosCommand} provides the available commands for the HEOS network.
  *
  * @author Johannes Einig - Initial contribution
  */
 public class HeosCommands {
 
-    private String playerID = "";
-    private String username = "";
-    private String password = "";
-
     // System Commands
-    private String registerChangeEventOn = "heos://system/register_for_change_events?enable=on";
-    private String registerChangeEventOFF = "heos://system/register_for_change_events?enable=off";
-    private String heosAccountCheck = "heos://system/check_account";
-    private String prettifyJSONon = "heos://system/prettify_json_response?enable=on";
-    private String prettifyJSONoff = "heos://system/prettify_json_response?enable=off";
-    private String rebootSystem = "heos://system/reboot";
-    private String signIn = "heos://system/sign_in?un=" + username + "&pw=" + password;
-    private String signOut = "heos://system/sign_out";
-    private String heartbeat = "heos://system/heart_beat";
+    private final String registerChangeEventOn = "heos://system/register_for_change_events?enable=on";
+    private final String registerChangeEventOFF = "heos://system/register_for_change_events?enable=off";
+    private final String heosAccountCheck = "heos://system/check_account";
+    private final String prettifyJSONon = "heos://system/prettify_json_response?enable=on";
+    private final String prettifyJSONoff = "heos://system/prettify_json_response?enable=off";
+    private final String rebootSystem = "heos://system/reboot";
+    private final String signOut = "heos://system/sign_out";
+    private final String heartbeat = "heos://system/heart_beat";
 
     // Player Commands Control
-    private String setPlayStatePlay = "heos://player/set_play_state?pid=";
-    private String setPlayStatePause = "heos://player/set_play_state?pid=";
-    private String setPlayStateStop = "heos://player/set_play_state?pid=";
-    private String setVolume = "heos://player/set_volume?pid=";
-    private String volumeUp = "heos://player/volume_up?pid=";
-    private String volumeDown = "heos://player/volume_down?pid=";
-    private String setMuteOn = "heos://player/set_mute?pid=";
-    private String setMuteOff = "heos://player/set_mute?pid=";
-    private String setMuteToggle = "heos://player/toggle_mute?pid=";
-    private String playNext = "heos://player/play_next?pid=";
-    private String playPrevious = "heos://player/play_previous?pid=";
-    private String playQueueItem = "heos://player/play_queue?pid=";
-    private String clearQueue = "heos://player/clear_queue?pid=";
-    private String deleteQueueItem = "heos://player/remove_from_queue?pid=";
-    private String setPlayMode = "heos://player/set_play_mode?pid=";
+    private final String setPlayStatePlay = "heos://player/set_play_state?pid=";
+    private final String setPlayStatePause = "heos://player/set_play_state?pid=";
+    private final String setPlayStateStop = "heos://player/set_play_state?pid=";
+    private final String setVolume = "heos://player/set_volume?pid=";
+    private final String volumeUp = "heos://player/volume_up?pid=";
+    private final String volumeDown = "heos://player/volume_down?pid=";
+    private final String setMuteOn = "heos://player/set_mute?pid=";
+    private final String setMuteOff = "heos://player/set_mute?pid=";
+    private final String setMuteToggle = "heos://player/toggle_mute?pid=";
+    private final String playNext = "heos://player/play_next?pid=";
+    private final String playPrevious = "heos://player/play_previous?pid=";
+    private final String playQueueItem = "heos://player/play_queue?pid=";
+    private final String clearQueue = "heos://player/clear_queue?pid=";
+    private final String deleteQueueItem = "heos://player/remove_from_queue?pid=";
+    private final String setPlayMode = "heos://player/set_play_mode?pid=";
 
     // Group Commands Control
     private final String getGroups = "heos://group/get_groups";
@@ -66,30 +60,22 @@ public class HeosCommands {
 
     // Player Commands get Information
 
-    private String getPlayers = "heos://player/get_players";
-    private String getPlayerInfo = "heos://player/get_player_info?pid=";
-    private String getPlayState = "heos://player/get_play_state?pid=";
-    private String getNowPlayingMedia = "heos://player/get_now_playing_media?pid=";
-    private String getVolume = "heos://player/get_volume?pid=";
-    private String getMute = "heos://player/get_mute?pid=";
-    private String getQueue = "heos://player/get_queue?pid=";
-    private String getPlayMode = "heos://player/get_play_mode?pid=";
+    private final String getPlayers = "heos://player/get_players";
+    private final String getPlayerInfo = "heos://player/get_player_info?pid=";
+    private final String getPlayState = "heos://player/get_play_state?pid=";
+    private final String getNowPlayingMedia = "heos://player/get_now_playing_media?pid=";
+    private final String getVolume = "heos://player/get_volume?pid=";
+    private final String getMute = "heos://player/get_mute?pid=";
+    private final String getQueue = "heos://player/get_queue?pid=";
+    private final String getPlayMode = "heos://player/get_play_mode?pid=";
 
     // Browse Commands
-    private String getMusicSources = "heos://browse/get_music_sources";
-    private String browseSource = "heos://browse/browse?sid=";
-    private String playStation = "heos://browse/play_stream?pid=";
-    private String addToQueue = "heos://browse/add_to_queue?pid=";
-    private String playInputSource = "heos://browse/play_input?pid=";
-    private String playURL = "heos://browse/play_stream?pid=";
-
-    public void setPlayerID(String playerID) {
-        this.playerID = playerID;
-    }
-
-    public String getPlayerID() {
-        return playerID;
-    }
+    private final String getMusicSources = "heos://browse/get_music_sources";
+    private final String browseSource = "heos://browse/browse?sid=";
+    private final String playStation = "heos://browse/play_stream?pid=";
+    private final String addToQueue = "heos://browse/add_to_queue?pid=";
+    private final String playInputSource = "heos://browse/play_input?pid=";
+    private final String playURL = "heos://browse/play_stream?pid=";
 
     public String registerChangeEventOn() {
         return registerChangeEventOn;
@@ -259,29 +245,15 @@ public class HeosCommands {
         return playInputSource + des_pid + "&spid=" + source_pid + "&input=inputs/" + input;
     }
 
-    public void setUsernamePwassword(String username, String password) {
-        this.username = username;
-        this.password = password;
-        signIn = "heos://system/sign_in?un=" + this.username + "&pw=" + this.password;
-    }
-
     public String playURL(String pid, String url) {
         return playURL + pid + "&url=" + url;
-    }
-
-    public String signIn() {
-        if (!username.isEmpty() && !password.isEmpty()) {
-            return signIn;
-        } else {
-            return null;
-        }
     }
 
     public String signIn(String username, String password) {
         return "heos://system/sign_in?un=" + username + "&pw=" + password;
     }
 
-    public String signOut(String gid) {
+    public String signOut() {
         return signOut;
     }
 

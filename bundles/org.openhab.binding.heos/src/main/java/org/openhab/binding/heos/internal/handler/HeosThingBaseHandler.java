@@ -140,7 +140,7 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
      */
     @Override
     public void dispose() {
-        api.unregisterforChangeEvents(this);
+        api.unregisterForChangeEvents(this);
         super.dispose();
     }
 
@@ -163,7 +163,7 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
      * Handles the updates send from the HEOS system to
      * the binding. To receive updates the handler has
      * to register itself via {@link HeosFacade} via the method:
-     * {@link HeosFacade#registerforChangeEvents(HeosEventListener)}
+     * {@link HeosFacade#registerForChangeEvents(HeosEventListener)}
      *
      * @param event
      * @param command
