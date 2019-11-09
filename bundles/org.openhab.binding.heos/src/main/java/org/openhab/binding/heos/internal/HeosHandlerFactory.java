@@ -12,6 +12,15 @@
  */
 package org.openhab.binding.heos.internal;
 
+import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
+
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.audio.AudioHTTPServer;
 import org.eclipse.smarthome.core.audio.AudioSink;
@@ -24,13 +33,13 @@ import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
+import org.openhab.binding.heos.internal.api.HeosAudioSink;
+import org.openhab.binding.heos.internal.discovery.HeosPlayerDiscovery;
 import org.openhab.binding.heos.internal.handler.HeosBridgeHandler;
+import org.openhab.binding.heos.internal.handler.HeosDynamicStateDescriptionProvider;
 import org.openhab.binding.heos.internal.handler.HeosGroupHandler;
 import org.openhab.binding.heos.internal.handler.HeosPlayerHandler;
-import org.openhab.binding.heos.internal.api.HeosAudioSink;
-import org.openhab.binding.heos.internal.api.HeosFacade;
-import org.openhab.binding.heos.internal.api.HeosSystem;
-import org.openhab.binding.heos.internal.discovery.HeosPlayerDiscovery;
+import org.openhab.binding.heos.internal.handler.HeosThingBaseHandler;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -39,13 +48,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
-
 /**
  * The {@link HeosHandlerFactory} is responsible for creating things and thing
  * handlers.
@@ -53,14 +55,16 @@ import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
  * @author Johannes Einig - Initial contribution
  */
 @Component(service = ThingHandlerFactory.class, configurationPid = "binding.heos")
+@NonNullByDefault
 public class HeosHandlerFactory extends BaseThingHandlerFactory {
     private final Logger logger = LoggerFactory.getLogger(HeosHandlerFactory.class);
 
-    private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
+    private final Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
+    private final Map<String, ServiceRegistration<AudioSink>> audioSinkRegistrations = new ConcurrentHashMap<>();
 
-    private AudioHTTPServer audioHTTPServer;
-    private Map<String, ServiceRegistration<AudioSink>> audioSinkRegistrations = new ConcurrentHashMap<>();
-    private NetworkAddressService networkAddressService;
+    private @NonNullByDefault({}) AudioHTTPServer audioHTTPServer;
+    private @NonNullByDefault({}) NetworkAddressService networkAddressService;
+    private @NonNullByDefault({}) HeosDynamicStateDescriptionProvider heosDynamicStateDescriptionProvider;
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -74,11 +78,12 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
     }
 
     @Override
-    protected ThingHandler createHandler(Thing thing) {
+    protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (THING_TYPE_BRIDGE.equals(thingTypeUID)) {
-            HeosBridgeHandler bridgeHandler = new HeosBridgeHandler((Bridge) thing);
+            HeosBridgeHandler bridgeHandler = new HeosBridgeHandler((Bridge) thing,
+                    heosDynamicStateDescriptionProvider);
             HeosPlayerDiscovery playerDiscovery = new HeosPlayerDiscovery(bridgeHandler);
             discoveryServiceRegs.put(bridgeHandler.getThing().getUID(), bundleContext
                     .registerService(DiscoveryService.class.getName(), playerDiscovery, new Hashtable<>()));
@@ -87,26 +92,24 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
             return bridgeHandler;
         }
         if (THING_TYPE_PLAYER.equals(thingTypeUID)) {
-            HeosPlayerHandler playerHandler = new HeosPlayerHandler(thing);
-            // register the speaker as an audio sink
-            HeosAudioSink audioSink = new HeosAudioSink(playerHandler, audioHTTPServer, createCallbackUrl());
-            @SuppressWarnings("unchecked")
-            ServiceRegistration<AudioSink> reg = (ServiceRegistration<AudioSink>) bundleContext
-                    .registerService(AudioSink.class.getName(), audioSink, new Hashtable<>());
-            audioSinkRegistrations.put(thing.getUID().toString(), reg);
+            HeosPlayerHandler playerHandler = new HeosPlayerHandler(thing, heosDynamicStateDescriptionProvider);
+            registerAudioSink(thing, playerHandler);
             return playerHandler;
         }
         if (THING_TYPE_GROUP.equals(thingTypeUID)) {
-            HeosGroupHandler groupHandler = new HeosGroupHandler(thing);
-            // register the group as an audio sink
-            HeosAudioSink audioSink = new HeosAudioSink(groupHandler, audioHTTPServer, createCallbackUrl());
-            @SuppressWarnings("unchecked")
-            ServiceRegistration<AudioSink> reg = (ServiceRegistration<AudioSink>) bundleContext
-                    .registerService(AudioSink.class.getName(), audioSink, new Hashtable<>());
-            audioSinkRegistrations.put(thing.getUID().toString(), reg);
+            HeosGroupHandler groupHandler = new HeosGroupHandler(thing, heosDynamicStateDescriptionProvider);
+            registerAudioSink(thing, groupHandler);
             return groupHandler;
         }
         return null;
+    }
+
+    private void registerAudioSink(Thing thing, HeosThingBaseHandler thingBaseHandler) {
+        HeosAudioSink audioSink = new HeosAudioSink(thingBaseHandler, audioHTTPServer, createCallbackUrl());
+        @SuppressWarnings("unchecked")
+        ServiceRegistration<AudioSink> reg = (ServiceRegistration<AudioSink>) bundleContext
+                .registerService(AudioSink.class.getName(), audioSink, new Hashtable<>());
+        audioSinkRegistrations.put(thing.getUID().toString(), reg);
     }
 
     @Override
@@ -148,7 +151,16 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
         this.networkAddressService = null;
     }
 
-    private String createCallbackUrl() {
+    @Reference
+    protected void setDynamicStateDescriptionProvider(HeosDynamicStateDescriptionProvider provider) {
+        this.heosDynamicStateDescriptionProvider = provider;
+    }
+
+    protected void unsetDynamicStateDescriptionProvider(HeosDynamicStateDescriptionProvider provider) {
+        this.heosDynamicStateDescriptionProvider = null;
+    }
+
+    private @Nullable String createCallbackUrl() {
         final String ipAddress = networkAddressService.getPrimaryIpv4HostAddress();
         if (ipAddress == null) {
             logger.warn("No network interface could be found.");

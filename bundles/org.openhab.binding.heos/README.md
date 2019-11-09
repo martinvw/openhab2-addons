@@ -126,13 +126,16 @@ Bridge heos:bridge:main "Bridge" [ipAddress="192.168.0.1", username="userName", 
 | PlayUrl           | String        | Plays a media file located at the URL                                 |
 | Shuffle           | Switch        | Switches shuffle ON or OFF                                            |
 | RepeatMode        | String        | Defines the repeat mode: Inputs are: "One" , "All" or "Off"           |
-| Playlists         | String        | Plays a playlist. Playlists are identified by numbers (starting at 0!). List can be found in the HEOS App |
-
+| Favourites        | String        | Plays a favourite. The selection options are retrieved automatically  |
+| Playlists         | String        | Plays a playlist. The selection options are retrieved automatically   |
+| Queue             | String        | Plays a from queue. The queue items are retrieved automatically       |
+| ClearQueue        | Switch        | Clear the queue when turned ON                                        |
 
 #### Example
 
 ```
 Player LivingRoom_Control "Control" {channel="heos:player:main:LivingRoom:Control"}
+Selection item=LivingRoom_Playlists     label="Playlist" icon="music"
 ```
 
 ### Channels of Thing type 'group'
@@ -155,7 +158,10 @@ Player LivingRoom_Control "Control" {channel="heos:player:main:LivingRoom:Contro
 | PlayUrl           | String        | Plays a media file located at the URL                                 |
 | Shuffle           | Switch        | Switches shuffle ON or OFF                                            |
 | RepeatMode        | String        | Defines the repeat mode: Inputs are: "One" ; "All" or "Off"           |
-| Playlists         | String        | Plays a playlist. Playlists are identified by numbers (starting at 0!). List can be found in the HEOS App            |
+| Favourites        | String        | Plays a favourite. The selection options are retrieved automatically  |
+| Playlists         | String        | Plays a playlist. The selection options are retrieved automatically   |
+| Queue             | String        | Plays a from queue. The queue items are retrieved automatically       |
+| ClearQueue        | Switch        | Clear the queue when turned ON                                        |
 
 | Input names   |
 |-------------- |
@@ -200,30 +206,12 @@ An current list can be found within the HEOS CLI protocol which can be found [he
 | Reboot                | Switch        | Reboot the whole HEOS System. Can be used if you get in trouble with the system                                                                           |
 | BuildGroup            | Switch        | Is used to define a group. The player which shall be grouped has to be selected first. If Switch is then activated the group is build.                    |
 
-
-
 For a list of the commands please refer to the [HEOS CLI protocol](https://rn.dmglobal.com/euheos/HEOS_CLI_ProtocolSpecification.pdf).
-
 
 ## *Dynamic Channels*
 
-Also the bridge, players and groups supports dynamic channels which represent the players of the network and the favorites.
-They are added dynamically if a player is found and if favorites are defined within the HEOS Account.
-To activate Favorites the system has to be signed in to the HEOS Account.
-The player and group channels are only shown on the bridge.
-
-
-### Favorite Channels
-
-| Channel ID    | Item Type     | Description                                                                                               |
-|------------   |-----------    |-------------------------------------------------------------------------------------------------------    |
-| {mid}         | Switch        | A channel which represents the favorite. Please check via UI how the correct Channel Type looks like.     |
-
- Example
-
- ```
- Switch Favorite_1 "Fav 1 [%s]" {channel="heos:bridge:main:s17492"}
- ```
+Also the bridge supports dynamic channels which represent the players of the network.
+They are added dynamically if a player is found. The player and group channels are only shown on the bridge.
 
 ### Player Channels
 
@@ -260,6 +248,7 @@ Dimmer LivingRoom_Volume "Volume" {channel="heos:player:main:LivingRoom:Volume"}
 String LivingRoom_Title "Title [%s]" {channel="heos:player:main:LivingRoom:Title"}
 String LivingRoom_Interpret "Interpret [%s]" {channel="heos:player:main:LivingRoom:Artist"}
 String LivingRoom_Album "Album [%s]" {channel="heos:player:main:LivingRoom:Album"}
+String LivingRoom_Playlists {channel="heos:player:main:LivingRoom:Playlists"}
 ```
 
 ###demo.sitemap
@@ -272,6 +261,7 @@ String LivingRoom_Album "Album [%s]" {channel="heos:player:main:LivingRoom:Album
     	Default item=LivingRoom_Title
     	Default item=LivingRoom_Interpret
     	Default item=LivingRoom_Album
+        Selection item=LivingRoom_Playlists     label="Playlist" icon="music"
     }
 ```
 
@@ -383,24 +373,4 @@ Frame label="Heos Group" visibility=[HeosGroup_Status==ONLINE] {
 	}
 
 }
-```
-
-### Playlists
-
-Playlists can be played by sending the number (starts at 0!) to the binding via the playlists channel at the corresponding player or group.
-To find the correct number for the playlist, please have a look to the HEOS App and see at which position the playlist you want to play is located.
-
-#### Example
-
-Items:
-
-```
-String HeosKitchen_Playlist		"Playlists" (gHeos) {channel="heos:player:918797451:Playlists"}
-
-```
-
-Sitemap:
-
-```
-Switch item=HeosKitchen_Playlists  	mappings=[0="San Glaser", 1="Classic", 2="Beasty Boys"]
 ```

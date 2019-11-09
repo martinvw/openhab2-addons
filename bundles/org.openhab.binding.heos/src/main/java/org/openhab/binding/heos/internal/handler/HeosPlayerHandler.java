@@ -12,20 +12,28 @@
  */
 package org.openhab.binding.heos.internal.handler;
 
-import static org.openhab.binding.heos.internal.HeosBindingConstants.PROP_PID;
+import static org.openhab.binding.heos.internal.json.dto.HeosCommunicationAttribute.PLAYER_ID;
+import static org.openhab.binding.heos.internal.json.dto.HeosEvent.GROUP_VOLUME_CHANGED;
 
-import java.util.Map;
+import java.io.IOException;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.types.Command;
-import org.openhab.binding.heos.internal.api.HeosSystem;
 import org.openhab.binding.heos.internal.configuration.PlayerConfiguration;
-import org.openhab.binding.heos.internal.resources.HeosConstants;
-import org.openhab.binding.heos.internal.resources.HeosPlayer;
+import org.openhab.binding.heos.internal.exception.HeosNotConnectedException;
+import org.openhab.binding.heos.internal.json.dto.HeosEventObject;
+import org.openhab.binding.heos.internal.json.dto.HeosResponseObject;
+import org.openhab.binding.heos.internal.json.payload.Media;
+import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link HeosPlayerHandler} handles the actions for a HEOS player.
@@ -33,18 +41,28 @@ import org.openhab.binding.heos.internal.resources.HeosPlayer;
  *
  * @author Johannes Einig - Initial contribution
  */
+@NonNullByDefault
 public class HeosPlayerHandler extends HeosThingBaseHandler {
+    private final Logger logger = LoggerFactory.getLogger(HeosPlayerHandler.class);
 
-    private String pid;
-    private HeosPlayer player = new HeosPlayer();
+    private @NonNullByDefault({}) String pid;
+    private @Nullable ScheduledFuture<?> scheduledFuture;
 
-    public HeosPlayerHandler(Thing thing) {
-        super(thing);
+    public HeosPlayerHandler(Thing thing, HeosDynamicStateDescriptionProvider heosDynamicStateDescriptionProvider) {
+        super(thing, heosDynamicStateDescriptionProvider);
     }
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        super.handleCommand(channelUID, command);
+        HeosChannelHandler channelHandler = getHeosChannelHandler(channelUID);
+        if (channelHandler != null) {
+            try {
+                channelHandler.handlePlayerCommand(command, getId(), thing.getUID());
+                handleSuccess();
+            } catch (IOException | ReadException e) {
+                handleError(e);
+            }
+        }
     }
 
     @Override
@@ -52,25 +70,43 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
         super.initialize();
 
         PlayerConfiguration configuration = thing.getConfiguration().as(PlayerConfiguration.class);
-
         pid = configuration.pid;
 
-        // TODO this is not nice
-        // Because initialization can take longer a scheduler with an extra thread is created
-        scheduler.schedule(() -> {
-            // TODO this is not nice
-            player = getApi().getPlayerState(pid);
-            if (!player.isOnline()) {
-                setStatusOffline();
-                return;
-            }
-            // Adding the favorite channel to the player
-            if (bridge.isLoggedin()) {
-                updateThingChannels(channelManager.addFavoriteChannels(getApi().getFavorites()));
-            }
+        delayedInitialize();
+    }
 
-            updateStatus(ThingStatus.ONLINE);
+    private void delayedInitialize() {
+        scheduledFuture = scheduler.schedule(() -> {
+            try {
+                handleThingStateUpdate(getApiConnection().getPlayerInfo(pid));
+                handleThingStateUpdate(getApiConnection().getPlayState(pid));
+                handleThingStateUpdate(getApiConnection().getPlayerMuteState(pid));
+                handleThingStateUpdate(getApiConnection().getHeosPlayerVolume(pid));
+                handleThingStateUpdate(getApiConnection().getPlayMode(pid));
+
+                // handle updated media
+                HeosResponseObject<Media> response = getApiConnection().getNowPlayingMedia(pid);
+                Media responseMedia = response.payload;
+                if (response.isFinished() && responseMedia != null) {
+                    handleThingMediaUpdate(responseMedia);
+                }
+
+                updateStatus(ThingStatus.ONLINE);
+            } catch (IOException | ReadException e) {
+                logger.debug("Failed to initialize, will try again", e);
+                delayedInitialize();
+            }
         }, 3, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void dispose() {
+        ScheduledFuture<?> localStartupFuture = scheduledFuture;
+        if (localStartupFuture != null && !localStartupFuture.isCancelled()) {
+            localStartupFuture.cancel(true);
+        }
+
+        super.dispose();
     }
 
     @Override
@@ -79,40 +115,49 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
     }
 
     @Override
-    public PercentType getNotificationSoundVolume() {
-        return PercentType.valueOf(player.getLevel());
-    }
-
-    @Override
     public void setNotificationSoundVolume(PercentType volume) {
-        getApi().setVolume(volume.toString(), pid);
     }
 
     @Override
-    public void playerStateChangeEvent(String pid, String event, String command) {
-        if (this.pid.equals(pid)) {
-            handleThingStateUpdate(event, command);
+    public void playerStateChangeEvent(HeosEventObject eventObject) {
+        if (!pid.equals(eventObject.getAttribute(PLAYER_ID))) {
+            return;
         }
+
+        if (GROUP_VOLUME_CHANGED.equals(eventObject.command)) {
+            logger.debug("Ignoring group-volume changes for players");
+            return;
+        }
+
+        handleThingStateUpdate(eventObject);
     }
 
     @Override
-    public void playerMediaChangeEvent(String pid, Map<String, String> info) {
-        if (this.pid.equals(pid)) {
-            player.updateMediaInfo(info);
-            handleThingMediaUpdate(info);
+    public <T> void playerStateChangeEvent(HeosResponseObject<T> responseObject) {
+        if (!pid.equals(responseObject.getAttribute(PLAYER_ID))) {
+            return;
         }
+
+        handleThingStateUpdate(responseObject);
     }
 
     @Override
-    public void bridgeChangeEvent(String event, String result, String command) {
-        if (HeosConstants.USER_CHANGED.equals(command)) {
-            updateThingChannels(channelManager.addFavoriteChannels(getApi().getFavorites()));
+    public void playerMediaChangeEvent(String eventPid, Media media) {
+        if (!pid.equals(eventPid)) {
+            return;
         }
+
+        handleThingMediaUpdate(media);
     }
 
     @Override
     public void setStatusOffline() {
-        getApi().unregisterForChangeEvents(this);
+        logger.warn("Status was set offline");
+        try {
+            getApiConnection().unregisterForChangeEvents(this);
+        } catch (HeosNotConnectedException e) {
+            logger.debug("Failed to unregister because the connection could not be fetched");
+        }
         updateStatus(ThingStatus.OFFLINE);
     }
 

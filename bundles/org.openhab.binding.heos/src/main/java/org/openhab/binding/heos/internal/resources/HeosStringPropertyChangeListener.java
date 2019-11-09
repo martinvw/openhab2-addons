@@ -15,15 +15,19 @@ package org.openhab.binding.heos.internal.resources;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * The {@Link HeosStringPropertyChangeListener} provides the possibility
  * to add a listener to an String and get informed about the new value.
  *
  * @author Johannes Einig - Initial contribution
  */
+@NonNullByDefault
 public class HeosStringPropertyChangeListener {
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    private String value;
+    private @Nullable String value;
 
     public void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
         pcs.addPropertyChangeListener(propertyChangeListener);
@@ -33,7 +37,7 @@ public class HeosStringPropertyChangeListener {
         pcs.removePropertyChangeListener(listener);
     }
 
-    public String getValue() {
+    public @Nullable String getValue() {
         return value;
     }
 
@@ -41,6 +45,5 @@ public class HeosStringPropertyChangeListener {
         String oldValue = this.value;
         value = newValue;
         pcs.firePropertyChange("value", oldValue, newValue);
-        value = null;
     }
 }

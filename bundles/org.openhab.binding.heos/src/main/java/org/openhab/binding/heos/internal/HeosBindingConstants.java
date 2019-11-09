@@ -40,9 +40,7 @@ public class HeosBindingConstants extends HeosConstants {
     public static final ThingTypeUID THING_TYPE_GROUP = new ThingTypeUID(BINDING_ID, "group");
 
     // List off all Channel Types
-
     public static final ChannelTypeUID CH_TYPE_PLAYER = new ChannelTypeUID(BINDING_ID, "chPlayer");
-    public static final ChannelTypeUID CH_TYPE_FAVORITE = new ChannelTypeUID(BINDING_ID, "chFavorite");
 
     // List of all Channel IDs
     public static final String CH_ID_CONTROL = "Control";
@@ -56,6 +54,9 @@ public class HeosBindingConstants extends HeosConstants {
     public static final String CH_ID_REBOOT = "Reboot";
     public static final String CH_ID_COVER = "Cover";
     public static final String CH_ID_PLAYLISTS = "Playlists";
+    public static final String CH_ID_FAVORITES = "Favorites";
+    public static final String CH_ID_QUEUE = "Queue";
+    public static final String CH_ID_CLEAR_QUEUE = "ClearQueue";
     public static final String CH_ID_INPUTS = "Inputs";
     public static final String CH_ID_CUR_POS = "CurrentPosition";
     public static final String CH_ID_DURATION = "Duration";
@@ -63,7 +64,7 @@ public class HeosBindingConstants extends HeosConstants {
     public static final String CH_ID_RAW_COMMAND = "RawCommand";
     public static final String CH_ID_TYPE = "Type";
     public static final String CH_ID_PLAY_URL = "PlayUrl";
-    public static final String CH_ID_SHUFFLE_MODE = "Shuffel";
+    public static final String CH_ID_SHUFFLE_MODE = "Shuffle";
     public static final String CH_ID_REPEAT_MODE = "RepeatMode";
 
     // Values for Bridge, Player and Group Properties;
@@ -88,8 +89,8 @@ public class HeosBindingConstants extends HeosConstants {
     public static final String PASSWORD = "password";
     public static final String HEARTBEAT = "heartbeat";
 
-
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.unmodifiableSet(
             Stream.of(THING_TYPE_BRIDGE, THING_TYPE_GROUP, THING_TYPE_PLAYER).collect(Collectors.toSet()));
 
+    public static final int FAILURE_COUNT_LIMIT = 5;
 }

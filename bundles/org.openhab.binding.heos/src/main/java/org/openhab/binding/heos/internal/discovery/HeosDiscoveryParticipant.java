@@ -12,6 +12,13 @@
  */
 package org.openhab.binding.heos.internal.discovery;
 
+import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
@@ -24,13 +31,6 @@ import org.jupnp.model.meta.RemoteDevice;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
 
 /**
  * The {@link HeosDiscoveryParticipant} discovers the HEOS Player of the
@@ -52,7 +52,7 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
     public @Nullable DiscoveryResult createResult(RemoteDevice device) {
         ThingUID uid = getThingUID(device);
         if (uid != null) {
-            Map<String, Object> properties = new HashMap<>(3);
+            Map<String, Object> properties = new HashMap<>();
             properties.put(IP_ADDRESS, device.getIdentity().getDescriptorURL().getHost());
             properties.put(PROP_NAME, device.getDetails().getModelDetails().getModelName());
             DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
@@ -66,14 +66,10 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
 
     @Override
     public @Nullable ThingUID getThingUID(RemoteDevice device) {
-        if (device == null) {
-            return null;
-        }
-
         DeviceDetails details = device.getDetails();
         String modelName = details.getModelDetails().getModelName();
         String modelManufacturer = details.getManufacturerDetails().getManufacturer();
-        if (modelManufacturer.equals("Denon") && (modelName.startsWith("HEOS") || modelName.endsWith("H"))) {
+        if ("Denon".equals(modelManufacturer) && (modelName.startsWith("HEOS") || modelName.endsWith("H"))) {
             String deviceType = device.getType().getType();
             if (deviceType.startsWith("ACT") || deviceType.startsWith("Aios")) {
                 return new ThingUID(THING_TYPE_BRIDGE, device.getIdentity().getUdn().getIdentifierString());

@@ -28,6 +28,9 @@
 			<channel id="Shuffle" typeId="shuffleMode" />
 			<channel id="RepeatMode" typeId="repeatMode" />
 			<channel id="Playlists" typeId="playlists" />
+			<channel id="Favorites" typeId="favorites" />
+			<channel id="Queue" typeId="queue" />
+			<channel id="ClearQueue" typeId="clearQueue" />
 		</channels>
 		<config-description>
 			<parameter name="members" type="text" readOnly="false">

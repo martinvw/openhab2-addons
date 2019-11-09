@@ -12,56 +12,65 @@
  */
 package org.openhab.binding.heos.internal.handler;
 
+import java.io.IOException;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.ThingUID;
+import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.openhab.binding.heos.internal.api.HeosFacade;
+import org.openhab.binding.heos.internal.resources.HeosEventListener;
+import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
 
 /**
  * The {@link HeosChannelHandlerControl} handles the control commands
  * coming from the implementing thing
  *
  * @author Johannes Einig - Initial contribution
- *
  */
-public class HeosChannelHandlerControl extends HeosChannelHandler {
+@NonNullByDefault
+public class HeosChannelHandlerControl extends BaseHeosChannelHandler {
+    private final HeosEventListener eventListener;
 
-    public HeosChannelHandlerControl(HeosBridgeHandler bridge, HeosFacade api) {
-        super(bridge, api);
+    public HeosChannelHandlerControl(HeosEventListener eventListener, HeosBridgeHandler bridge) {
+        super(bridge);
+        this.eventListener = eventListener;
     }
 
     @Override
-    protected void handleCommandPlayer() {
-        handleCommand();
+    public void handlePlayerCommand(Command command, String id, ThingUID uid) throws IOException, ReadException {
+        handleCommand(command, id);
     }
 
     @Override
-    protected void handleCommandGroup() {
-        handleCommand();
+    public void handleGroupCommand(Command command, String id, ThingUID uid, HeosGroupHandler heosGroupHandler)
+            throws IOException, ReadException {
+        handleCommand(command, id);
     }
 
     @Override
-    protected void handleCommandBridge() {
+    public void handleBridgeCommand(Command command, ThingUID uid) {
         // No such channel within bridge
     }
 
-    private void handleCommand() {
+    private void handleCommand(Command command, String id) throws IOException, ReadException {
         if (command instanceof RefreshType) {
-            api.getHeosPlayState(id);
+            eventListener.playerStateChangeEvent(getApi().getPlayState(id));
             return;
         }
         switch (command.toString()) {
             case "PLAY":
             case "ON":
-                api.play(id);
+                getApi().play(id);
                 break;
             case "PAUSE":
             case "OFF":
-                api.pause(id);
+                getApi().pause(id);
                 break;
             case "NEXT":
-                api.next(id);
+                getApi().next(id);
                 break;
             case "PREVIOUS":
-                api.previous(id);
+                getApi().previous(id);
                 break;
         }
     }

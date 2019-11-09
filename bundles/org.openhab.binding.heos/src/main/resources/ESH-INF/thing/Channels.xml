@@ -26,6 +26,18 @@
 		<item-type>String</item-type>
 		<label>Playlists</label>
 	</channel-type>
+	<channel-type id="favorites" advanced="true">
+		<item-type>String</item-type>
+		<label>Favorites</label>
+	</channel-type>
+	<channel-type id="queue" advanced="true">
+		<item-type>String</item-type>
+		<label>Queue</label>
+	</channel-type>
+	<channel-type id="clearQueue" advanced="true">
+		<item-type>Switch</item-type>
+		<label>Clear Queue</label>
+	</channel-type>
 	<channel-type id="reboot">
 		<item-type>Switch</item-type>
 		<label>Reboot</label>

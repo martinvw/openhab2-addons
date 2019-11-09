@@ -16,10 +16,15 @@ import static org.openhab.binding.heos.internal.resources.HeosConstants.PID;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.Channel;
+import org.eclipse.smarthome.core.thing.ChannelUID;
+import org.eclipse.smarthome.core.thing.ThingUID;
+import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.openhab.binding.heos.internal.api.HeosFacade;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link HeosChannelHandlerPlayerSelect} handles the player selection channel command
@@ -27,33 +32,39 @@ import org.openhab.binding.heos.internal.api.HeosFacade;
  *
  * @author Johannes Einig - Initial contribution
  */
-public class HeosChannelHandlerPlayerSelect extends HeosChannelHandler {
+@NonNullByDefault
+public class HeosChannelHandlerPlayerSelect extends BaseHeosChannelHandler {
+    protected final Logger logger = LoggerFactory.getLogger(HeosChannelHandlerPlayerSelect.class);
 
-    public HeosChannelHandlerPlayerSelect(HeosBridgeHandler bridge, HeosFacade api) {
-        super(bridge, api);
+    private final ChannelUID channelUID;
+
+    public HeosChannelHandlerPlayerSelect(ChannelUID channelUID, HeosBridgeHandler bridge) {
+        super(bridge);
+        this.channelUID = channelUID;
     }
 
     @Override
-    protected void handleCommandPlayer() {
+    public void handlePlayerCommand(Command command, String id, ThingUID uid) {
         // not used on player
     }
 
     @Override
-    protected void handleCommandGroup() {
+    public void handleGroupCommand(Command command, String id, ThingUID uid, HeosGroupHandler heosGroupHandler) {
         // not used on group
     }
 
     @Override
-    protected void handleCommandBridge() {
+    public void handleBridgeCommand(Command command, ThingUID uid) {
         if (command instanceof RefreshType) {
             return;
         }
-        List<String[]> selectedPlayerList = bridge.getSelectedPlayerList();
         Channel channel = bridge.getThing().getChannel(channelUID.getId());
         if (channel == null) {
-            logger.debug("Channel {} not found", channelUID.toString());
+            logger.debug("Channel {} not found", channelUID);
             return;
         }
+
+        List<String[]> selectedPlayerList = bridge.getSelectedPlayerList();
 
         if (command.equals(OnOffType.ON)) {
             String[] selectedPlayerInfo = new String[2];

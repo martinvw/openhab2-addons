@@ -12,49 +12,57 @@
  */
 package org.openhab.binding.heos.internal.handler;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.ThingUID;
+import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.openhab.binding.heos.internal.api.HeosFacade;
+import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link HeosChannelHandlerPlayURL} handles the PlayURL channel command
  * from the implementing thing.
  *
  * @author Johannes Einig - Initial contribution
- *
  */
-public class HeosChannelHandlerPlayURL extends HeosChannelHandler {
+@NonNullByDefault
+public class HeosChannelHandlerPlayURL extends BaseHeosChannelHandler {
+    protected final Logger logger = LoggerFactory.getLogger(HeosChannelHandlerPlayURL.class);
 
-    public HeosChannelHandlerPlayURL(HeosBridgeHandler bridge, HeosFacade api) {
-        super(bridge, api);
+    public HeosChannelHandlerPlayURL(HeosBridgeHandler bridge) {
+        super(bridge);
     }
 
     @Override
-    protected void handleCommandPlayer() {
-        handleCommand();
+    public void handlePlayerCommand(Command command, String id, ThingUID uid) throws IOException, ReadException {
+        handleCommand(command, id);
     }
 
     @Override
-    protected void handleCommandGroup() {
-        handleCommand();
+    public void handleGroupCommand(Command command, String id, ThingUID uid, HeosGroupHandler heosGroupHandler)
+            throws IOException, ReadException {
+        handleCommand(command, id);
     }
 
     @Override
-    protected void handleCommandBridge() {
+    public void handleBridgeCommand(Command command, ThingUID uid) {
         // not used on bridge
     }
 
-    private void handleCommand() {
+    private void handleCommand(Command command, String id) throws IOException, ReadException {
         if (command instanceof RefreshType) {
             return;
         }
         try {
             URL url = new URL(command.toString());
-            api.playURL(id, url);
+            getApi().playURL(id, url);
         } catch (MalformedURLException e) {
-            logger.debug("Command '{}' is not a propper URL. Error: {}", command.toString(), e.getMessage());
+            logger.debug("Command '{}' is not a proper URL. Error: {}", command.toString(), e.getMessage());
         }
     }
 }

@@ -147,20 +147,17 @@ public class Telnet {
     public List<String> readLine(int timeOut) throws ReadException, IOException {
         readResultList.clear();
         long timeZero = System.currentTimeMillis();
-        long timeAfterTry;
-        long timeTriedToRead;
         if (client.isConnected()) {
             readLineResult = "";
             int i = 1;
             while (i != -1) {
                 i = bufferedStream.available();
                 byte[] buffer = new byte[i];
+                // TODO this could block for ever?
                 bufferedStream.read(buffer);
                 String str = new String(buffer, StandardCharsets.UTF_8);
                 i = concatReadLineResult(str);
-                timeAfterTry = System.currentTimeMillis();
-                timeTriedToRead = timeAfterTry - timeZero;
-                if (timeTriedToRead >= timeOut) {
+                if (System.currentTimeMillis() - timeZero >= timeOut) {
                     throw new ReadException();
                 }
             }
@@ -177,7 +174,7 @@ public class Telnet {
      * End of line is detected. Each element of the list
      * should be a JSON Element
      */
-    private int concatReadLineResult(String value) {
+    private synchronized int concatReadLineResult(String value) {
         readLineResult = readLineResult.concat(value);
         if (readLineResult.endsWith("\r\n")) {
             readLineResult = readLineResult.trim();
@@ -209,6 +206,7 @@ public class Telnet {
      */
     public void startInputListener() {
         logger.warn("Starting input listener");
+        client.setReaderThread(true);
         client.registerInputListener(this::inputAvailableRead);
     }
 
@@ -228,9 +226,9 @@ public class Telnet {
             byte[] buffer = new byte[i];
             bufferedStream.read(buffer);
             String str = new String(buffer, StandardCharsets.UTF_8);
-            i = concatReadResult(str);
+            concatReadResult(str);
         } catch (IOException e) {
-            logger.debug("IO Exception- Message: {}", e.getMessage());
+            logger.debug("IO Exception, message: {}", e.getMessage());
         }
     }
 
@@ -258,7 +256,7 @@ public class Telnet {
      *
      * @return true if HEOS is reachable
      */
-    public boolean isConnectionAlive() {
+    public boolean isHostReachable() {
         try {
             return address != null && address.isReachable(IS_ALIVE_TIMEOUT);
         } catch (IOException e) {
@@ -269,10 +267,7 @@ public class Telnet {
 
     @Override
     public String toString() {
-        return "Telnet{" +
-                "ip='" + ip + '\'' +
-                ", port=" + port +
-                '}';
+        return "Telnet{" + "ip='" + ip + '\'' + ", port=" + port + '}';
     }
 
     public HeosStringPropertyChangeListener getReadResultListener() {

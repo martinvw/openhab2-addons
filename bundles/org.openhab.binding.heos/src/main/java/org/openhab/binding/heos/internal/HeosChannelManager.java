@@ -12,37 +12,27 @@
  */
 package org.openhab.binding.heos.internal;
 
-import org.eclipse.smarthome.core.thing.Channel;
-import org.eclipse.smarthome.core.thing.ChannelUID;
-import org.eclipse.smarthome.core.thing.binding.ThingHandler;
-import org.eclipse.smarthome.core.thing.binding.builder.ChannelBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.openhab.binding.heos.internal.HeosBindingConstants.CH_TYPE_FAVORITE;
-import static org.openhab.binding.heos.internal.HeosBindingConstants.PROP_NAME;
-import static org.openhab.binding.heos.internal.resources.HeosConstants.MID;
-import static org.openhab.binding.heos.internal.resources.HeosConstants.NAME;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.Channel;
+import org.eclipse.smarthome.core.thing.ChannelUID;
+import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 
 /**
  * The {@link HeosChannelManager} provides the functions to
  * add and remove channels from the channel list provided by the thing
  * The generation of the individual channels has to be done by the thingHandler
- * itself. Only for the favorites a function is provided which generates the
- * individual channels for each favorite.
+ * itself.
  *
  * @author Johannes Einig - Initial contribution
  */
+@NonNullByDefault
 public class HeosChannelManager {
-    private final Logger logger = LoggerFactory.getLogger(HeosChannelManager.class);
-
     private final ThingHandler handler;
 
     public HeosChannelManager(ThingHandler handler) {
@@ -50,35 +40,16 @@ public class HeosChannelManager {
     }
 
     public List<Channel> addSingleChannel(Channel channel) {
-        ChannelWrapper channels = getChannelsFromThing();
-        channels.addChannel(channel);
-        return channels.get();
-    }
-
-    public List<Channel> addMultipleChannels(List<Channel> channels) {
-        ChannelWrapper channelWrapper = getChannelsFromThing();
-        channels.forEach(channelWrapper::addChannel);
-        return channelWrapper.get();
+        ChannelWrapper channelList = getChannelsFromThing();
+        channelList.removeChannel(channel.getUID());
+        channelList.add(channel);
+        return channelList.get();
     }
 
     public List<Channel> removeSingleChannel(String channelIdentifier) {
         ChannelWrapper channelWrapper = getChannelsFromThing();
         channelWrapper.removeChannel(generateChannelUID(channelIdentifier));
         return channelWrapper.get();
-    }
-
-    public List<Channel> addFavoriteChannels(List<Map<String, String>> favoritesList) {
-        List<Channel> channelList = new ArrayList<>();
-        favoritesList.forEach(element -> channelList.add(generateFavoriteChannel(element)));
-        return addMultipleChannels(channelList);
-    }
-
-    private Channel generateFavoriteChannel(Map<String, String> properties) {
-        logger.debug("Generate favorite channel: {}", properties);
-        return ChannelBuilder.create(generateChannelUID(properties.get(MID)), "Switch")
-                .withLabel(properties.get(NAME))
-                .withType(CH_TYPE_FAVORITE)
-                .withProperties(properties).build();
     }
 
     /*
@@ -99,7 +70,6 @@ public class HeosChannelManager {
      * @author Martin van Wingerden - Initial contribution
      */
     private static class ChannelWrapper {
-        private final Logger logger = LoggerFactory.getLogger(ChannelWrapper.class);
         private final List<Channel> channels;
 
         ChannelWrapper(List<Channel> channels) {
@@ -107,28 +77,14 @@ public class HeosChannelManager {
         }
 
         private void removeChannel(ChannelUID uid) {
-            logger.debug("Aiming to remove: {}", uid);
-
-            List<Channel> itemsToBeRemoved = channels.stream()
-                    .filter(Objects::nonNull)
-                    .filter(channel -> uid.equals(channel.getUID()))
-                    .collect(Collectors.toList());
+            List<Channel> itemsToBeRemoved = channels.stream().filter(Objects::nonNull)
+                    .filter(channel -> uid.equals(channel.getUID())).collect(Collectors.toList());
 
             channels.removeAll(itemsToBeRemoved);
         }
 
-        /*
-         * Function to add an channel to the channel list.
-         * Checks first if channel already exists.
-         * If so, updated the channel by removing it first and
-         * add it again.
-         */
-        private void addChannel(Channel channel) {
-            // If channel already exists remove it first
-            removeChannel(channel.getUID());
-            // Then add the new/updated channel to the list
+        public void add(Channel channel) {
             channels.add(channel);
-            logger.debug("Adding Channel: {}", channel.getLabel());
         }
 
         public List<Channel> get() {

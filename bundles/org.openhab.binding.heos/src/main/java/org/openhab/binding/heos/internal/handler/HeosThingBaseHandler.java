@@ -12,37 +12,53 @@
  */
 package org.openhab.binding.heos.internal.handler;
 
+import static org.eclipse.smarthome.core.thing.ThingStatus.*;
 import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
-//import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
-import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
+import static org.openhab.binding.heos.internal.json.dto.HeosCommandGroup.GROUP;
+import static org.openhab.binding.heos.internal.json.dto.HeosCommandGroup.PLAYER;
+import static org.openhab.binding.heos.internal.json.dto.HeosCommunicationAttribute.*;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.PlayPauseType;
 import org.eclipse.smarthome.core.library.types.RawType;
 import org.eclipse.smarthome.core.library.types.StringType;
-import org.eclipse.smarthome.core.thing.Channel;
+import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.ThingStatusInfo;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
-import org.eclipse.smarthome.core.thing.binding.builder.ThingBuilder;
-import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
-import org.eclipse.smarthome.core.types.Command;
+import org.eclipse.smarthome.core.types.UnDefType;
 import org.eclipse.smarthome.io.net.http.HttpUtil;
 import org.openhab.binding.heos.internal.HeosChannelHandlerFactory;
-import org.openhab.binding.heos.internal.HeosChannelManager;
 import org.openhab.binding.heos.internal.api.HeosFacade;
-import org.openhab.binding.heos.internal.api.HeosSystem;
+import org.openhab.binding.heos.internal.exception.HeosNotConnectedException;
+import org.openhab.binding.heos.internal.exception.HeosNotFoundException;
+import org.openhab.binding.heos.internal.json.dto.HeosCommandTuple;
+import org.openhab.binding.heos.internal.json.dto.HeosCommunicationAttribute;
+import org.openhab.binding.heos.internal.json.dto.HeosEvent;
+import org.openhab.binding.heos.internal.json.dto.HeosEventObject;
+import org.openhab.binding.heos.internal.json.dto.HeosObject;
+import org.openhab.binding.heos.internal.json.dto.HeosResponseObject;
+import org.openhab.binding.heos.internal.json.payload.Media;
+import org.openhab.binding.heos.internal.json.payload.Player;
 import org.openhab.binding.heos.internal.resources.HeosEventListener;
+import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,74 +67,123 @@ import org.slf4j.LoggerFactory;
  * It provides basic command handling and common needed methods.
  *
  * @author Johannes Einig - Initial contribution
- *
  */
+@NonNullByDefault
 public abstract class HeosThingBaseHandler extends BaseThingHandler implements HeosEventListener {
     private final Logger logger = LoggerFactory.getLogger(HeosThingBaseHandler.class);
+    private final HeosDynamicStateDescriptionProvider heosDynamicStateDescriptionProvider;
+    private final ChannelUID favoritesChannelUID;
+    private final ChannelUID playlistsChannelUID;
+    private final ChannelUID queueChannelUID;
 
-    private HeosChannelHandlerFactory channelHandlerFactory;
-    protected HeosBridgeHandler bridge;
-    protected HeosChannelManager channelManager = new HeosChannelManager(this);
+    private @Nullable HeosChannelHandlerFactory channelHandlerFactory;
+    protected @Nullable HeosBridgeHandler bridgeHandler;
 
-    HeosThingBaseHandler(Thing thing) {
+    private String notificationVolume = "0";
+
+    private int failureCount;
+    private @Nullable ScheduledFuture<?> scheduleQueueFetchFuture;
+    private @Nullable ScheduledFuture<?> handleDynamicStatesFuture;
+
+    HeosThingBaseHandler(Thing thing, HeosDynamicStateDescriptionProvider heosDynamicStateDescriptionProvider) {
         super(thing);
-
-        // TODO use configuration object
+        this.heosDynamicStateDescriptionProvider = heosDynamicStateDescriptionProvider;
+        favoritesChannelUID = new ChannelUID(thing.getUID(), CH_ID_FAVORITES);
+        playlistsChannelUID = new ChannelUID(thing.getUID(), CH_ID_PLAYLISTS);
+        queueChannelUID = new ChannelUID(thing.getUID(), CH_ID_QUEUE);
     }
 
     @Override
     public void initialize() {
-        if (getBridge() != null) {
-            bridge = (HeosBridgeHandler) getBridge().getHandler();
-            channelHandlerFactory = bridge.getChannelHandlerFactory();
+        Bridge bridge = getBridge();
+        HeosBridgeHandler localBridgeHandler;
+        if (bridge != null) {
+            localBridgeHandler = (HeosBridgeHandler) bridge.getHandler();
+            if (localBridgeHandler != null) {
+                bridgeHandler = localBridgeHandler;
+                channelHandlerFactory = localBridgeHandler.getChannelHandlerFactory();
+            } else {
+                updateStatus(OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
+                return;
+            }
         } else {
             logger.warn("No Bridge set within child handler");
+            updateStatus(OFFLINE, ThingStatusDetail.BRIDGE_OFFLINE);
+            return;
         }
 
-        getApi().registerForChangeEvents(this);
+        try {
+            getApiConnection().registerForChangeEvents(this);
+            scheduleQueueFetchFuture = scheduler.schedule(this::fetchQueueFromPlayer, 30, TimeUnit.SECONDS);
+
+            if (localBridgeHandler.isLoggedIn()) {
+                handleDynamicStatesSignedIn();
+            }
+        } catch (HeosNotConnectedException e) {
+            updateStatus(OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
+        }
     }
 
-    public HeosFacade getApi(){
-        return getHeosSystem().getAPI();
+    void handleSuccess() {
+        failureCount = 0;
+        updateStatus(ONLINE);
     }
 
-    @Deprecated
-    public HeosSystem getHeosSystem() {
-        HeosBridgeHandler localBridge = bridge;
+    void handleError(Exception e) {
+        logger.debug("Failed to handle player/group command", e);
+        failureCount++;
+
+        if (failureCount > FAILURE_COUNT_LIMIT) {
+            updateStatus(OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Failed to handle command: " + e.getMessage());
+        }
+    }
+
+    public HeosFacade getApiConnection() throws HeosNotConnectedException {
+        HeosBridgeHandler localBridge = bridgeHandler;
         if (localBridge != null) {
-            return localBridge.getSystem();
-        } else {
-            // TODO handle this?
-            return null;
+            return localBridge.getApiConnection();
         }
+        throw new HeosNotConnectedException();
     }
 
-    protected abstract String getId();
+    protected abstract String getId() throws HeosNotFoundException;
 
     public abstract void setStatusOffline();
 
     public abstract void setStatusOnline();
 
-    public abstract PercentType getNotificationSoundVolume();
+    public PercentType getNotificationSoundVolume() {
+        return PercentType.valueOf(notificationVolume);
+    }
 
-    public abstract void setNotificationSoundVolume(PercentType volume);
+    public void setNotificationSoundVolume(PercentType volume) {
+        notificationVolume = volume.toString();
+    }
+
+    @Nullable
+    HeosChannelHandler getHeosChannelHandler(ChannelUID channelUID) {
+        HeosChannelHandlerFactory localChannelHandlerFactory = this.channelHandlerFactory;
+        return localChannelHandlerFactory != null ? localChannelHandlerFactory.getChannelHandler(channelUID, this, null)
+                : null;
+    }
 
     @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
-        ChannelTypeUID channelTypeUID = null; // Needed to detect the favorite channels
-        Channel channel = this.getThing().getChannel(channelUID.getId());
-        if (channel != null) {
-            channelTypeUID = channel.getChannelTypeUID();
-        } else {
-            logger.debug("No valid channel found");
-            return;
-        }
-        HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID, channelTypeUID);
-        if (channelHandler != null) {
-            channelHandler.handleCommand(command, getId(), this, channelUID);
+    public void bridgeChangeEvent(String event, boolean success, Object command) {
+        logger.debug("BridgeChangeEvent: {}", command);
+        if (HeosEvent.USER_CHANGED == command) {
+            handleDynamicStatesFuture = scheduler.schedule(this::handleDynamicStatesSignedIn, 0, TimeUnit.SECONDS);
         }
     }
 
+    void handleDynamicStatesSignedIn() {
+        try {
+            heosDynamicStateDescriptionProvider.setFavorites(favoritesChannelUID, getApiConnection().getFavorites());
+            heosDynamicStateDescriptionProvider.setPlaylists(playlistsChannelUID, getApiConnection().getPlaylists());
+        } catch (IOException | ReadException e) {
+            logger.debug("Failed to set favorites / playlists, rescheduling", e);
+            handleDynamicStatesFuture = scheduler.schedule(this::handleDynamicStatesSignedIn, 30, TimeUnit.SECONDS);
+        }
+    }
 
     @Override
     public void bridgeStatusChanged(ThingStatusInfo bridgeStatusInfo) {
@@ -131,20 +196,27 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         }
     }
 
-    protected void updateThingChannels(List<Channel> channelList) {
-        ThingBuilder thingBuilder = editThing();
-        thingBuilder.withChannels(channelList);
-        updateThing(thingBuilder.build());
-    }
-
     /**
      * Dispose the handler and unregister the handler
      * form Change Events
      */
     @Override
     public void dispose() {
-        getApi().unregisterForChangeEvents(this);
-        super.dispose();
+        try {
+            getApiConnection().unregisterForChangeEvents(this);
+        } catch (HeosNotConnectedException e) {
+            logger.trace("No connection available while trying to unregister");
+        }
+
+        ScheduledFuture<?> localeScheduleQueueFetchFuture = this.scheduleQueueFetchFuture;
+        if (localeScheduleQueueFetchFuture != null && !localeScheduleQueueFetchFuture.isCancelled()) {
+            localeScheduleQueueFetchFuture.cancel(true);
+        }
+
+        ScheduledFuture<?> handleDynamicStatesFuture = this.handleDynamicStatesFuture;
+        if (handleDynamicStatesFuture != null && !handleDynamicStatesFuture.isCancelled()) {
+            handleDynamicStatesFuture.cancel(true);
+        }
     }
 
     /**
@@ -152,14 +224,15 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
      * used for audio sink function
      *
      * @param urlStr The external URL where the file is located
+     * @throws ReadException
+     * @throws IOException
      */
-    public void playURL(String urlStr) {
+    public void playURL(String urlStr) throws IOException, ReadException {
         try {
             URL url = new URL(urlStr);
-            // TODO this is not nice
-            getApi().playURL(getId(), url);
+            getApiConnection().playURL(getId(), url);
         } catch (MalformedURLException e) {
-            logger.debug("Command '{}' is not a propper URL. Error: {}", urlStr, e.getMessage());
+            logger.debug("Command '{}' is not a proper URL. Error: {}", urlStr, e.getMessage());
         }
     }
 
@@ -169,105 +242,247 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
      * to register itself via {@link HeosFacade} via the method:
      * {@link HeosFacade#registerForChangeEvents(HeosEventListener)}
      *
-     * @param event
-     * @param command
+     * @param eventObject
      */
-    @SuppressWarnings("null")
-    protected void handleThingStateUpdate(String event, String command) {
-        if (event.equals(STATE)) {
-            switch (command) {
-                case PLAY:
-                    updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
-                    break;
-                case PAUSE:
-                case STOP:
-                    updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
-                    break;
-            }
+    protected void handleThingStateUpdate(HeosEventObject eventObject) {
+        HeosEvent command = eventObject.command;
+
+        if (command == null) {
+            logger.debug("Ignoring event with null command");
+            return;
         }
-        if (event.equals(VOLUME)) {
-            updateState(CH_ID_VOLUME, PercentType.valueOf(command));
-        }
-        if (event.equals(MUTE)) {
-            if (command != null) {
-                switch (command) {
-                    case ON:
-                        updateState(CH_ID_MUTE, OnOffType.ON);
-                        break;
-                    case OFF:
-                        updateState(CH_ID_MUTE, OnOffType.OFF);
-                        break;
+
+        switch (command) {
+
+            case PLAYER_STATE_CHANGED:
+                playerStateChanged(eventObject);
+                break;
+
+            case PLAYER_VOLUME_CHANGED:
+            case GROUP_VOLUME_CHANGED:
+                @Nullable
+                String level = eventObject.getAttribute(LEVEL);
+                if (level != null) {
+                    notificationVolume = level;
+                    updateState(CH_ID_VOLUME, PercentType.valueOf(level));
+                    updateState(CH_ID_MUTE, OnOffType.from(eventObject.getBooleanAttribute(MUTE)));
                 }
-            }
+                break;
+
+            case SHUFFLE_MODE_CHANGED:
+                handleShuffleMode(eventObject);
+                break;
+
+            case PLAYER_NOW_PLAYING_PROGRESS:
+                @Nullable
+                Long position = eventObject.getNumericAttribute(CURRENT_POSITION);
+                @Nullable
+                Long duration = eventObject.getNumericAttribute(DURATION);
+                if (position != null && duration != null) {
+                    updateState(CH_ID_CUR_POS, dividedByThousand(position));
+                    updateState(CH_ID_DURATION, dividedByThousand(duration));
+                }
+                break;
+
+            case REPEAT_MODE_CHANGED:
+                handleRepeatMode(eventObject);
+                break;
+
+            case PLAYER_PLAYBACK_ERROR:
+                updateStatus(UNKNOWN, ThingStatusDetail.NONE, eventObject.getAttribute(ERROR));
+                break;
+
+            case PLAYER_QUEUE_CHANGED:
+                fetchQueueFromPlayer();
+                break;
+
+            case SOURCES_CHANGED:
+                // we are not yet handling the actual sources, although we might want to do that in the future
+                logger.trace("Ignoring {}, support might be added in the future", command);
+                break;
+
+            case GROUPS_CHANGED:
+            case PLAYERS_CHANGED:
+            case PLAYER_NOW_PLAYING_CHANGED:
+            case USER_CHANGED:
+                logger.trace("Ignoring {}, will be handled inside HeosEventController", command);
+                break;
         }
-        if (event.equals(CUR_POS)) {
-            updateState(CH_ID_CUR_POS, DecimalType.valueOf(command));
+    }
+
+    private DecimalType dividedByThousand(long position) {
+        return new DecimalType(new BigDecimal(position).divide(BigDecimal.valueOf(1000), RoundingMode.HALF_DOWN));
+    }
+
+    private void handleShuffleMode(HeosObject eventObject) {
+        updateState(CH_ID_SHUFFLE_MODE,
+                OnOffType.from(eventObject.getBooleanAttribute(HeosCommunicationAttribute.SHUFFLE)));
+    }
+
+    protected <T> void handleThingStateUpdate(HeosResponseObject<T> responseObject) {
+        @Nullable
+        HeosCommandTuple cmd = responseObject.heosCommand;
+
+        if (cmd == null) {
+            logger.debug("Ignoring response with null command");
+            return;
         }
-        if (event.equals(DURATION)) {
-            updateState(CH_ID_DURATION, DecimalType.valueOf(command));
-        }
-        if (event.equals(SHUFFLE_MODE_CHANGED)) {
-            if (ON.equals(command)) {
-                updateState(CH_ID_SHUFFLE_MODE, OnOffType.ON);
-            } else {
-                updateState(CH_ID_SHUFFLE_MODE, OnOffType.OFF);
-            }
-        }
-        if (event.equals(REPEAT_MODE_CHANGED)) {
-            if (REPEAT_ALL.equals(command)) {
-                updateState(CH_ID_REPEAT_MODE, StringType.valueOf(HEOS_UI_ALL));
-            } else if (REPEAT_MODE.equals(command)) {
-                updateState(CH_ID_REPEAT_MODE, StringType.valueOf(HEOS_UI_ONE));
-            } else if (OFF.equals(command)) {
-                updateState(CH_ID_REPEAT_MODE, StringType.valueOf(HEOS_UI_OFF));
+
+        if (cmd.commandGroup == PLAYER || cmd.commandGroup == GROUP) {
+            switch (cmd.command) {
+                case GET_PLAY_STATE:
+                    playerStateChanged(responseObject);
+                    break;
+
+                case GET_MUTE:
+                    updateState(CH_ID_MUTE, OnOffType.from(responseObject.getBooleanAttribute(MUTE)));
+                    break;
+
+                case GET_VOLUME:
+                    @Nullable
+                    String level = responseObject.getAttribute(LEVEL);
+                    if (level != null) {
+                        notificationVolume = level;
+                        updateState(CH_ID_VOLUME, PercentType.valueOf(level));
+                    }
+                    break;
+
+                case GET_PLAY_MODE:
+                    handleRepeatMode(responseObject);
+                    handleShuffleMode(responseObject);
+                    break;
+
+                case GET_NOW_PLAYING_MEDIA:
+                    @Nullable
+                    T mediaPayload = responseObject.payload;
+                    if (mediaPayload instanceof Media) {
+                        handleThingMediaUpdate((Media) mediaPayload);
+                    }
+                    break;
+
+                case GET_PLAYER_INFO:
+                    @Nullable
+                    T playerPayload = responseObject.payload;
+                    if (playerPayload instanceof Player) {
+                        handlePlayerInfo((Player) playerPayload);
+                    }
+                    break;
             }
         }
     }
 
-    protected void handleThingMediaUpdate(Map<String, String> info) {
-        for (String key : info.keySet()) {
-            switch (key) {
-                case SONG:
-                    updateState(CH_ID_SONG, StringType.valueOf(info.get(key)));
-                    break;
-                case ARTIST:
-                    updateState(CH_ID_ARTIST, StringType.valueOf(info.get(key)));
-                    break;
-                case ALBUM:
-                    updateState(CH_ID_ALBUM, StringType.valueOf(info.get(key)));
-                    break;
-                case IMAGE_URL:
-                    try {
-                        URL url = new URL(info.get(key)); // checks if String is proper URL
-                        RawType cover = HttpUtil.downloadImage(url.toString());
-                        if (cover != null) {
-                            updateState(CH_ID_COVER, cover);
-                        }
-                        break;
-                    } catch (MalformedURLException e) {
-                        logger.debug("Cover can't be loaded. No proper URL: {}", info.get(key));
-                        break;
-                    }
-                case STATION:
-                    updateState(CH_ID_STATION, StringType.valueOf(info.get(key)));
-                    if (info.get(SID).equals(INPUT_SID)) {
-                        // removes the "input/" part before the input name
-                        String inputName = info.get(MID).substring(info.get(MID).indexOf("/") + 1);
-                        updateState(CH_ID_INPUTS, StringType.valueOf(inputName));
-                    }
-                    break;
-                case TYPE:
-                    if (INPUT_SID.equals(info.get(SID))) {
-                        updateState(CH_ID_TYPE, StringType.valueOf(info.get(STATION)));
-                    } else {
-                        updateState(CH_ID_TYPE, StringType.valueOf(info.get(key)));
-                        updateState(CH_ID_INPUTS, StringType.valueOf(""));
-                    }
-                    if (!STATION.equals(info.get(key))) {
-                        updateState(CH_ID_STATION, StringType.valueOf(""));
-                    }
-                    break;
+    private void handleRepeatMode(HeosObject eventObject) {
+        String repeatMode = eventObject.getAttribute(REPEAT);
+        if (repeatMode == null) {
+            updateState(CH_ID_REPEAT_MODE, UnDefType.NULL);
+            return;
+        }
+
+        switch (repeatMode) {
+            case REPEAT_ALL:
+                updateState(CH_ID_REPEAT_MODE, StringType.valueOf(HEOS_UI_ALL));
+                break;
+
+            case REPEAT_ONE:
+                updateState(CH_ID_REPEAT_MODE, StringType.valueOf(HEOS_UI_ONE));
+                break;
+
+            case OFF:
+                updateState(CH_ID_REPEAT_MODE, StringType.valueOf(HEOS_UI_OFF));
+                break;
+        }
+    }
+
+    private void playerStateChanged(HeosObject eventObject) {
+        @Nullable
+        String attribute = eventObject.getAttribute(STATE);
+        if (attribute == null) {
+            updateState(CH_ID_CONTROL, UnDefType.NULL);
+            return;
+        }
+        switch (attribute) {
+            case PLAY:
+                updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
+                break;
+            case PAUSE:
+            case STOP:
+                updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
+                break;
+        }
+    }
+
+    private void fetchQueueFromPlayer() {
+        try {
+            List<Media> queue = getApiConnection().getQueue(getId());
+            heosDynamicStateDescriptionProvider.setQueue(queueChannelUID, queue);
+        } catch (IOException | ReadException e) {
+            logger.debug("Failed to set queue, rescheduling", e);
+            scheduleQueueFetchFuture = scheduler.schedule(this::fetchQueueFromPlayer, 30, TimeUnit.SECONDS);
+        }
+    }
+
+    protected void handleThingMediaUpdate(Media info) {
+        logger.debug("Received updated media state: {}", info);
+
+        updateState(CH_ID_SONG, StringType.valueOf(info.song));
+        updateState(CH_ID_ARTIST, StringType.valueOf(info.artist));
+        updateState(CH_ID_ALBUM, StringType.valueOf(info.album));
+        if (SONG.equals(info.type)) {
+            updateState(CH_ID_QUEUE, StringType.valueOf(String.valueOf(info.queueId)));
+            updateState(CH_ID_FAVORITES, UnDefType.UNDEF);
+        } else if (STATION.equals(info.type)) {
+            updateState(CH_ID_QUEUE, UnDefType.UNDEF);
+            updateState(CH_ID_FAVORITES, StringType.valueOf(info.albumId));
+        } else {
+            updateState(CH_ID_QUEUE, UnDefType.UNDEF);
+            updateState(CH_ID_FAVORITES, UnDefType.UNDEF);
+        }
+        handleImageUrl(info);
+        handleStation(info);
+        handleSourceId(info);
+    }
+
+    private void handleImageUrl(Media info) {
+        if (StringUtils.isNotBlank(info.imageUrl)) {
+            try {
+                URL url = new URL(info.imageUrl); // checks if String is proper URL
+                RawType cover = HttpUtil.downloadImage(url.toString());
+                if (cover != null) {
+                    updateState(CH_ID_COVER, cover);
+                    return;
+                }
+            } catch (MalformedURLException e) {
+                logger.debug("Cover can't be loaded. No proper URL: {}", info.imageUrl, e);
             }
         }
+        updateState(CH_ID_COVER, UnDefType.NULL);
+    }
+
+    private void handleStation(Media info) {
+        if (STATION.equals(info.type)) {
+            updateState(CH_ID_STATION, StringType.valueOf(info.station));
+        } else {
+            updateState(CH_ID_STATION, UnDefType.UNDEF);
+        }
+    }
+
+    private void handleSourceId(Media info) {
+        if (info.sourceId == INPUT_SID) {
+            String inputName = info.mediaId.substring(info.mediaId.indexOf("/") + 1);
+            updateState(CH_ID_INPUTS, StringType.valueOf(inputName));
+            updateState(CH_ID_TYPE, StringType.valueOf(info.station));
+        } else {
+            updateState(CH_ID_TYPE, StringType.valueOf(info.type));
+            updateState(CH_ID_INPUTS, UnDefType.UNDEF);
+        }
+    }
+
+    private void handlePlayerInfo(Player player) {
+        updateProperty(PROP_NAME, player.name);
+        updateProperty(PROP_PID, String.valueOf(player.playerId));
+        updateProperty(PROP_MODEL, player.model);
+        updateProperty(PROP_VERSION, player.version);
+        updateProperty(PROP_NETWORK, player.network);
+        updateProperty(PROP_IP, player.ip);
     }
 }
