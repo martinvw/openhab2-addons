@@ -264,7 +264,7 @@ public class HeosSystem {
                     logger.debug("Event command connected: {}", eventSendCommand.isConnected());
 
                     // TODO would this be a good idea to force receiving updates?
-                    // eventSendCommand.send(HeosCommands.registerChangeEventOn(), Void.class);
+                    eventSendCommand.send(HeosCommands.registerChangeEventOn(), Void.class);
 
                     logger.debug("Sending HEOS Heart Beat");
                     HeosResponseObject<Void> response = send(HeosCommands.heartbeat());

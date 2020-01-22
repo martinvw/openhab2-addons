@@ -12,9 +12,9 @@
  */
 package org.openhab.binding.heos.internal.handler;
 
-import static org.eclipse.smarthome.core.thing.ThingStatus.OFFLINE;
-import static org.eclipse.smarthome.core.thing.ThingStatus.ONLINE;
+import static org.eclipse.smarthome.core.thing.ThingStatus.*;
 import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
+import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.OnOffType;
@@ -160,7 +159,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             triggerPlayerDiscovery();
             String username = configuration.username;
             String password = configuration.password;
-            if (StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)) {
+            if (username != null && !"".equals(username) && password != null && !"".equals(username)) {
                 login(connection, username, password);
             } else {
                 updateStatus(ThingStatus.ONLINE, ThingStatusDetail.CONFIGURATION_ERROR,
@@ -299,19 +298,21 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         try {
             String channelIdentifier = "";
             String pid = "";
-            if (childThing.getHandler() instanceof HeosPlayerHandler) {
+            ThingHandler handler = childThing.getHandler();
+            if (handler instanceof HeosPlayerHandler) {
                 channelIdentifier = "P" + childThing.getUID().getId();
-                pid = ((HeosPlayerHandler) childThing.getHandler()).getId();
-            } else if (childThing.getHandler() instanceof HeosGroupHandler) {
+                pid = ((HeosPlayerHandler) handler).getId();
+            } else if (handler instanceof HeosGroupHandler) {
                 channelIdentifier = "G" + childThing.getUID().getId();
                 if (groupId == null) {
-                    pid = ((HeosGroupHandler) childThing.getHandler()).getId();
+                    pid = ((HeosGroupHandler) handler).getId();
                 } else {
                     pid = groupId;
                 }
             }
             Map<String, String> properties = new HashMap<>();
             String playerName = childThing.getLabel();
+            playerName = playerName == null ? pid : playerName;
             ChannelUID channelUID = new ChannelUID(getThing().getUID(), channelIdentifier);
             properties.put(PROP_NAME, playerName);
             properties.put(PID, pid);
