@@ -30,6 +30,7 @@ import org.eclipse.smarthome.core.thing.ThingUID;
 import org.jupnp.model.meta.DeviceDetails;
 import org.jupnp.model.meta.ModelDetails;
 import org.jupnp.model.meta.RemoteDevice;
+import org.openhab.binding.heos.internal.configuration.BridgeConfiguration;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
             properties.put(Thing.PROPERTY_VENDOR, device.getDetails().getManufacturerDetails().getManufacturer());
             properties.put(Thing.PROPERTY_MODEL_ID, getModel(device.getDetails().getModelDetails()));
             properties.put(Thing.PROPERTY_SERIAL_NUMBER, device.getDetails().getSerialNumber());
-            properties.put(IP_ADDRESS, device.getIdentity().getDescriptorURL().getHost());
+            properties.put(BridgeConfiguration.IP_ADDRESS, device.getIdentity().getDescriptorURL().getHost());
             properties.put(PROP_NAME, device.getDetails().getFriendlyName());
             DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
                     .withLabel(" Bridge - " + device.getDetails().getFriendlyName())

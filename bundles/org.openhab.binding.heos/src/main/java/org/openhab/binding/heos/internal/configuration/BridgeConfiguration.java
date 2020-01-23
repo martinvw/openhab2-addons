@@ -22,6 +22,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 @NonNullByDefault
 public class BridgeConfiguration {
+    public static final String IP_ADDRESS = "ipAddress";
 
     /**
      * Network address of the HEOS bridge

@@ -80,7 +80,6 @@ public class HeosBindingConstants extends HeosConstants {
     public static final String PROP_GROUP_HASH = "Members Hash value";
     public static final String PROP_GROUP_LEADER = "Group leader";
 
-    public static final String IP_ADDRESS = "ipAddress";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String HEARTBEAT = "heartbeat";

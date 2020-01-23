@@ -31,6 +31,7 @@ import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.openhab.binding.heos.internal.handler.HeosBridgeHandler;
+import org.openhab.binding.heos.internal.handler.HeosPlayerHandler;
 import org.openhab.binding.heos.internal.json.payload.Group;
 import org.openhab.binding.heos.internal.json.payload.Player;
 import org.slf4j.Logger;
@@ -84,16 +85,7 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService implements Heo
             for (Player player : playerMap.values()) {
                 ThingUID uid = new ThingUID(THING_TYPE_PLAYER, "" + player.playerId);
                 Map<String, Object> properties = new HashMap<>();
-                properties.put(PROP_NAME, player.name);
-                properties.put(PROP_PID, String.valueOf(player.playerId));
-                properties.put(Thing.PROPERTY_MODEL_ID, player.model);
-                properties.put(Thing.PROPERTY_FIRMWARE_VERSION, player.version);
-                properties.put(PROP_NETWORK, player.network);
-                properties.put(PROP_IP, player.ip);
-                String serialNumber = player.serial;
-                if (serialNumber != null) {
-                    properties.put(Thing.PROPERTY_SERIAL_NUMBER, serialNumber);
-                }
+                HeosPlayerHandler.propertiesFromPlayer(properties, player);
 
                 DiscoveryResult result = DiscoveryResultBuilder.create(uid).withLabel(player.name)
                         .withProperties(properties).withBridge(bridgeUID)

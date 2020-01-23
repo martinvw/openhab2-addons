@@ -14,7 +14,6 @@ package org.openhab.binding.heos.internal.handler;
 
 import static org.eclipse.smarthome.core.thing.ThingStatus.*;
 import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
-import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -92,7 +91,6 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     private boolean bridgeHandlerDisposalOngoing = false;
 
     private @NonNullByDefault({}) BridgeConfiguration configuration;
-    private @NonNullByDefault({}) Map<String, String> properties;
 
     private int failureCount;
 
@@ -135,12 +133,6 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     @Override
     public synchronized void initialize() {
         configuration = thing.getConfiguration().as(BridgeConfiguration.class);
-        properties = thing.getProperties();
-
-        scheduledStartUp();
-    }
-
-    private void scheduledStartUp() {
         startupFuture = scheduler.schedule(this::delayedInitialize, 5, TimeUnit.SECONDS);
     }
 
@@ -159,7 +151,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             triggerPlayerDiscovery();
             String username = configuration.username;
             String password = configuration.password;
-            if (username != null && !"".equals(username) && password != null && !"".equals(username)) {
+            if (username != null && !"".equals(username) && password != null && !"".equals(password)) {
                 login(connection, username, password);
             } else {
                 updateStatus(ThingStatus.ONLINE, ThingStatusDetail.CONFIGURATION_ERROR,
@@ -178,7 +170,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     private HeosFacade connectBridge() throws IOException, Telnet.ReadException {
         loggedIn = false;
 
-        logger.debug("Initialize Bridge '{}' with IP '{}'", properties.get(PROP_NAME), configuration.ipAddress);
+        logger.debug("Initialize Bridge '{}' with IP '{}'", thing.getProperties().get(PROP_NAME), configuration.ipAddress);
         bridgeHandlerDisposalOngoing = false;
         HeosFacade connection = heos.establishConnection(configuration.ipAddress, HEOS_PORT, configuration.heartbeat);
         connection.registerForChangeEvents(this);
@@ -219,7 +211,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         localApiConnection.unregisterForChangeEvents(this);
         logger.debug("HEOS bridge removed from change notifications");
 
-        logger.debug("Dispose bridge '{}'", properties.get(PROP_NAME));
+        logger.debug("Dispose bridge '{}'", thing.getProperties().get(PROP_NAME));
         localApiConnection.closeConnection();
     }
 

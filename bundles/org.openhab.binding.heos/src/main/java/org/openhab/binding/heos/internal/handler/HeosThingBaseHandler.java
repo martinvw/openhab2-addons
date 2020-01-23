@@ -16,26 +16,26 @@ import static org.eclipse.smarthome.core.thing.ThingStatus.*;
 import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
 import static org.openhab.binding.heos.internal.json.dto.HeosCommandGroup.*;
 import static org.openhab.binding.heos.internal.json.dto.HeosCommunicationAttribute.*;
-import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.PlayPauseType;
+import org.eclipse.smarthome.core.library.types.QuantityType;
 import org.eclipse.smarthome.core.library.types.RawType;
 import org.eclipse.smarthome.core.library.types.StringType;
+import org.eclipse.smarthome.core.library.unit.SmartHomeUnits;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -61,6 +61,8 @@ import org.openhab.binding.heos.internal.resources.HeosEventListener;
 import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.measure.quantity.Time;
 
 /**
  * The {@link HeosThingBaseHandler} class is the base Class all HEOS handler have to extend.
@@ -279,8 +281,8 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
                 @Nullable
                 Long duration = eventObject.getNumericAttribute(DURATION);
                 if (position != null && duration != null) {
-                    updateState(CH_ID_CUR_POS, dividedByThousand(position));
-                    updateState(CH_ID_DURATION, dividedByThousand(duration));
+                    updateState(CH_ID_CUR_POS, quantityFromMilliSeconds(position));
+                    updateState(CH_ID_DURATION, quantityFromMilliSeconds(duration));
                 }
                 break;
 
@@ -310,8 +312,8 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         }
     }
 
-    private DecimalType dividedByThousand(long position) {
-        return new DecimalType(new BigDecimal(position).divide(BigDecimal.valueOf(1000), RoundingMode.HALF_DOWN));
+    private QuantityType<Time> quantityFromMilliSeconds(long position) {
+        return new QuantityType<>(position / 1000, SmartHomeUnits.SECOND);
     }
 
     private void handleShuffleMode(HeosObject eventObject) {
@@ -478,15 +480,8 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     }
 
     private void handlePlayerInfo(Player player) {
-        updateProperty(PROP_NAME, player.name);
-        updateProperty(PROP_PID, String.valueOf(player.playerId));
-        updateProperty(Thing.PROPERTY_MODEL_ID, player.model);
-        updateProperty(Thing.PROPERTY_FIRMWARE_VERSION, player.version);
-        updateProperty(PROP_NETWORK, player.network);
-        updateProperty(PROP_IP, player.ip);
-        String serialNumber = player.serial;
-        if (serialNumber != null) {
-            updateProperty(Thing.PROPERTY_SERIAL_NUMBER, serialNumber);
-        }
+        Map<String, String> prop = new HashMap<>();
+        HeosPlayerHandler.propertiesFromPlayer(prop, player);
+        updateProperties(prop);
     }
 }

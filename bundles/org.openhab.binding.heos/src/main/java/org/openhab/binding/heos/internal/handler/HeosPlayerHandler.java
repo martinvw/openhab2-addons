@@ -12,13 +12,18 @@
  */
 package org.openhab.binding.heos.internal.handler;
 
+import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
+import static org.openhab.binding.heos.internal.HeosBindingConstants.PROP_IP;
 import static org.openhab.binding.heos.internal.json.dto.HeosCommunicationAttribute.PLAYER_ID;
 import static org.openhab.binding.heos.internal.json.dto.HeosEvent.GROUP_VOLUME_CHANGED;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.PercentType;
@@ -31,6 +36,7 @@ import org.openhab.binding.heos.internal.exception.HeosNotConnectedException;
 import org.openhab.binding.heos.internal.json.dto.HeosEventObject;
 import org.openhab.binding.heos.internal.json.dto.HeosResponseObject;
 import org.openhab.binding.heos.internal.json.payload.Media;
+import org.openhab.binding.heos.internal.json.payload.Player;
 import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,5 +170,18 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
     @Override
     public void setStatusOnline() {
         this.initialize();
+    }
+
+    public static void propertiesFromPlayer(Map<String, ? super String> prop, Player player) {
+        prop.put(PROP_NAME, player.name);
+        prop.put(PROP_PID, String.valueOf(player.playerId));
+        prop.put(Thing.PROPERTY_MODEL_ID, player.model);
+        prop.put(Thing.PROPERTY_FIRMWARE_VERSION, player.version);
+        prop.put(PROP_NETWORK, player.network);
+        prop.put(PROP_IP, player.ip);
+        String serialNumber = player.serial;
+        if (serialNumber != null) {
+            prop.put(Thing.PROPERTY_SERIAL_NUMBER, serialNumber);
+        }
     }
 }
