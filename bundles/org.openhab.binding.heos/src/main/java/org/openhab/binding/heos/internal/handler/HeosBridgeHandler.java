@@ -21,8 +21,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -73,14 +76,13 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     private static final int HEOS_PORT = 1255;
 
-    private List<HeosPlayerDiscoveryListener> playerDiscoveryList = new ArrayList<>();
-    private Map<String, String> selectedPlayer = new HashMap<>();
-    private List<String[]> selectedPlayerList = new ArrayList<>();
+    private List<HeosPlayerDiscoveryListener> playerDiscoveryList = new CopyOnWriteArrayList<>();
+    private List<String[]> selectedPlayerList = new CopyOnWriteArrayList<>();
     private HeosChannelManager channelManager = new HeosChannelManager(this);
     private HeosChannelHandlerFactory channelHandlerFactory;
 
-    private Map<String, HeosGroupHandler> groupHandlerMap = new HashMap<>();
-    private Map<String, String> hashToGidMap = new HashMap<>();
+    private Map<String, HeosGroupHandler> groupHandlerMap = new ConcurrentHashMap<>();
+    private Map<String, String> hashToGidMap = new ConcurrentHashMap<>();
 
     private @Nullable ScheduledFuture<?> startupFuture;
 
@@ -409,11 +411,8 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
      * @return a HashMap which the currently selected player
      */
     public Map<String, String> getSelectedPlayer() {
-        selectedPlayer.clear();
-        for (String[] strings : selectedPlayerList) {
-            selectedPlayer.put(strings[0], strings[1]);
-        }
-        return selectedPlayer;
+        return selectedPlayerList.stream()
+                .collect(Collectors.toMap(a -> a[0], a -> a[1], (a, b) -> a));
     }
 
     public List<String[]> getSelectedPlayerList() {

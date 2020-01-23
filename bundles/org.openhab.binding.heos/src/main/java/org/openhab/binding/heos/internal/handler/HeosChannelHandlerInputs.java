@@ -13,6 +13,7 @@
 package org.openhab.binding.heos.internal.handler;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -68,16 +69,17 @@ public class HeosChannelHandlerInputs extends BaseHeosChannelHandler {
             return;
         }
 
-        if (bridge.getSelectedPlayer().isEmpty()) {
+        Map<String, String> selectedPlayers = bridge.getSelectedPlayer();
+        if (selectedPlayers.isEmpty()) {
+            // no selected player, just play it from the player itself
             getApi().playInputSource(id, command.toString());
-        } else if (bridge.getSelectedPlayer().size() > 1) {
+        } else if (selectedPlayers.size() > 1) {
             logger.debug("Only one source can be selected for HEOS Input. Selected amount of sources: {} ",
-                    bridge.getSelectedPlayer().size());
+                    selectedPlayers.size());
         } else {
-            for (String sourcePid : bridge.getSelectedPlayer().keySet()) {
+            for (String sourcePid : selectedPlayers.keySet()) {
                 getApi().playInputSource(id, sourcePid, command.toString());
             }
         }
-        bridge.getSelectedPlayer().clear();
     }
 }

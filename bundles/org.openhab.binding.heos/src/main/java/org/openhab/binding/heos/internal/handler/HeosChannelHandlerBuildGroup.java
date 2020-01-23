@@ -58,12 +58,7 @@ public class HeosChannelHandlerBuildGroup extends BaseHeosChannelHandler {
         if (command == OnOffType.ON) {
             List<String[]> selectedPlayerList = bridge.getSelectedPlayerList();
             if (!selectedPlayerList.isEmpty()) {
-                // selectedPlayerList TODO i was in the middle of something here?
-                String[] players = new String[selectedPlayerList.size()];
-                for (int i = 0; i < selectedPlayerList.size(); i++) {
-                    players[i] = selectedPlayerList.get(i)[0];
-                }
-                getApi().groupPlayer(players);
+                getApi().groupPlayer(selectedPlayerList.stream().map(a -> a[0]).toArray(String[]::new));
                 bridge.resetPlayerList(channelUID);
             }
         }
