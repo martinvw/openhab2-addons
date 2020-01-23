@@ -44,6 +44,7 @@ public class HeosEventController extends HeosSystemEventListener {
 
     public HeosEventController(HeosSystem system) {
         this.system = system;
+        lastEventTime = System.currentTimeMillis();
     }
 
     public void handleEvent(HeosEventObject eventObject) {

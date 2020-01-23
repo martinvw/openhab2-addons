@@ -205,6 +205,7 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     @Override
     public void dispose() {
         try {
+            logger.warn("Disposing this: {}", this);
             getApiConnection().unregisterForChangeEvents(this);
         } catch (HeosNotConnectedException e) {
             logger.trace("No connection available while trying to unregister");

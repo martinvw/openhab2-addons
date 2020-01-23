@@ -199,6 +199,7 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
      */
     @Override
     public void setStatusOffline() {
+        logger.warn("Status was set offline");
         try {
             getApiConnection().unregisterForChangeEvents(this);
         } catch (HeosNotConnectedException e) {
