@@ -17,6 +17,8 @@ import java.beans.PropertyChangeSupport;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@Link HeosStringPropertyChangeListener} provides the possibility
@@ -26,6 +28,8 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 @NonNullByDefault
 public class HeosStringPropertyChangeListener {
+    private final Logger logger = LoggerFactory.getLogger(HeosStringPropertyChangeListener.class);
+
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private @Nullable String value;
 
@@ -44,6 +48,7 @@ public class HeosStringPropertyChangeListener {
     public void setValue(String newValue) {
         String oldValue = this.value;
         value = newValue;
+        logger.debug("Firing property change: {} {}", newValue, Thread.currentThread());
         pcs.firePropertyChange("value", oldValue, newValue);
     }
 }

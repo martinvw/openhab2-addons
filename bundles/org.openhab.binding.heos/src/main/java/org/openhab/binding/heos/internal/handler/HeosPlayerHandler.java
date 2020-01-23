@@ -13,17 +13,14 @@
 package org.openhab.binding.heos.internal.handler;
 
 import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
-import static org.openhab.binding.heos.internal.HeosBindingConstants.PROP_IP;
 import static org.openhab.binding.heos.internal.json.dto.HeosCommunicationAttribute.PLAYER_ID;
 import static org.openhab.binding.heos.internal.json.dto.HeosEvent.GROUP_VOLUME_CHANGED;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.PercentType;

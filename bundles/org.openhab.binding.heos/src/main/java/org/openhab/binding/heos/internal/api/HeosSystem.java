@@ -47,7 +47,8 @@ import com.google.gson.JsonSyntaxException;
 public class HeosSystem {
     private final Logger logger = LoggerFactory.getLogger(HeosSystem.class);
 
-    private static final int START_DELAY = 30;
+    private static final int START_DELAY_SEC = 30;
+    private static final long LAST_EVENT_THRESHOLD = TimeUnit.MINUTES.toMillis(30);
 
     private final ScheduledExecutorService keepAliveExecutor = Executors
             .newSingleThreadScheduledExecutor(r -> new Thread(r, "HeosKeepAlive"));
@@ -119,8 +120,8 @@ public class HeosSystem {
      * reconnect the method fires a bridgeEvent via the {@code HeosEvenController.class}
      */
     void startHeartBeat(int heartbeatPulse) {
-        keepAliveJob = keepAliveExecutor.scheduleWithFixedDelay(new KeepAliveRunnable(), START_DELAY, heartbeatPulse,
-                TimeUnit.SECONDS);
+        keepAliveJob = keepAliveExecutor.scheduleWithFixedDelay(new KeepAliveRunnable(), START_DELAY_SEC,
+                heartbeatPulse, TimeUnit.SECONDS);
     }
 
     synchronized void startEventListener() throws IOException, ReadException {
@@ -257,18 +258,17 @@ public class HeosSystem {
      * @author Johannes Einig
      */
     private class KeepAliveRunnable implements Runnable {
+
         @Override
         public void run() {
             try {
                 if (sendCommand.isHostReachable()) {
-                    logger.debug("Event command connected: {}", eventSendCommand.isConnected());
-
-                    // TODO would this be a good idea to force receiving updates?
-                    eventSendCommand.send(HeosCommands.registerChangeEventOn(), Void.class);
+                    long timeSinceLastEvent = System.currentTimeMillis() - eventController.getLastEventTime();
+                    logger.debug("Time since latest event: {} s", timeSinceLastEvent / 1000);
 
                     logger.debug("Sending HEOS Heart Beat");
                     HeosResponseObject<Void> response = send(HeosCommands.heartbeat());
-                    if (response.result) {
+                    if (timeSinceLastEvent < LAST_EVENT_THRESHOLD && response.result) {
                         return;
                     }
                 }

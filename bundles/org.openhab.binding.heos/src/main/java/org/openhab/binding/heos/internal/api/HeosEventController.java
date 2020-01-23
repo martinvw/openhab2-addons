@@ -40,12 +40,15 @@ public class HeosEventController extends HeosSystemEventListener {
 
     private final HeosSystem system;
 
+    private long lastEventTime;
+
     public HeosEventController(HeosSystem system) {
         this.system = system;
     }
 
     public void handleEvent(HeosEventObject eventObject) {
         HeosEvent command = eventObject.command;
+        lastEventTime = System.currentTimeMillis();
 
         logger.debug("Handling event: {}", eventObject);
 
@@ -103,5 +106,9 @@ public class HeosEventController extends HeosSystemEventListener {
 
     public void systemReachable() {
         fireBridgeEvent(EVENT_TYPE_EVENT, true, CONNECTION_RESTORED);
+    }
+
+    long getLastEventTime() {
+        return lastEventTime;
     }
 }
