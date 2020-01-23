@@ -11,7 +11,7 @@
 			<channel typeId="reboot" id="Reboot"></channel>
 			<channel typeId="buildGroup" id="BuildGroup"></channel>
 		</channels>
-		<representation-property>Role</representation-property>
+		<representation-property>vendor</representation-property>
 		<config-description>
 			<parameter name="ipAddress" type="text">
 				<context>network-address</context>

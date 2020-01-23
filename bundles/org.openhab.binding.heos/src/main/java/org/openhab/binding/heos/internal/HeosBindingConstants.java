@@ -75,14 +75,10 @@ public class HeosBindingConstants extends HeosConstants {
     public static final String PROP_GROUP_MEMBERS = "members";
     public static final String PROP_NAME = "Name";
     public static final String PROP_GID = "Group ID";
-    public static final String PROP_MODEL = "Model";
     public static final String PROP_IP = "IP Address";
     public static final String PROP_NETWORK = "Connection";
-    public static final String PROP_VERSION = "Version";
     public static final String PROP_GROUP_HASH = "Members Hash value";
     public static final String PROP_GROUP_LEADER = "Group leader";
-    public static final String PROP_ROLE = "Role";
-    public static final String PROP_BRIDGE = "HEOS Bridge";
 
     public static final String IP_ADDRESS = "ipAddress";
     public static final String USERNAME = "username";

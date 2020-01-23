@@ -14,9 +14,9 @@ package org.openhab.binding.heos.internal.handler;
 
 import static org.eclipse.smarthome.core.thing.ThingStatus.*;
 import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
-import static org.openhab.binding.heos.internal.json.dto.HeosCommandGroup.GROUP;
-import static org.openhab.binding.heos.internal.json.dto.HeosCommandGroup.PLAYER;
+import static org.openhab.binding.heos.internal.json.dto.HeosCommandGroup.*;
 import static org.openhab.binding.heos.internal.json.dto.HeosCommunicationAttribute.*;
+import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -480,9 +480,13 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     private void handlePlayerInfo(Player player) {
         updateProperty(PROP_NAME, player.name);
         updateProperty(PROP_PID, String.valueOf(player.playerId));
-        updateProperty(PROP_MODEL, player.model);
-        updateProperty(PROP_VERSION, player.version);
+        updateProperty(Thing.PROPERTY_MODEL_ID, player.model);
+        updateProperty(Thing.PROPERTY_FIRMWARE_VERSION, player.version);
         updateProperty(PROP_NETWORK, player.network);
         updateProperty(PROP_IP, player.ip);
+        String serialNumber = player.serial;
+        if (serialNumber != null) {
+            updateProperty(Thing.PROPERTY_SERIAL_NUMBER, serialNumber);
+        }
     }
 }

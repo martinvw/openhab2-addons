@@ -333,7 +333,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         groupHandlerMap.remove(handler.getGroupMemberHash());
     }
 
-    public String getActualGID(String groupHash) {
+    public @Nullable String getActualGID(String groupHash) {
         return hashToGidMap.get(groupHash);
     }
 

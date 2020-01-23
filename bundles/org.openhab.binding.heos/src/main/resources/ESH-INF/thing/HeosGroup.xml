@@ -32,6 +32,9 @@
 			<channel id="Queue" typeId="queue" />
 			<channel id="ClearQueue" typeId="clearQueue" />
 		</channels>
+		<properties>
+			<property name="vendor">Denon</property>
+		</properties>
 		<config-description>
 			<parameter name="members" type="text" readOnly="false">
 				<label>The Group Member Player IDs</label>
