@@ -81,7 +81,7 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
         if ("Denon".equals(modelManufacturer) && (modelName.startsWith("HEOS") || modelName.endsWith("H"))) {
             String deviceType = device.getType().getType();
             if (deviceType.startsWith("ACT") || deviceType.startsWith("Aios")) {
-                return new ThingUID(THING_TYPE_BRIDGE, "bridge");
+                return new ThingUID(THING_TYPE_BRIDGE, device.getIdentity().getUdn().getIdentifierString());
             }
         }
         return null;
