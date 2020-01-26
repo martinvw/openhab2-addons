@@ -246,11 +246,7 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
                 setStatusOffline();
             } else {
                 try {
-                    handleThingStateUpdate(getApiConnection().getPlayMode(groupId));
-                    handleThingStateUpdate(getApiConnection().getPlayState(groupId));
-                    handleThingStateUpdate(getApiConnection().getHeosGroupMuteState(groupId));
-                    handleThingStateUpdate(getApiConnection().getHeosGroupVolume(groupId));
-                    handleThingStateUpdate(getApiConnection().getNowPlayingMedia(groupId));
+                    refreshPlayState(groupId);
 
                     HeosResponseObject<Group> response = getApiConnection().getGroupInfo(groupId);
                     @Nullable
@@ -275,5 +271,13 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
                 }
             }
         }, 0, TimeUnit.SECONDS);
+    }
+
+    @Override
+    void refreshPlayState(String id) throws IOException, ReadException {
+        super.refreshPlayState(id);
+
+        handleThingStateUpdate(getApiConnection().getGroupMuteState(id));
+        handleThingStateUpdate(getApiConnection().getGroupVolume(id));
     }
 }

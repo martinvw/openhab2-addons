@@ -50,8 +50,7 @@ public class HeosSystem {
     private static final int START_DELAY_SEC = 30;
     private static final long LAST_EVENT_THRESHOLD = TimeUnit.MINUTES.toMillis(30);
 
-    private final ScheduledExecutorService keepAliveExecutor = Executors
-            .newSingleThreadScheduledExecutor(r -> new Thread(r, "HeosKeepAlive"));
+    private final ScheduledExecutorService scheduler;
 
     private final HeosEventController eventController = new HeosEventController(this);
 
@@ -79,6 +78,11 @@ public class HeosSystem {
     };
 
     private @Nullable ScheduledFuture<?> keepAliveJob;
+    private @Nullable ScheduledFuture<?> reconnectJob;
+
+    public HeosSystem(ScheduledExecutorService scheduler) {
+        this.scheduler = scheduler;
+    }
 
     /**
      * Establishes the connection to the HEOS-Network if IP and Port is
@@ -120,7 +124,7 @@ public class HeosSystem {
      * reconnect the method fires a bridgeEvent via the {@code HeosEvenController.class}
      */
     void startHeartBeat(int heartbeatPulse) {
-        keepAliveJob = keepAliveExecutor.scheduleWithFixedDelay(new KeepAliveRunnable(), START_DELAY_SEC,
+        keepAliveJob = scheduler.scheduleWithFixedDelay(new KeepAliveRunnable(), START_DELAY_SEC,
                 heartbeatPulse, TimeUnit.SECONDS);
     }
 
@@ -138,11 +142,19 @@ public class HeosSystem {
         if (job != null && !job.isCancelled()) {
             job.cancel(true);
         }
+        cancelReconnectJob();
 
         eventLine.getReadResultListener().removePropertyChangeListener(eventProcessor);
         eventSendCommand.stopInputListener(HeosCommands.registerChangeEventOff());
         eventSendCommand.disconnect();
         sendCommand.disconnect();
+    }
+
+    private void cancelReconnectJob() {
+        ScheduledFuture<?> localReconnectJob = HeosSystem.this.reconnectJob;
+        if (localReconnectJob != null && !localReconnectJob.isCancelled()) {
+            localReconnectJob.cancel(false);
+        }
     }
 
     HeosResponseObject<Void> send(String command) throws IOException, ReadException {
@@ -286,20 +298,18 @@ public class HeosSystem {
         private void restartConnection() {
             closeConnection();
             eventController.connectionToSystemLost();
-            try {
-                while (!sendCommand.isHostReachable()) {
-                    logger.debug("Trying to reconnect to HEOS Network...");
-                    Thread.sleep(5000);
-                }
-                logger.debug("Reconnecting to Bridge");
-                Thread.sleep(15000); // Waiting time is needed because System needs some time to start up
-            } catch (InterruptedException e) {
-                logger.debug("Failure during restart procedure");
-                eventController.systemReachable();
-                Thread.currentThread().interrupt();
+            reconnectJob = scheduler.scheduleWithFixedDelay(this::reconnect, 1, 5, TimeUnit.SECONDS);
+        }
+
+        private void reconnect(){
+            logger.debug("Trying to reconnect to HEOS Network...");
+            if (!sendCommand.isHostReachable()) {
                 return;
             }
-            eventController.systemReachable();
+
+            cancelReconnectJob();
+            logger.debug("Reconnecting to Bridge");
+            scheduler.schedule(eventController::systemReachable, 15, TimeUnit.SECONDS);
         }
     }
 }

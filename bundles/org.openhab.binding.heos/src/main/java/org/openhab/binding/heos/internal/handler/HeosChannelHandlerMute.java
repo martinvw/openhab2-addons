@@ -54,7 +54,7 @@ public class HeosChannelHandlerMute extends BaseHeosChannelHandler {
     public void handleGroupCommand(Command command, String id, ThingUID uid, HeosGroupHandler heosGroupHandler)
             throws IOException, ReadException {
         if (command instanceof RefreshType) {
-            eventListener.playerStateChangeEvent(getApi().getHeosGroupMuteState(id));
+            eventListener.playerStateChangeEvent(getApi().getGroupMuteState(id));
             return;
         }
         if (command.equals(OnOffType.ON)) {

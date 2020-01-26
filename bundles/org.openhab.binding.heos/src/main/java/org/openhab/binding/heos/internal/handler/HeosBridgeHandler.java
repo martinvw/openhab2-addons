@@ -98,7 +98,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     public HeosBridgeHandler(Bridge thing, HeosDynamicStateDescriptionProvider heosDynamicStateDescriptionProvider) {
         super(thing);
-        heos = new HeosSystem();
+        heos = new HeosSystem(scheduler);
         channelHandlerFactory = new HeosChannelHandlerFactory(this, heosDynamicStateDescriptionProvider);
     }
 

@@ -175,6 +175,14 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         if (HeosEvent.USER_CHANGED == command) {
             handleDynamicStatesFuture = scheduler.schedule(this::handleDynamicStatesSignedIn, 0, TimeUnit.SECONDS);
         }
+
+        if (EVENT_TYPE_EVENT.equals(event) && CONNECTION_RESTORED.equals(command)) {
+            try {
+                refreshPlayState(getId());
+            } catch (IOException | ReadException e) {
+                logger.debug("Failed to refreshPlayState", e);
+            }
+        }
     }
 
     void handleDynamicStatesSignedIn() {
@@ -320,6 +328,12 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     private void handleShuffleMode(HeosObject eventObject) {
         updateState(CH_ID_SHUFFLE_MODE,
                 OnOffType.from(eventObject.getBooleanAttribute(HeosCommunicationAttribute.SHUFFLE)));
+    }
+
+    void refreshPlayState(String id) throws IOException, ReadException {
+        handleThingStateUpdate(getApiConnection().getPlayMode(id));
+        handleThingStateUpdate(getApiConnection().getPlayState(id));
+        handleThingStateUpdate(getApiConnection().getNowPlayingMedia(id));
     }
 
     protected <T> void handleThingStateUpdate(HeosResponseObject<T> responseObject) {

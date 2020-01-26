@@ -473,7 +473,7 @@ public class HeosFacade {
      * @param id The player id the volume shall get for
      * @return
      */
-    public HeosResponseObject<Void> getHeosPlayerVolume(String id) throws IOException, ReadException {
+    public HeosResponseObject<Void> getPlayerVolume(String id) throws IOException, ReadException {
         return heosSystem.send(HeosCommands.getVolume(id));
     }
 
@@ -489,11 +489,11 @@ public class HeosFacade {
         return heosSystem.send(HeosCommands.getPlayMode(id));
     }
 
-    public HeosResponseObject<Void> getHeosGroupMuteState(String id) throws IOException, ReadException {
+    public HeosResponseObject<Void> getGroupMuteState(String id) throws IOException, ReadException {
         return heosSystem.send(HeosCommands.getGroupMute(id));
     }
 
-    public HeosResponseObject<Void> getHeosGroupVolume(String id) throws IOException, ReadException {
+    public HeosResponseObject<Void> getGroupVolume(String id) throws IOException, ReadException {
         return heosSystem.send(HeosCommands.getGroupVolume(id));
     }
 

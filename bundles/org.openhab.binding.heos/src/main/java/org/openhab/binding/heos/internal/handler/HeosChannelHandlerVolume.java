@@ -40,7 +40,7 @@ public class HeosChannelHandlerVolume extends BaseHeosChannelHandler {
     @Override
     public void handlePlayerCommand(Command command, String id, ThingUID uid) throws IOException, ReadException {
         if (command instanceof RefreshType) {
-            eventListener.playerStateChangeEvent(getApi().getHeosPlayerVolume(id));
+            eventListener.playerStateChangeEvent(getApi().getPlayerVolume(id));
             return;
         }
         if (command instanceof IncreaseDecreaseType) {
@@ -58,7 +58,7 @@ public class HeosChannelHandlerVolume extends BaseHeosChannelHandler {
     public void handleGroupCommand(Command command, String id, ThingUID uid, HeosGroupHandler heosGroupHandler)
             throws IOException, ReadException {
         if (command instanceof RefreshType) {
-            eventListener.playerStateChangeEvent(getApi().getHeosGroupVolume(id));
+            eventListener.playerStateChangeEvent(getApi().getGroupVolume(id));
             return;
         }
         if (command instanceof IncreaseDecreaseType) {

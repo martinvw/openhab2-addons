@@ -81,18 +81,9 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
     private void delayedInitialize() {
         scheduledFuture = scheduler.schedule(() -> {
             try {
-                handleThingStateUpdate(getApiConnection().getPlayerInfo(pid));
-                handleThingStateUpdate(getApiConnection().getPlayState(pid));
-                handleThingStateUpdate(getApiConnection().getPlayerMuteState(pid));
-                handleThingStateUpdate(getApiConnection().getHeosPlayerVolume(pid));
-                handleThingStateUpdate(getApiConnection().getPlayMode(pid));
+                refreshPlayState(pid);
 
-                // handle updated media
-                HeosResponseObject<Media> response = getApiConnection().getNowPlayingMedia(pid);
-                Media responseMedia = response.payload;
-                if (response.isFinished() && responseMedia != null) {
-                    handleThingMediaUpdate(responseMedia);
-                }
+                handleThingStateUpdate(getApiConnection().getPlayerInfo(pid));
 
                 updateStatus(ThingStatus.ONLINE);
             } catch (IOException | ReadException e) {
@@ -100,6 +91,14 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
                 delayedInitialize();
             }
         }, 3, TimeUnit.SECONDS);
+    }
+
+    @Override
+    void refreshPlayState(String id) throws IOException, ReadException {
+        super.refreshPlayState(id);
+
+        handleThingStateUpdate(getApiConnection().getPlayerMuteState(id));
+        handleThingStateUpdate(getApiConnection().getPlayerVolume(id));
     }
 
     @Override
