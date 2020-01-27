@@ -16,7 +16,6 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -124,8 +123,8 @@ public class HeosSystem {
      * reconnect the method fires a bridgeEvent via the {@code HeosEvenController.class}
      */
     void startHeartBeat(int heartbeatPulse) {
-        keepAliveJob = scheduler.scheduleWithFixedDelay(new KeepAliveRunnable(), START_DELAY_SEC,
-                heartbeatPulse, TimeUnit.SECONDS);
+        keepAliveJob = scheduler.scheduleWithFixedDelay(new KeepAliveRunnable(), START_DELAY_SEC, heartbeatPulse,
+                TimeUnit.SECONDS);
     }
 
     synchronized void startEventListener() throws IOException, ReadException {
@@ -301,7 +300,7 @@ public class HeosSystem {
             reconnectJob = scheduler.scheduleWithFixedDelay(this::reconnect, 1, 5, TimeUnit.SECONDS);
         }
 
-        private void reconnect(){
+        private void reconnect() {
             logger.debug("Trying to reconnect to HEOS Network...");
             if (!sendCommand.isHostReachable()) {
                 return;

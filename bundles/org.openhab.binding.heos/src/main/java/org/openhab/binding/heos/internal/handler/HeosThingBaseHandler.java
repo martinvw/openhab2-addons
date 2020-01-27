@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import javax.measure.quantity.Time;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -61,8 +63,6 @@ import org.openhab.binding.heos.internal.resources.HeosEventListener;
 import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.measure.quantity.Time;
 
 /**
  * The {@link HeosThingBaseHandler} class is the base Class all HEOS handler have to extend.

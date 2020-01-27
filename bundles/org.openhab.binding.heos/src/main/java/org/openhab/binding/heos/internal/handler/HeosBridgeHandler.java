@@ -16,7 +16,6 @@ import static org.eclipse.smarthome.core.thing.ThingStatus.*;
 import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -172,7 +171,8 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     private HeosFacade connectBridge() throws IOException, Telnet.ReadException {
         loggedIn = false;
 
-        logger.debug("Initialize Bridge '{}' with IP '{}'", thing.getProperties().get(PROP_NAME), configuration.ipAddress);
+        logger.debug("Initialize Bridge '{}' with IP '{}'", thing.getProperties().get(PROP_NAME),
+                configuration.ipAddress);
         bridgeHandlerDisposalOngoing = false;
         HeosFacade connection = heos.establishConnection(configuration.ipAddress, HEOS_PORT, configuration.heartbeat);
         connection.registerForChangeEvents(this);
@@ -411,8 +411,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
      * @return a HashMap which the currently selected player
      */
     public Map<String, String> getSelectedPlayer() {
-        return selectedPlayerList.stream()
-                .collect(Collectors.toMap(a -> a[0], a -> a[1], (a, b) -> a));
+        return selectedPlayerList.stream().collect(Collectors.toMap(a -> a[0], a -> a[1], (a, b) -> a));
     }
 
     public List<String[]> getSelectedPlayerList() {
