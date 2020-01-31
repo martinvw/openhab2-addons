@@ -16,9 +16,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -50,6 +48,7 @@ public class HeosSystem {
     private static final long LAST_EVENT_THRESHOLD = TimeUnit.MINUTES.toMillis(30);
 
     private final ScheduledExecutorService scheduler;
+    private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 
     private final HeosEventController eventController = new HeosEventController(this);
 
@@ -70,7 +69,8 @@ public class HeosSystem {
     private final HeosJsonParser parser = new HeosJsonParser();
     private final PropertyChangeListener eventProcessor = evt -> {
         try {
-            eventController.handleEvent(parser.parseEvent((String) evt.getNewValue()));
+            String newValue = (String) evt.getNewValue();
+            singleThreadExecutor.submit(() -> eventController.handleEvent(parser.parseEvent(newValue)));
         } catch (JsonSyntaxException e) {
             logger.debug("Failed processing event JSON", e);
         }

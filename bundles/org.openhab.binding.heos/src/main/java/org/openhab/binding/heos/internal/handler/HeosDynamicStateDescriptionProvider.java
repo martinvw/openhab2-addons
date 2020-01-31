@@ -36,6 +36,15 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = { DynamicStateDescriptionProvider.class, HeosDynamicStateDescriptionProvider.class })
 @NonNullByDefault
 public class HeosDynamicStateDescriptionProvider extends BaseDynamicStateDescriptionProvider {
+
+    String getValueByLabel(ChannelUID channelUID, String input) {
+        Optional<String> optionalValueByLabel = channelOptionsMap.get(channelUID).stream()
+                .filter(o -> input.equals(o.getLabel())).map(StateOption::getValue).findFirst();
+
+        // if no match was found we assume that it already was a value and not a label
+        return optionalValueByLabel.orElse(input);
+    }
+
     public void setFavorites(ChannelUID channelUID, List<BrowseResult> favorites) {
         setBrowseResultList(channelUID, favorites, d -> d.mediaId);
     }

@@ -57,12 +57,13 @@ public class HeosChannelHandlerFavorite extends BaseHeosChannelHandler {
     }
 
     private void handleCommand(Command command, String id, ThingUID uid) throws IOException, ReadException {
+        ChannelUID channelUID = new ChannelUID(uid, CH_ID_FAVORITES);
         if (command instanceof RefreshType) {
-            heosDynamicStateDescriptionProvider.setFavorites(new ChannelUID(uid, CH_ID_FAVORITES),
-                    getApi().getFavorites());
+            heosDynamicStateDescriptionProvider.setFavorites(channelUID, getApi().getFavorites());
             return;
         }
 
-        getApi().playStream(id, FAVORITE_SID, command.toString());
+        String idCommand = heosDynamicStateDescriptionProvider.getValueByLabel(channelUID, command.toString());
+        getApi().playStream(id, FAVORITE_SID, idCommand);
     }
 }

@@ -85,7 +85,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     private @Nullable ScheduledFuture<?> startupFuture;
 
-    private HeosSystem heos;
+    private final HeosSystem heosSystem;
     private @Nullable HeosFacade apiConnection;
 
     private boolean loggedIn = false;
@@ -97,7 +97,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     public HeosBridgeHandler(Bridge thing, HeosDynamicStateDescriptionProvider heosDynamicStateDescriptionProvider) {
         super(thing);
-        heos = new HeosSystem(scheduler);
+        heosSystem = new HeosSystem(scheduler);
         channelHandlerFactory = new HeosChannelHandlerFactory(this, heosDynamicStateDescriptionProvider);
     }
 
@@ -174,7 +174,8 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         logger.debug("Initialize Bridge '{}' with IP '{}'", thing.getProperties().get(PROP_NAME),
                 configuration.ipAddress);
         bridgeHandlerDisposalOngoing = false;
-        HeosFacade connection = heos.establishConnection(configuration.ipAddress, HEOS_PORT, configuration.heartbeat);
+        HeosFacade connection = heosSystem.establishConnection(configuration.ipAddress, HEOS_PORT,
+                configuration.heartbeat);
         connection.registerForChangeEvents(this);
 
         apiConnection = connection;

@@ -237,6 +237,11 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
                 return;
             }
 
+            if (bridgeHandler.isLoggedIn()) {
+                scheduledFutureDynamicStates = scheduler.schedule(this::handleDynamicStatesSignedIn, 0,
+                        TimeUnit.SECONDS);
+            }
+
             bridgeHandler.addGroupHandlerInformation(this);
             // Checks if there is a group online with the same group member hash.
             // If not setting the group offline.
@@ -256,10 +261,6 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
                     }
 
                     getApiConnection().addHeosGroupToOldGroupMap(HeosGroup.calculateGroupMemberHash(group), group);
-                    if (bridgeHandler.isLoggedIn()) {
-                        scheduledFutureDynamicStates = scheduler.schedule(this::handleDynamicStatesSignedIn, 0,
-                                TimeUnit.SECONDS);
-                    }
                     gid = groupId;
                     updateConfiguration(groupId, group);
                     updateStatus(ThingStatus.ONLINE);

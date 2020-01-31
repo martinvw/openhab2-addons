@@ -57,12 +57,13 @@ public class HeosChannelHandlerPlaylist extends BaseHeosChannelHandler {
     }
 
     private void handleCommand(Command command, String id, ThingUID uid) throws IOException, ReadException {
+        ChannelUID channelUID = new ChannelUID(uid, CH_ID_PLAYLISTS);
         if (command instanceof RefreshType) {
-            heosDynamicStateDescriptionProvider.setPlaylists(new ChannelUID(uid, CH_ID_PLAYLISTS),
-                    getApi().getPlaylists());
+            heosDynamicStateDescriptionProvider.setPlaylists(channelUID, getApi().getPlaylists());
             return;
         }
 
-        getApi().addContainerToQueuePlayNow(id, PLAYLISTS_SID, command.toString());
+        String idCommand = heosDynamicStateDescriptionProvider.getValueByLabel(channelUID, command.toString());
+        getApi().addContainerToQueuePlayNow(id, PLAYLISTS_SID, idCommand);
     }
 }

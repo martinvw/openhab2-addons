@@ -14,7 +14,8 @@ package org.openhab.binding.heos.internal.handler;
 
 import static org.eclipse.smarthome.core.thing.ThingStatus.*;
 import static org.openhab.binding.heos.internal.HeosBindingConstants.*;
-import static org.openhab.binding.heos.internal.json.dto.HeosCommandGroup.*;
+import static org.openhab.binding.heos.internal.json.dto.HeosCommandGroup.GROUP;
+import static org.openhab.binding.heos.internal.json.dto.HeosCommandGroup.PLAYER;
 import static org.openhab.binding.heos.internal.json.dto.HeosCommunicationAttribute.*;
 
 import java.io.IOException;
@@ -31,19 +32,9 @@ import javax.measure.quantity.Time;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.library.types.PercentType;
-import org.eclipse.smarthome.core.library.types.PlayPauseType;
-import org.eclipse.smarthome.core.library.types.QuantityType;
-import org.eclipse.smarthome.core.library.types.RawType;
-import org.eclipse.smarthome.core.library.types.StringType;
+import org.eclipse.smarthome.core.library.types.*;
 import org.eclipse.smarthome.core.library.unit.SmartHomeUnits;
-import org.eclipse.smarthome.core.thing.Bridge;
-import org.eclipse.smarthome.core.thing.ChannelUID;
-import org.eclipse.smarthome.core.thing.Thing;
-import org.eclipse.smarthome.core.thing.ThingStatus;
-import org.eclipse.smarthome.core.thing.ThingStatusDetail;
-import org.eclipse.smarthome.core.thing.ThingStatusInfo;
+import org.eclipse.smarthome.core.thing.*;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.UnDefType;
 import org.eclipse.smarthome.io.net.http.HttpUtil;
@@ -51,12 +42,7 @@ import org.openhab.binding.heos.internal.HeosChannelHandlerFactory;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 import org.openhab.binding.heos.internal.exception.HeosNotConnectedException;
 import org.openhab.binding.heos.internal.exception.HeosNotFoundException;
-import org.openhab.binding.heos.internal.json.dto.HeosCommandTuple;
-import org.openhab.binding.heos.internal.json.dto.HeosCommunicationAttribute;
-import org.openhab.binding.heos.internal.json.dto.HeosEvent;
-import org.openhab.binding.heos.internal.json.dto.HeosEventObject;
-import org.openhab.binding.heos.internal.json.dto.HeosObject;
-import org.openhab.binding.heos.internal.json.dto.HeosResponseObject;
+import org.openhab.binding.heos.internal.json.dto.*;
 import org.openhab.binding.heos.internal.json.payload.Media;
 import org.openhab.binding.heos.internal.json.payload.Player;
 import org.openhab.binding.heos.internal.resources.HeosEventListener;
@@ -432,10 +418,13 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         try {
             List<Media> queue = getApiConnection().getQueue(getId());
             heosDynamicStateDescriptionProvider.setQueue(queueChannelUID, queue);
+            return;
+        } catch (HeosNotConnectedException e) {
+            logger.debug("HEOS player/group is not connected, rescheduling");
         } catch (IOException | ReadException e) {
             logger.debug("Failed to set queue, rescheduling", e);
-            scheduleQueueFetchFuture = scheduler.schedule(this::fetchQueueFromPlayer, 30, TimeUnit.SECONDS);
         }
+        scheduleQueueFetchFuture = scheduler.schedule(this::fetchQueueFromPlayer, 30, TimeUnit.SECONDS);
     }
 
     protected void handleThingMediaUpdate(Media info) {

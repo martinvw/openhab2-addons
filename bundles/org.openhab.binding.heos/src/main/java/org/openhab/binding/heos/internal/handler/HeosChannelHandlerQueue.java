@@ -56,11 +56,13 @@ public class HeosChannelHandlerQueue extends BaseHeosChannelHandler {
     }
 
     private void handleCommand(Command command, String id, ThingUID uid) throws IOException, ReadException {
+        ChannelUID channelUID = new ChannelUID(uid, CH_ID_QUEUE);
         if (command instanceof RefreshType) {
-            heosDynamicStateDescriptionProvider.setQueue(new ChannelUID(uid, CH_ID_QUEUE), getApi().getQueue(id));
+            heosDynamicStateDescriptionProvider.setQueue(channelUID, getApi().getQueue(id));
             return;
         }
 
-        getApi().playMediaFromQueue(id, command.toString());
+        String idCommand = heosDynamicStateDescriptionProvider.getValueByLabel(channelUID, command.toString());
+        getApi().playMediaFromQueue(id, idCommand);
     }
 }

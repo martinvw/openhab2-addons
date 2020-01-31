@@ -46,9 +46,8 @@ public class HeosStringPropertyChangeListener {
     }
 
     public void setValue(String newValue) {
-        String oldValue = this.value;
         value = newValue;
         logger.debug("Firing property change: {} {}", newValue, Thread.currentThread());
-        pcs.firePropertyChange("value", oldValue, newValue);
+        pcs.firePropertyChange("value", null, newValue);
     }
 }
