@@ -18,10 +18,12 @@ import static org.openhab.binding.heos.internal.resources.HeosConstants.FAVORITE
 import java.io.IOException;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
+import org.openhab.binding.heos.internal.exception.HeosNotFoundException;
 import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
 
 /**
@@ -46,8 +48,11 @@ public class HeosChannelHandlerFavorite extends BaseHeosChannelHandler {
     }
 
     @Override
-    public void handleGroupCommand(Command command, String id, ThingUID uid, HeosGroupHandler heosGroupHandler)
-            throws IOException, ReadException {
+    public void handleGroupCommand(Command command, @Nullable String id, ThingUID uid,
+            HeosGroupHandler heosGroupHandler) throws IOException, ReadException {
+        if (id == null) {
+            throw new HeosNotFoundException();
+        }
         handleCommand(command, id, uid);
     }
 

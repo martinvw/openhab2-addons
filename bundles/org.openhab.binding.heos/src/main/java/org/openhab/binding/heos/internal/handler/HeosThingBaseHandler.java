@@ -419,8 +419,8 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
             List<Media> queue = getApiConnection().getQueue(getId());
             heosDynamicStateDescriptionProvider.setQueue(queueChannelUID, queue);
             return;
-        } catch (HeosNotConnectedException e) {
-            logger.debug("HEOS player/group is not connected, rescheduling");
+        } catch (HeosNotFoundException e) {
+            logger.debug("HEOS player/group is not found, rescheduling");
         } catch (IOException | ReadException e) {
             logger.debug("Failed to set queue, rescheduling", e);
         }

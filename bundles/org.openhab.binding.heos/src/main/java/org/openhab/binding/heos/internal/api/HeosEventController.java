@@ -105,6 +105,10 @@ public class HeosEventController extends HeosSystemEventListener {
         fireBridgeEvent(EVENT_TYPE_EVENT, false, CONNECTION_LOST);
     }
 
+    public void eventStreamTimeout() {
+        fireBridgeEvent(EVENT_TYPE_EVENT, false, EVENT_STREAM_TIMEOUT);
+    }
+
     public void systemReachable() {
         fireBridgeEvent(EVENT_TYPE_EVENT, true, CONNECTION_RESTORED);
     }

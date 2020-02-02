@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
@@ -44,7 +45,8 @@ public class HeosChannelHandlerBuildGroup extends BaseHeosChannelHandler {
     }
 
     @Override
-    public void handleGroupCommand(Command command, String id, ThingUID uid, HeosGroupHandler heosGroupHandler) {
+    public void handleGroupCommand(Command command, @Nullable String id, ThingUID uid,
+            HeosGroupHandler heosGroupHandler) {
         // not used on group
     }
 

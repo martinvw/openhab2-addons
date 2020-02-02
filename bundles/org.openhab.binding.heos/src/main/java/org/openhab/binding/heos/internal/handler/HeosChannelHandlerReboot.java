@@ -15,6 +15,7 @@ package org.openhab.binding.heos.internal.handler;
 import java.io.IOException;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.types.Command;
@@ -39,7 +40,8 @@ public class HeosChannelHandlerReboot extends BaseHeosChannelHandler {
     }
 
     @Override
-    public void handleGroupCommand(Command command, String id, ThingUID uid, HeosGroupHandler heosGroupHandler) {
+    public void handleGroupCommand(Command command, @Nullable String id, ThingUID uid,
+            HeosGroupHandler heosGroupHandler) {
         // Not used on group
     }
 

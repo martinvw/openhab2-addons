@@ -17,6 +17,7 @@ import static org.openhab.binding.heos.internal.resources.HeosConstants.PID;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -49,7 +50,8 @@ public class HeosChannelHandlerPlayerSelect extends BaseHeosChannelHandler {
     }
 
     @Override
-    public void handleGroupCommand(Command command, String id, ThingUID uid, HeosGroupHandler heosGroupHandler) {
+    public void handleGroupCommand(Command command, @Nullable String id, ThingUID uid,
+            HeosGroupHandler heosGroupHandler) {
         // not used on group
     }
 

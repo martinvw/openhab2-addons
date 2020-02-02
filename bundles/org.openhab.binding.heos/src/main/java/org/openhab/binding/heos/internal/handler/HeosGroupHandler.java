@@ -74,13 +74,27 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
             HeosChannelHandler channelHandler = getHeosChannelHandler(channelUID);
             if (channelHandler != null) {
                 try {
-                    channelHandler.handleGroupCommand(command, getId(), thing.getUID(), this);
+                    String id = getMaybeId(channelUID, command);
+                    channelHandler.handleGroupCommand(command, id, thing.getUID(), this);
                     handleSuccess();
                 } catch (IOException | ReadException e) {
                     handleError(e);
                 }
             }
         }
+    }
+
+    @Nullable
+    private String getMaybeId(ChannelUID channelUID, Command command) throws HeosNotFoundException {
+        if (isCreateGroupRequest(channelUID, command)) {
+            return null;
+        } else {
+            return getId();
+        }
+    }
+
+    private boolean isCreateGroupRequest(ChannelUID channelUID, Command command) {
+        return CH_ID_UNGROUP.equals(channelUID.getId()) && OnOffType.ON == command;
     }
 
     /**
@@ -96,10 +110,6 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
 
         // Prevents that initialize() is called multiple times if group goes online
         blockInitialization = true;
-        if (ThingStatus.ONLINE == thing.getStatus()) {
-            logger.debug("Skipping startup because group is already marked online.");
-            return;
-        }
 
         scheduledStartUp();
     }
@@ -171,7 +181,7 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
     public <T> void playerStateChangeEvent(HeosResponseObject<T> responseObject) {
         if (ThingStatus.UNINITIALIZED == getThing().getStatus()) {
             logger.debug("Can't Handle Event. Group {} not initialized. Status is: {}", getConfig().get(PROP_NAME),
-                    getThing().getStatus().toString());
+                    getThing().getStatus());
             return;
         }
 
@@ -212,8 +222,10 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
 
     @Override
     public void setStatusOnline() {
-        if (ThingStatus.OFFLINE == thing.getStatus() && !blockInitialization) {
+        if (!blockInitialization) {
             initialize();
+        } else {
+            logger.debug("Not initializing from setStatusOnline ({}, {})", thing.getStatus(), blockInitialization);
         }
     }
 
@@ -261,6 +273,7 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
                     }
 
                     getApiConnection().addHeosGroupToOldGroupMap(HeosGroup.calculateGroupMemberHash(group), group);
+
                     gid = groupId;
                     updateConfiguration(groupId, group);
                     updateStatus(ThingStatus.ONLINE);
@@ -271,7 +284,7 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
                     scheduledStartUp();
                 }
             }
-        }, 0, TimeUnit.SECONDS);
+        }, 3, TimeUnit.SECONDS);
     }
 
     @Override

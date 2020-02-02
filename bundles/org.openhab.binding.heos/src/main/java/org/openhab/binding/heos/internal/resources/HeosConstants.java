@@ -26,6 +26,7 @@ public class HeosConstants {
     public static final String HEOS = "heos";
 
     public static final String CONNECTION_LOST = "connection_lost";
+    public static final String EVENT_STREAM_TIMEOUT = "event_stream_timeout";
     public static final String CONNECTION_RESTORED = "connection_restored";
 
     public static final String PID = "pid";

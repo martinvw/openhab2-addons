@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -45,10 +46,10 @@ public class HeosSystem {
     private final Logger logger = LoggerFactory.getLogger(HeosSystem.class);
 
     private static final int START_DELAY_SEC = 30;
-    private static final long LAST_EVENT_THRESHOLD = TimeUnit.MINUTES.toMillis(30);
+    private static final long LAST_EVENT_THRESHOLD = TimeUnit.HOURS.toMillis(2);
 
     private final ScheduledExecutorService scheduler;
-    private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+    private @Nullable ExecutorService singleThreadExecutor;
 
     private final HeosEventController eventController = new HeosEventController(this);
 
@@ -68,9 +69,14 @@ public class HeosSystem {
 
     private final HeosJsonParser parser = new HeosJsonParser();
     private final PropertyChangeListener eventProcessor = evt -> {
+        String newValue = (String) evt.getNewValue();
+        ExecutorService executor = singleThreadExecutor;
+        if (executor == null) {
+            logger.warn("No executor available ignoring event: {}", newValue);
+            return;
+        }
         try {
-            String newValue = (String) evt.getNewValue();
-            singleThreadExecutor.submit(() -> eventController.handleEvent(parser.parseEvent(newValue)));
+            executor.submit(() -> eventController.handleEvent(parser.parseEvent(newValue)));
         } catch (JsonSyntaxException e) {
             logger.debug("Failed processing event JSON", e);
         }
@@ -95,6 +101,7 @@ public class HeosSystem {
      */
     public HeosFacade establishConnection(String connectionIP, int connectionPort, int heartbeat)
             throws IOException, ReadException {
+        singleThreadExecutor = Executors.newSingleThreadExecutor();
         if (commandLine.connect(connectionIP, connectionPort)) {
             logger.debug("HEOS command line connected at IP {} @ port {}", connectionIP, connectionPort);
             send(HeosCommands.registerChangeEventOff());
@@ -147,6 +154,7 @@ public class HeosSystem {
         eventSendCommand.stopInputListener(HeosCommands.registerChangeEventOff());
         eventSendCommand.disconnect();
         sendCommand.disconnect();
+        singleThreadExecutor.shutdownNow();
     }
 
     private void cancelReconnectJob() {
@@ -277,9 +285,15 @@ public class HeosSystem {
                     long timeSinceLastEvent = System.currentTimeMillis() - eventController.getLastEventTime();
                     logger.debug("Time since latest event: {} s", timeSinceLastEvent / 1000);
 
+                    if (timeSinceLastEvent > LAST_EVENT_THRESHOLD) {
+                        logger.debug("Events haven't been received for too long");
+                        resetEventStream();
+                        return;
+                    }
+
                     logger.debug("Sending HEOS Heart Beat");
                     HeosResponseObject<Void> response = send(HeosCommands.heartbeat());
-                    if (timeSinceLastEvent < LAST_EVENT_THRESHOLD && response.result) {
+                    if (response.result) {
                         return;
                     }
                 }
@@ -295,8 +309,17 @@ public class HeosSystem {
         }
 
         private void restartConnection() {
+            reset(a -> eventController.connectionToSystemLost());
+        }
+
+        private void resetEventStream() {
+            reset(a -> eventController.eventStreamTimeout());
+        }
+
+        private void reset(Consumer<@Nullable Void> method) {
             closeConnection();
-            eventController.connectionToSystemLost();
+            method.accept(null);
+
             reconnectJob = scheduler.scheduleWithFixedDelay(this::reconnect, 1, 5, TimeUnit.SECONDS);
         }
 

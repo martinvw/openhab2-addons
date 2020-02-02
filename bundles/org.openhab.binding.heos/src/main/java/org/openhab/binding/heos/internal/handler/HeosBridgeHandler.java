@@ -316,7 +316,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                     .withProperties(properties).build();
             updateThingChannels(channelManager.addSingleChannel(channel));
         } catch (HeosNotFoundException e) {
-            logger.debug("Group is not yet initialized fully", e);
+            logger.debug("Group is not yet initialized fully");
         }
     }
 
@@ -354,6 +354,8 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                 triggerPlayerDiscovery();
             } else if (HeosEvent.GROUPS_CHANGED.equals(command)) {
                 triggerPlayerDiscovery();
+            } else if (EVENT_STREAM_TIMEOUT.equals(command)) {
+                logger.debug("HEOS Bridge events timed-out might be nothing, trying to reconnect");
             } else if (CONNECTION_LOST.equals(command)) {
                 updateStatus(OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
                 logger.debug("HEOS Bridge OFFLINE");
