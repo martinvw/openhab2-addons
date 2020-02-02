@@ -134,7 +134,7 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         throw new HeosNotConnectedException();
     }
 
-    protected abstract String getId() throws HeosNotFoundException;
+    public abstract String getId() throws HeosNotFoundException;
 
     public abstract void setStatusOffline();
 

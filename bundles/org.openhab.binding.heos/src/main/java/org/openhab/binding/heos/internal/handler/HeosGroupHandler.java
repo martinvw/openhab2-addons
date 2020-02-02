@@ -128,7 +128,7 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
     }
 
     @Override
-    protected String getId() throws HeosNotFoundException {
+    public String getId() throws HeosNotFoundException {
         String localGroupId = this.gid;
         if (localGroupId == null) {
             throw new HeosNotFoundException();

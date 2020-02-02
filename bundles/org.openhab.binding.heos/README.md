@@ -374,3 +374,21 @@ Frame label="Heos Group" visibility=[HeosGroup_Status==ONLINE] {
 
 }
 ```
+
+## Rule Actions
+
+Multiple actions are supported by this binding. In classic rules these are accessible as shown in the example below:
+
+```
+ val actions = getActions("heos","heos:bridge:bridgeId")
+ if(null === actions) {
+        logInfo("actions", "Actions not found, check thing ID")
+        return
+ } else {
+        actions.playInputFromPlayer(-3213214, "aux_in_1", 89089081)
+ }
+```
+
+### playInputFromPlayer(sourcePlayer, sourceInput, destination)
+
+Allows to play a source from a player to another player. 

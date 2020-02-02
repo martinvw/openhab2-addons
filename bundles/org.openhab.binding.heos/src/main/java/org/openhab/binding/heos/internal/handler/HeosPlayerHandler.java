@@ -112,7 +112,7 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
     }
 
     @Override
-    protected String getId() {
+    public String getId() {
         return pid;
     }
 
