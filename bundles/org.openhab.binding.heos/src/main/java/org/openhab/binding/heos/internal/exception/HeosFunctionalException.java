@@ -12,13 +12,13 @@
  */
 package org.openhab.binding.heos.internal.exception;
 
+import java.io.IOException;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.heos.internal.json.dto.HeosErrorCode;
 
-import java.io.IOException;
-
 /**
- * Exception to inform the caller that there is functional error reported by the  HEOS system
+ * Exception to inform the caller that there is functional error reported by the HEOS system
  *
  * @author Martin van Wingerden - Initial contribution
  */
