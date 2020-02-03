@@ -162,11 +162,15 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
             handleDynamicStatesFuture = scheduler.schedule(this::handleDynamicStatesSignedIn, 0, TimeUnit.SECONDS);
         }
 
-        if (EVENT_TYPE_EVENT.equals(event) && CONNECTION_RESTORED.equals(command)) {
-            try {
-                refreshPlayState(getId());
-            } catch (IOException | ReadException e) {
-                logger.debug("Failed to refreshPlayState", e);
+        if (EVENT_TYPE_EVENT.equals(event)) {
+            if (HeosEvent.GROUPS_CHANGED.equals(command)) {
+                fetchQueueFromPlayer();
+            } else if (CONNECTION_RESTORED.equals(command)) {
+                try {
+                    refreshPlayState(getId());
+                } catch (IOException | ReadException e) {
+                    logger.debug("Failed to refreshPlayState", e);
+                }
             }
         }
     }
@@ -415,6 +419,11 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     }
 
     private void fetchQueueFromPlayer() {
+        ScheduledFuture<?> existingJob = scheduleQueueFetchFuture;
+        if (existingJob != null && !existingJob.isCancelled()) {
+            existingJob.cancel(true);
+        }
+
         try {
             List<Media> queue = getApiConnection().getQueue(getId());
             heosDynamicStateDescriptionProvider.setQueue(queueChannelUID, queue);
