@@ -32,6 +32,7 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.internal.configuration.GroupConfiguration;
+import org.openhab.binding.heos.internal.exception.HeosFunctionalException;
 import org.openhab.binding.heos.internal.exception.HeosNotConnectedException;
 import org.openhab.binding.heos.internal.exception.HeosNotFoundException;
 import org.openhab.binding.heos.internal.json.dto.HeosCommunicationAttribute;
@@ -178,7 +179,7 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
     }
 
     @Override
-    public <T> void playerStateChangeEvent(HeosResponseObject<T> responseObject) {
+    public <T> void playerStateChangeEvent(HeosResponseObject<T> responseObject) throws HeosFunctionalException {
         if (ThingStatus.UNINITIALIZED == getThing().getStatus()) {
             logger.debug("Can't Handle Event. Group {} not initialized. Status is: {}", getConfig().get(PROP_NAME),
                     getThing().getStatus());

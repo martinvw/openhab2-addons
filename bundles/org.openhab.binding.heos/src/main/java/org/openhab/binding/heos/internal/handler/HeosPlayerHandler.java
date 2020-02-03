@@ -27,9 +27,12 @@ import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
+import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.internal.configuration.PlayerConfiguration;
+import org.openhab.binding.heos.internal.exception.HeosFunctionalException;
 import org.openhab.binding.heos.internal.exception.HeosNotConnectedException;
+import org.openhab.binding.heos.internal.json.dto.HeosErrorCode;
 import org.openhab.binding.heos.internal.json.dto.HeosEventObject;
 import org.openhab.binding.heos.internal.json.dto.HeosResponseObject;
 import org.openhab.binding.heos.internal.json.payload.Media;
@@ -86,6 +89,12 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
                 handleThingStateUpdate(getApiConnection().getPlayerInfo(pid));
 
                 updateStatus(ThingStatus.ONLINE);
+            } catch (HeosFunctionalException e) {
+                if (e.getCode() == HeosErrorCode.INVALID_ID) {
+                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.GONE, e.getCode().toString());
+                } else {
+                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, e.getCode().toString());
+                }
             } catch (IOException | ReadException e) {
                 logger.debug("Failed to initialize, will try again", e);
                 delayedInitialize();
@@ -135,7 +144,7 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
     }
 
     @Override
-    public <T> void playerStateChangeEvent(HeosResponseObject<T> responseObject) {
+    public <T> void playerStateChangeEvent(HeosResponseObject<T> responseObject) throws HeosFunctionalException {
         if (!pid.equals(responseObject.getAttribute(PLAYER_ID))) {
             return;
         }

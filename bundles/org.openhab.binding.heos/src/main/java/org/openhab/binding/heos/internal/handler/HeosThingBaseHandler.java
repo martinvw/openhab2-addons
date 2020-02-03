@@ -40,6 +40,7 @@ import org.eclipse.smarthome.core.types.UnDefType;
 import org.eclipse.smarthome.io.net.http.HttpUtil;
 import org.openhab.binding.heos.internal.HeosChannelHandlerFactory;
 import org.openhab.binding.heos.internal.api.HeosFacade;
+import org.openhab.binding.heos.internal.exception.HeosFunctionalException;
 import org.openhab.binding.heos.internal.exception.HeosNotConnectedException;
 import org.openhab.binding.heos.internal.exception.HeosNotFoundException;
 import org.openhab.binding.heos.internal.json.dto.*;
@@ -326,7 +327,9 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         handleThingStateUpdate(getApiConnection().getNowPlayingMedia(id));
     }
 
-    protected <T> void handleThingStateUpdate(HeosResponseObject<T> responseObject) {
+    protected <T> void handleThingStateUpdate(HeosResponseObject<T> responseObject) throws HeosFunctionalException {
+        handleResponseError(responseObject);
+
         @Nullable
         HeosCommandTuple cmd = responseObject.heosCommand;
 
@@ -375,6 +378,13 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
                     }
                     break;
             }
+        }
+    }
+
+    private <T> void handleResponseError(HeosResponseObject<T> responseObject) throws HeosFunctionalException {
+        HeosError error = responseObject.getError();
+        if (error != null) {
+            throw new HeosFunctionalException(error.code);
         }
     }
 

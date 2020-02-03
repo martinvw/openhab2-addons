@@ -16,6 +16,7 @@ import java.util.EventListener;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.heos.internal.api.HeosEventController;
+import org.openhab.binding.heos.internal.exception.HeosFunctionalException;
 import org.openhab.binding.heos.internal.json.dto.HeosEventObject;
 import org.openhab.binding.heos.internal.json.dto.HeosResponseObject;
 import org.openhab.binding.heos.internal.json.payload.Media;
@@ -33,7 +34,7 @@ public interface HeosEventListener extends EventListener {
 
     void playerStateChangeEvent(HeosEventObject eventObject);
 
-    <T> void playerStateChangeEvent(HeosResponseObject<T> responseObject);
+    <T> void playerStateChangeEvent(HeosResponseObject<T> responseObject) throws HeosFunctionalException;
 
     void playerMediaChangeEvent(String pid, Media media);
 
