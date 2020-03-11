@@ -136,6 +136,10 @@ Bridge heos:bridge:main "Bridge" [ipAddress="192.168.0.1", username="userName", 
 | Queue             | String        | Plays from the queue. The queue items are retrieved automatically     |
 | ClearQueue        | Switch        | Clear the queue when turned ON                                        |
 
+The `Favourites`, `Playlists`, `Queue` selection options are queried automatically from the HEOS system (if you set up any in the HEOS app).
+This means the available options will be visible in a Selection, you don't have to specify them manually.
+You can send commands to these channels from rules by sending the name of the selected item (For example: Starting a favorite radio channel from rule).
+
 #### Example
 
 ```
@@ -167,6 +171,12 @@ Selection item=LivingRoom_Playlists     label="Playlist" icon="music"
 | Playlists         | String        | Plays a playlist. The selection options are retrieved automatically   |
 | Queue             | String        | Plays from the queue. The queue items are retrieved automatically     |
 | ClearQueue        | Switch        | Clear the queue when turned ON                                        |
+
+The `Favourites`, `Playlists`, `Queue` selection options are queried automatically from the HEOS system (if you set up any in the HEOS app).
+This means the available options will be visible in a Selection, you don't have to specify them manually.
+You can send commands to these channels from rules by sending the name of the selected item (For example: Starting a favorite radio channel from rule).
+
+### Available inputs
 
 | Input names   |
 |-------------- |
