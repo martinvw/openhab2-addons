@@ -234,7 +234,7 @@ Example
 
 ## Full Example
 
-###demo.things:
+### demo.things:
 
 ```
 Bridge heos:bridge:main "Bridge" [ipAddress="192.168.0.1", username="userName", password="123456"] {
@@ -244,7 +244,7 @@ Bridge heos:bridge:main "Bridge" [ipAddress="192.168.0.1", username="userName", 
 }
 ```
 
-###demo.items:
+### demo.items:
 
 ```
 Player LivingRoom_Control "Control" {channel="heos:player:main:LivingRoom:Control"}
@@ -256,7 +256,7 @@ String LivingRoom_Album "Album [%s]" {channel="heos:player:main:LivingRoom:Album
 String LivingRoom_Playlists {channel="heos:player:main:LivingRoom:Playlists"}
 ```
 
-###demo.sitemap
+### demo.sitemap
 
 ```
    Frame label="LivingRoom" {
