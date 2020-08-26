@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
@@ -36,11 +37,13 @@ public interface HeosChannelHandler {
      * @param command the command to handle
      * @param id of the group or player
      * @param uid
+     * @param configuration
      */
-    void handlePlayerCommand(Command command, String id, ThingUID uid) throws IOException, ReadException;
-
-    void handleGroupCommand(Command command, @Nullable String id, ThingUID uid, HeosGroupHandler heosGroupHandler)
+    void handlePlayerCommand(Command command, String id, ThingUID uid, @Nullable Configuration configuration)
             throws IOException, ReadException;
+
+    void handleGroupCommand(Command command, @Nullable String id, ThingUID uid, @Nullable Configuration configuration,
+            HeosGroupHandler heosGroupHandler) throws IOException, ReadException;
 
     /**
      * Handles a command for classes without an id. Used

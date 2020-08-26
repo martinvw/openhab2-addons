@@ -29,6 +29,7 @@ import org.openhab.binding.heos.internal.json.payload.BrowseResult;
 import org.openhab.binding.heos.internal.json.payload.Group;
 import org.openhab.binding.heos.internal.json.payload.Media;
 import org.openhab.binding.heos.internal.json.payload.Player;
+import org.openhab.binding.heos.internal.resources.AddCriteria;
 import org.openhab.binding.heos.internal.resources.HeosCommands;
 import org.openhab.binding.heos.internal.resources.HeosConstants;
 import org.openhab.binding.heos.internal.resources.HeosEventListener;
@@ -329,8 +330,9 @@ public class HeosFacade {
      * @param sid The source ID where the media is located
      * @param cid The container ID of the media
      */
-    public void addContainerToQueuePlayNow(String pid, String sid, String cid) throws IOException, ReadException {
-        heosSystem.send(HeosCommands.addContainerToQueuePlayNow(pid, sid, cid));
+    public void addContainerToQueue(String pid, String sid, String cid, AddCriteria criteria)
+            throws IOException, ReadException {
+        heosSystem.send(HeosCommands.addContainerToQueue(pid, sid, cid, criteria));
     }
 
     /**

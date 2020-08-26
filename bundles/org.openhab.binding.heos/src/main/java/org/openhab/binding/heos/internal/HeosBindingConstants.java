@@ -39,8 +39,9 @@ public class HeosBindingConstants extends HeosConstants {
     public static final ThingTypeUID THING_TYPE_PLAYER = new ThingTypeUID(BINDING_ID, "player");
     public static final ThingTypeUID THING_TYPE_GROUP = new ThingTypeUID(BINDING_ID, "group");
 
-    // List off all Channel Types
+    // List off Channel Types
     public static final ChannelTypeUID CH_TYPE_PLAYER = new ChannelTypeUID(BINDING_ID, "chPlayer");
+    public static final ChannelTypeUID CH_TYPE_PLAYLISTS = new ChannelTypeUID(BINDING_ID, "playlists");
 
     // List of all Channel IDs
     public static final String CH_ID_CONTROL = "Control";
@@ -54,6 +55,7 @@ public class HeosBindingConstants extends HeosConstants {
     public static final String CH_ID_REBOOT = "Reboot";
     public static final String CH_ID_COVER = "Cover";
     public static final String CH_ID_PLAYLISTS = "Playlists";
+    public static final String CH_ID_SINGLE_PLAYLIST = "SinglePlaylist";
     public static final String CH_ID_FAVORITES = "Favorites";
     public static final String CH_ID_QUEUE = "Queue";
     public static final String CH_ID_CLEAR_QUEUE = "ClearQueue";
@@ -79,10 +81,6 @@ public class HeosBindingConstants extends HeosConstants {
     public static final String PROP_NETWORK = "Connection";
     public static final String PROP_GROUP_HASH = "Members Hash value";
     public static final String PROP_GROUP_LEADER = "Group leader";
-
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
-    public static final String HEARTBEAT = "heartbeat";
 
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.unmodifiableSet(
             Stream.of(THING_TYPE_BRIDGE, THING_TYPE_GROUP, THING_TYPE_PLAYER).collect(Collectors.toSet()));

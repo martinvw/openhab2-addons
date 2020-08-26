@@ -94,7 +94,9 @@ public class HeosChannelHandlerFactory {
             case CH_ID_BUILDGROUP:
                 return new HeosChannelHandlerBuildGroup(channelUID, bridge);
             case CH_ID_PLAYLISTS:
-                return new HeosChannelHandlerPlaylist(heosDynamicStateDescriptionProvider, bridge);
+                return new HeosChannelHandlerPlaylists(heosDynamicStateDescriptionProvider, bridge);
+            case CH_ID_SINGLE_PLAYLIST:
+                return new HeosChannelHandlerSinglePlaylist(heosDynamicStateDescriptionProvider, bridge);
             case CH_ID_FAVORITES:
                 return new HeosChannelHandlerFavorite(heosDynamicStateDescriptionProvider, bridge);
             case CH_ID_CUR_POS:

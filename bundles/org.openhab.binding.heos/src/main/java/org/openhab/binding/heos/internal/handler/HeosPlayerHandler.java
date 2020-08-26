@@ -64,7 +64,7 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
         HeosChannelHandler channelHandler = getHeosChannelHandler(channelUID);
         if (channelHandler != null) {
             try {
-                channelHandler.handlePlayerCommand(command, getId(), thing.getUID());
+                channelHandler.handlePlayerCommand(command, getId(), thing.getUID(), thing.getConfiguration());
                 handleSuccess();
             } catch (IOException | ReadException e) {
                 handleError(e);

@@ -78,7 +78,7 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
                 try {
                     @Nullable
                     String id = getMaybeId(channelUID, command);
-                    channelHandler.handleGroupCommand(command, id, thing.getUID(), this);
+                    channelHandler.handleGroupCommand(command, id, thing.getUID(), thing.getConfiguration(), this);
                     handleSuccess();
                 } catch (IOException | ReadException e) {
                     handleError(e);

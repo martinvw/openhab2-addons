@@ -216,8 +216,8 @@ public class HeosCommands {
         return addToQueue + pid;
     }
 
-    public static String addContainerToQueuePlayNow(String pid, String sid, String cid) {
-        return addToQueue + pid + "&sid=" + sid + "&cid=" + cid + "&aid=1";
+    public static String addContainerToQueue(String pid, String sid, String cid, AddCriteria addCriteria) {
+        return addToQueue + pid + "&sid=" + sid + "&cid=" + cid + "&aid=" + addCriteria.getId();
     }
 
     public static String clearQueue(String pid) {

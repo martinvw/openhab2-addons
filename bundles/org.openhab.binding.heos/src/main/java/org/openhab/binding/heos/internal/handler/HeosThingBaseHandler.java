@@ -45,6 +45,7 @@ import org.openhab.binding.heos.internal.exception.HeosFunctionalException;
 import org.openhab.binding.heos.internal.exception.HeosNotConnectedException;
 import org.openhab.binding.heos.internal.exception.HeosNotFoundException;
 import org.openhab.binding.heos.internal.json.dto.*;
+import org.openhab.binding.heos.internal.json.payload.BrowseResult;
 import org.openhab.binding.heos.internal.json.payload.Media;
 import org.openhab.binding.heos.internal.json.payload.Player;
 import org.openhab.binding.heos.internal.resources.HeosEventListener;
@@ -64,6 +65,7 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     private final HeosDynamicStateDescriptionProvider heosDynamicStateDescriptionProvider;
     private final ChannelUID favoritesChannelUID;
     private final ChannelUID playlistsChannelUID;
+    private final ChannelUID singlePlaylistsChannelUID;
     private final ChannelUID queueChannelUID;
 
     private @Nullable HeosChannelHandlerFactory channelHandlerFactory;
@@ -80,6 +82,7 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         this.heosDynamicStateDescriptionProvider = heosDynamicStateDescriptionProvider;
         favoritesChannelUID = new ChannelUID(thing.getUID(), CH_ID_FAVORITES);
         playlistsChannelUID = new ChannelUID(thing.getUID(), CH_ID_PLAYLISTS);
+        singlePlaylistsChannelUID = new ChannelUID(thing.getUID(), CH_ID_SINGLE_PLAYLIST);
         queueChannelUID = new ChannelUID(thing.getUID(), CH_ID_QUEUE);
     }
 
@@ -190,7 +193,9 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     void handleDynamicStatesSignedIn() {
         try {
             heosDynamicStateDescriptionProvider.setFavorites(favoritesChannelUID, getApiConnection().getFavorites());
-            heosDynamicStateDescriptionProvider.setPlaylists(playlistsChannelUID, getApiConnection().getPlaylists());
+            List<BrowseResult> playlists = getApiConnection().getPlaylists();
+            heosDynamicStateDescriptionProvider.setPlaylists(playlistsChannelUID, playlists);
+            heosDynamicStateDescriptionProvider.setPlaylists(singlePlaylistsChannelUID, playlists);
         } catch (IOException | ReadException e) {
             logger.debug("Failed to set favorites / playlists, rescheduling", e);
             cancel(handleDynamicStatesFuture, false);

@@ -30,6 +30,7 @@
 			<channel id="RepeatMode" typeId="repeatMode"/>
 			<channel id="Favorites" typeId="favorites"/>
 			<channel id="Playlists" typeId="playlists"/>
+			<channel id="SinglePlaylists" typeId="singlePlaylist"/>
 			<channel id="Queue" typeId="queue"/>
 			<channel id="ClearQueue" typeId="clearQueue"/>
 		</channels>

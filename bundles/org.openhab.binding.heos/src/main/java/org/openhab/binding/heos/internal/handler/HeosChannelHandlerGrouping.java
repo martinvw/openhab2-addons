@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.types.Command;
@@ -36,13 +37,14 @@ public class HeosChannelHandlerGrouping extends BaseHeosChannelHandler {
     }
 
     @Override
-    public void handlePlayerCommand(Command command, String id, ThingUID uid) {
+    public void handlePlayerCommand(Command command, String id, ThingUID uid, @Nullable Configuration configuration) {
         // No such channel on player
     }
 
     @Override
     public void handleGroupCommand(Command command, @Nullable String id, ThingUID uid,
-            HeosGroupHandler heosGroupHandler) throws IOException, ReadException {
+            @Nullable Configuration configuration, HeosGroupHandler heosGroupHandler)
+            throws IOException, ReadException {
 
         if (command instanceof RefreshType) {
             return;

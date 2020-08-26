@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -45,13 +46,13 @@ public class HeosChannelHandlerPlayerSelect extends BaseHeosChannelHandler {
     }
 
     @Override
-    public void handlePlayerCommand(Command command, String id, ThingUID uid) {
+    public void handlePlayerCommand(Command command, String id, ThingUID uid, @Nullable Configuration configuration) {
         // not used on player
     }
 
     @Override
     public void handleGroupCommand(Command command, @Nullable String id, ThingUID uid,
-            HeosGroupHandler heosGroupHandler) {
+            @Nullable Configuration configuration, HeosGroupHandler heosGroupHandler) {
         // not used on group
     }
 

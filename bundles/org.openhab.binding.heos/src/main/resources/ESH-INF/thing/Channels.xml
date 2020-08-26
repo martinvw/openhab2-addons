@@ -26,6 +26,24 @@
 		<item-type>String</item-type>
 		<label>Playlists</label>
 	</channel-type>
+	<channel-type id="singlePlaylist" advanced="true">
+		<item-type>String</item-type>
+		<label>Play Playlist</label>
+		<state readOnly="false">
+			<options>
+				<option value="PLAY_NOW">Play Now</option>
+				<option value="PLAY_NEXT">Play Next</option>
+				<option value="ADD_TO_END">Add to End</option>
+				<option value="REPLACE_AND_PLAY">Replace and Play</option>
+			</options>
+		</state>
+		<config-description>
+			<parameter name="playlist" type="text">
+				<label>Playlist</label>
+				<description>Id or exact name of playlist</description>
+			</parameter>
+		</config-description>
+	</channel-type>
 	<channel-type id="favorites" advanced="true">
 		<item-type>String</item-type>
 		<label>Favorites</label>

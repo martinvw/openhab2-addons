@@ -1,0 +1,35 @@
+/**
+ * Copyright (c) 2010-2020 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+package org.openhab.binding.heos.internal.resources;
+
+/**
+ * The {@link AddCriteria} provides the available add-criteria for HEOS containers.
+ *
+ * @author Martin van Wingerden - Initial contribution
+ */
+public enum AddCriteria {
+    PLAY_NOW(1),
+    PLAY_NEXT(2),
+    ADD_TO_END(3),
+    REPLACE_AND_PLAY(4);
+
+    private final int id;
+
+    AddCriteria(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+}
